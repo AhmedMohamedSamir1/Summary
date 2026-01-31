@@ -1,0 +1,37 @@
+- MediatR is a popular .NET library that helps you implement the Mediator design pattern
+  It allows components to communicate indirectly through a mediator instead of calling each other directly.
+
+
+
+Instead of:
+	controller -> service -> repository
+You do:
+	controller -> MediatR -> handler -> repository
+	Controller -> MediatR (Command)  -> Handler -> Service -> Repository ->  Database
+🎯 Why Use MediatR?
+	- Decouples code — Controllers don’t directly depend on services.
+	- Organizes business logic — Each action (e.g., CreateOrder, GetUserById) has its own handler.
+	- Works well with CQRS, Clean Architecture, and Onion Architecture.
+
+- 🧱 Core Concepts of MediatR
+	- IRequest<T>: 				--> Represents a command or query with a response
+	- IRequestHandler<TRequest, TResponse>	--> Handles the request
+	- IMediator				--> The mediator service to send requests
+
+
+- ✨ Real-life Analogy
+	- Imagine you're in a restaurant:
+		- You (controller) want food (data).
+		- Instead of going to the kitchen (handler) yourself, you ask a waiter (mediator).
+		- The waiter takes your request to the kitchen and returns the result.
+		- You and the kitchen are decoupled.
+
+
+------------------------
+
+<< 1. Install MediatR >>
+
+install-package MediatR.Extensions.Microsoft.DependencyInjection
+
+	
+	

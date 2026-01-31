@@ -1,0 +1,14 @@
+1. live server : to refresh the page automatically
+2. Auto Rename Tag: the one with <tag> </tag>
+	
+<< bootstrap >>
+	- IntelliSense for CSS class names in HTML : Auto complete bootstrap classes
+
+
+-----------------------------------------------------------------------------------------------------
+
+
+<< Angular >>
+   - Angular Language Service
+   - Auto import
+

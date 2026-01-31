@@ -1,0 +1,1289 @@
+
+<< framework & library ,  dependency >>
+
+- framework 
+	- structure that dictates (determines) how your application should be built.
+	- includes a wide range of libraries and tools that provide built-in functionality
+	
+- Dependencies are the libraries or packages that used at application
+	
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<< install angular >>
+
+- install node.js if it is not installed
+
+	- install node
+		from --> https://nodejs.org/en/download/prebuilt-installer
+		download node.js installer
+
+	- to ensure that nodejs is installed
+		node -v 
+	
+- install typescript if it is not installed
+	- open cmd and wite this command  -->  npm i -g typescript
+	- to ensure that typescript is installed use this command to get the version of typescript -->  tsc -v
+
+
+- to install angular cli --> npm i -g @angular/cli
+- to display the version of installed angular --> ng v			 
+
+- after install angular and you are trying to create new componenet and you get this error
+	The term 'ng' is not recognized as the name of a cmdlet
+	open PowerShell and write this command --> Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+
+- this is Angular 17
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<< create angular project, run angular project >>
+
+- open CMD
+	- ng new project_name
+	- ng new AngularDay1      --> to create a new project, it will create new folder with name AngularDay1
+				  --> there is no app.module.ts
+
+		which stylesheet format would you like to use --> choose css
+		do you want to enable serevr side rendering --> choose NO						
+
+	- ng new AngularDay1 --no-standalone	--> create new project with modules way
+		- Every component added must be declared inside app.module.ts
+			@NgModule({
+  			   declarations: [AppComponent, HomeComponent],
+  			   imports: [BrowserModule],
+			})
+			export class AppModule {}
+
+		
+
+	
+- to run the app -->   ng serve -o		
+- to run on specifc port --> ng serve -o --port 5201
+- to run using npm start
+	at package.json + scripts -->  "start" : "ng serve -o",
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+<< bundling >>
+
+- Combining many application files (JavaScript, CSS, etc.) into a small number of optimized files that the browser downloads and runs.
+- Without bundling, a browser would need to load hundreds of files: That would mean:
+	- Many HTTP requests ❌
+	- Slower page load ❌
+	- Harder caching ❌
+
+- Bundling in Angular (what actually happens)
+	Angular takes: Many TypeScript files , Many component templates, Many style files and turns them into:
+	main.js, styles.css, runtime.js, polyfills.js, + lazy chunks [Each file is a bundle.]
+
+- Bundling in Angular is the process of combining application code and styles into optimized output files to improve performance and loading efficiency.
+
+
+
+- Definition: A bundle is a packaged, optimized, and minified JavaScript file (or a set of files) generated during the build process. 
+  It consolidates (includes) all the application's code, dependencies, and assets required to run the application in the browser.
+
+- Purpose: Bundles are created to optimize the loading and execution of your web application by reducing the number of HTTP requests
+  and optimizing the size of the files.
+
+- How Bundles Are Created
+	- When you build your Angular application (e.g., ng build --prod), Angular's build tool (powered by Webpack) processes all your code and dependencies.
+	- It combines multiple files (HTML, CSS, JavaScript, TypeScript, and other assets) into a smaller set of optimized files, called bundles.
+	- The build tool splits your app into different bundles to allow efficient loading.
+	- Bundles are categorized based on their purpose, like core Angular functionality, your app's code, lazy-loaded modules, etc.
+
+- Types of Bundles in Angular
+	- When you build an Angular app, you will typically see these bundles in the dist/ folder
+
+	1. Main Bundle (main.js):
+		- Contains the main application code, including components, services, and modules that are eagerly loaded (not lazy-loaded).
+		- If you are not using lazy loading, all the components and their dependencies will be included in this file.
+	
+	2. Polyfills Bundle (polyfills.js):
+		- Includes polyfills to make the application compatible with older browsers (e.g., Internet Explorer 11).
+
+	3. Vendor Bundle (vendor.js):
+		- Contains third-party libraries and dependencies, such as Angular core libraries, RxJS, or any other npm packages you’ve imported.
+
+	4. Runtime Bundle (runtime.js):
+		- Manages the loading and execution of the other bundles. It contains Webpack-specific code to handle module loading.
+	
+	5. Lazy-Loaded Bundles (if configured):
+		- If you use lazy loading, the modules are split into their own smaller bundles (e.g., dashboard-module.js) and are loaded on demand.
+
+- How Bundles Are Loaded
+	- Eager Loading: All components are included in the initial load.
+	  Example: If your app has a DashboardComponent, ProfileComponent, and SettingsComponent, 
+  	  the entire code for these components is part of the main bundle and loaded upfront so if you are work on large application it will be slown down.
+
+	- Lazy Loading: Only the required parts of the app are loaded initially. Other parts are split into separate bundles and loaded dynamically when needed.
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<< info >>
+
+- When you first request the website Angular loads the root module (AppComponent) 
+	- This includes:
+		The Angular framework.
+		Global styles.
+		Necessary services and configurations.
+		Any components that are part of the initial route.
+	- The initial payload is kept minimal to reduce the load time.
+
+- Angular supports lazy loading for modules and components.
+	- Angular uses lazy loading to load components and modules only when they are needed like user navigates 
+	  to a specific route or performs a specific action This is a key performance optimization in SPAs.
+
+- What Happens Without Lazy Loading?
+	- all components, modules, and their associated resources are bundled into the main.js together and loaded when the application is first requested.
+	  This is referred to as eager loading.
+	
+	- The initial bundle size becomes large, which slows down the loading of your application.
+	- Even if the user doesn’t need certain components, they are still downloaded and loaded into memory.
+	- This increases the size of the main bundle because there is no separation of modules based on usage or routes.
+
+- Architecture patterns of Angular is MVC
+	- 
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+<<helpful extension >>
+
+- Angular Language Service
+- Auto import
+
+
+---------------------------------------------------------------------------------------------------------------------
+
+<< start up files after creating new project >>
+
+- .editorconfig file: include editor configuration
+
+- node_modules: 
+	- It stores the actual installed packages (dependencies) on your local machine that your project requires to run.
+	- Contains the source code of all dependencies listed in your package.json file.
+	- Includes both direct dependencies (those explicitly listed in package.json) and transitive dependencies (dependencies of your dependencies).
+	- Automatically generated when you run npm install.
+	- Should not be committed to version control (Git) 
+		you delete it before committing to GIT
+		run --> npm i after pulling from GIT
+
+- Package.Json includes:   
+	1. Metadata : This section contains basic information about the project: like name, version
+
+	2. scripts: The scripts section defines command-line scripts that can be run using 
+		npm run <script-name>
+		npm script-name
+	3. dependencies
+		- These are the packages names required for the application to run in production.
+	
+	4. devDependencies
+		- These are the packages names required for development, testing, and building the application but are not needed in production.	
+
+- package-lock.json
+	- The file ensures that when you run npm install, you get exactly the same package versions on all machines
+
+
+- Angular.json
+	- It manages project-specific settings and configurations that are essential for building and running your Angular application like
+	- include angular configuration like
+		- sourceRoot: 
+		- styles, files added here are automatically included in the Index.html
+		- scripts
+- src	
+   - style.cs
+	- global style
+
+   - idnex.html
+	- is the main HTML page that the browser loads when a user accesses the Angular application. 
+	  It provides the basic structure and serves as the entry point for your app in the browser.
+	- include The <app-root> element which is the placeholder for the root component (usually AppComponent),
+
+  - main.ts
+	- The entry point is the first file the application runs to bootstrap (start) the Angular app. In Angular, this is the main.ts file.
+	- is responsible for bootstrapping the root module (usually AppModule) and initializing the Angular app
+  
+  - AppModule
+	- The AppModule is a container for all Angular components, directives, and services.
+	- It declares the AppComponent as the root component and other components or modules used in the application.
+	- why it is a module : because it has a decorator @NgModule that has 
+		- declaration[] array that include all components name created within this module
+		- imports[] array : includes the modules i need within this module
+		- providers[] array: include services created within this module
+		- bootstrap[AppComponent] array:  tells Angular to render the AppComponent as the root component.
+
+   - AppComponent  
+	- Root Component
+	- This is the default component that Angular renders when the application starts.
+	- Angular injects the HTML of AppComponent into the <app-root> tag found in index.html.
+
+   - Step-by-Step Scenario: How They Work Together
+	- User Requests the App:
+		- The browser sends a request to the server to retrieve the application.
+		- The server responds with the index.html file, which is the static HTML file containing the basic structure of the app.
+		- The index.html file includes the <app-root> tag, a placeholder for Angular to inject content.
+
+	- Angular Bootstrapping Begins:
+		- The browser loads main.ts, which is the entry point for the Angular app.
+		- Inside main.ts, the platformBrowserDynamic() function bootstraps the AppModule, which is the root module of the application.
+
+	- AppModule Initialization:
+		- The AppModule is loaded. This module defines the components, directives, and services required for the app.
+		- The bootstrap: [AppComponent] in AppModule tells Angular to render the AppComponent as the root component.
+
+	- AppComponent Rendering:
+		- Angular finds the <app-root> tag in index.html.
+		- It replaces the <app-root> tag with the HTML defined in the AppComponent.
+	- App Is Fully Loaded:
+		- Once the AppComponent is rendered, Angular loads additional components (if needed) and initializes the rest of the application.
+
+
+Simplified Sequence
+	- Browser loads index.html.
+	- main.ts bootstraps AppModule.
+	- AppModule initializes and identifies AppComponent as the root component.
+	- AppComponent is injected into <app-root> in index.html.
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+<< difference between adding files via angular.json and adding it manually in the html page >>
+
+- using Angular.json [Recommended]
+	- Bundles styles into the build
+	- Minifies in production
+	- Angular injects them automatically into index.html:
+
+- Using <link> directly in index.html
+	- Angular does NOT process this file
+	- No bundling
+	- No minification
+	- No hashing
+	- No optimization
+	- This is treated as a static asset, not part of Angular’s build pipeline.
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+<< Angular’s build pipeline >>
+
+- The sequence of tools and steps Angular CLI runs to turn your source code into optimized files that a browser can run
+- 
+---------------------------------------------------------------------------------------------------------------------
+
+
+<< project structure >>
+
+- src folder existed once you create a project
+	- Create Components folder: 
+
+	- app folder : existed once you create a project
+		
+		- app.routes.ts
+			- this is where you'll map URL paths to specific components.
+			- is the configuration file where you define routes for navigating between different components in your app. 
+			- It handles which component to display when a specific URL path is accessed.
+				1- Defines Routes: This file contains a list of routes that map URL paths to components.
+				2- Enables Navigation: It allows Angular to display different components based on the URL, 
+			   	   enabling navigation in a single-page application (SPA) without reloading the entire page.
+				3- You can configure lazy-loaded routes to improve performance by loading feature modules only when needed.
+
+		- app.component.ts
+			- This is the root component of the application, containing the <router-outlet> and other high-level UI elements.
+				- router-outlet
+					- is a built-in directive that serves as a placeholder for dynamically loading different components based on the current route.
+				  	  It acts as a container where the routed components are rendered during navigation.
+ 		
+		- Services
+		- DTOs
+		- Interfaces
+			- IAPIResponse.ts
+			- ILoginResponse.ts
+			- ICountResponse.ts
+			- IHttpErrorResponse.ts
+			- IUserClaims.ts
+		- Enums
+			- SearchType --> export enum SearchType { ProjectName = 1, }
+			- DataResource -> for each DB table
+		- Constants
+			- RoleConst
+			- StorageKeysConst
+			- PaginationSettingsConst --> export const PaginationSettingsConst = { pageSize: 6 } as const
+			- PolicyNamesConst
+
+		- Guards folder	
+		- Assets
+			- Images
+
+		- Shared
+			- SweatAlert
+			
+
+	- main.ts 
+		- is the entry point of the application, It’s responsible for bootstrapping the Angular application and kickstarting the whole process of loading 
+	  	  and rendering your app in the browser.
+		- is responsible for bootstrapping the root module (usually AppModule) and initializing the Angular app
+		- tells Angular which root component (AppComponent) and configuration (appConfig) to use for initializing the application.
+		- bootstrapApplication(AppComponent, appConfig): 
+			- This function is used to bootstrap the application with the root component (AppComponent) and the application configuration (appConfig).
+		
+	- style.css
+		- used for global styles that apply throughout the entire application.
+	
+	- Create Environments folder
+		- create environments.production.ts
+		- create environments.developement.ts --> export const environment = {baseUrl: 'https://localhost:3000'}
+	
+
+-----------------------------------------------------------------------------------------------------------------------------------
+
+<< modules  [export, import] >>
+
+- import and export are used to share code between different files or modules
+- In TypeScript, each file is considered a module if it contains any import or export statements.
+
+- export keyword is used to make variables, functions, classes, interfaces, or any other code available for use in other modules.
+- The import keyword is used to bring the code that has been exported from other modules.
+
+- you can import the exported elements
+- you have only one export default 
+
+--- There are two types of export: Named Exports (the most commonly used), Default Exports
+
+- export naming --> export + element(class, variable, method, etc.)
+ 
+	- at html
+		<script type="module" src="main.js"></script>
+
+	- at script.js
+		export function add(){ console.log("this is add from script"); }
+		export function sub(){ console.log("this is sub from script"); }
+	
+	- at main.js
+		import {add, sub} from './script.js';  //
+		add();
+
+- export default
+	- the js file allows you only one export default
+	- at html
+		<script type="module" src="main.js"></script>
+
+	- at script.js
+		export default function sub(){ console.log("this is sub from script"); }
+
+	- at main.js
+		- import sub from './script.js';
+		- because there is only one export default you can import it with any name you want
+		- import exp_def from './script.js';  // you don't need curly braces when importing the default export.
+
+		 
+- import sub, {add, mul} from './script.js'; // the default is first
+
+- import * as all from './script.js';
+	all.add()
+	all.default()
+
+- File-level import
+
+	- TypeScript imports at the top of your file, allowing you to bring the code inside your current ts file like
+		interfaces, functions, classes, variable, ETC.
+
+- imports in @Component
+	- These are Angular imports,
+	- is used in standalone components
+	- They make Angular features available inside the HTML of the component.
+	- Used to bring Angular-specific elements (components, directives, pipes or NgModules) into a standalone component's context.
+	- used when Your component is standalone (standalone: true) and needs access to Angular features like RouterOutlet, other components.
+	- When using standalone components, if you want to include one standalone component inside another, 
+	  you need to import it in the imports array of the @Component decorator of the parent component.
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------
+
+<< commands >>
+
+ng g c componentName --skip-tests 	 //generate a new component with the specified name and skip creating the associated test files.
+
+ng g c componentName --skip-tests --flat
+npm i		    	// install all required used packages
+npm i bootstrap		// install bootstrap
+
+ng g  m Shared --routing  // to install module
+
+ng add @angular/material // to install angular material
+
+	
+npm uninstall package-name  // to uninstall 
+
+--------------------------------------------------------------------------------------------------------------
+
+<< add css & JS files & install bootstrap, adbootstrap-icon >>
+
+at angular.json file -->  -> 
+	at script array you can add js files, 
+	at style array you can add  css files
+
+<< add bootstrap package >>
+	- npm i bootstrap
+	- ng add @ng-bootstrap/ng-bootstrap // recommended, to use the component that need the js code
+	- npm i @ng-bootstrap/ng-bootstrap  // recommended, to use the component that need the js code
+
+	- at angular.json -> at architect object -> build object ->  options object
+		- at styles array  -> "node_modules/bootstrap/dist/css/bootstrap.min.css",      // bootstrap css file
+		- at scripts array -> "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"  // bootstrap Js file
+
+	npm install @ng-bootstrap/ng-bootstrap
+
+<< add bootstrap Icon package>>
+	npm i bootstrap-icons
+	at style array "node_modules/bootstrap-icons/font/bootstrap-icons.min.css"
+
+
+- use ng-bootstrap, ngx-bootstrap, Angular Material
+
+-------------------------------------------------------------------------------------------------------------------------
+
+<< install lineicons >>
+
+- npm install lineicons
+
+- at style array
+	- "node_modules/lineicons/dist/lineicons.css",
+
+
+- to uninstall lineicons
+	- npm uninstall lineicons
+
+-------------------------------------------------------------------------------------------------------------------
+
+<< images >>
+
+- inside src folder create assets folder
+
+- add it in assets folder  ==> <img src="assets/images/slider/logo.jpg">
+
+-----------------------------------------------------------------------------------------------------------------------------
+
+<< component >>
+
+- ng g c componentName --skip-tests
+
+- ng g c project-details --skip-tests 
+	- project-details folder will be created and includes
+		- project-details.component.ts  // this is the file that run at first
+		- ProjectDetails.Component.html
+		- ProjectDetails.Component.css
+
+for each component created it has 3 files
+	1. componentName.html
+	2. componentName.css
+	3. componentName.ts
+
+import { Component } from '@angular/core';  
+   -- you're importing a TypeScript class named Component provided by the Angular framework.
+   -- The @ symbol before '@angular/core' It's used to indicate that you're importing from an external module or package
+   -- The @ symbol is used in npm (Node Package Manager) to denote packages that are scoped, Scoped packages 
+      are typically packages that are related to a specific organization, framework, or project. For example, Angular's packages are all scoped under @angular.
+
+@Component({
+  selector: 'app-content',                       // This is the tag name to use in HTML
+  templateUrl: './content.component.html',       // path of HTML
+  styleUrls: ['./my-component.component.css']    // Path of CSS file(s) for this component
+  imports: [ProductCardComponent],               // to import other Angular modules or components
+  standalone: true				 // this component in not within module
+  template: '<p></p>'				 // if you want to write the html of component in the same file [not recommended]
+  styles: [`p{color:green}`]
+})
+
+export class MyComponent {
+  // Component logic here
+}
+
+
+-- @Component 
+   - is a TypeScript decorator provided by Angular, it is used to mark a class as an Angular component
+
+- you need to import the created component to root component (app.component.ts)
+	- which means add it to imports array
+
+-
+ 
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+<< Binding >>
+
+-  one way binding
+
+	- interpolation
+		- from controller(ts) to view (html)
+
+		- at component ts file: 
+			title: string ="";
+			flag: boolean = false;
+			imgSrc1: string = '4.jpg';
+
+		- at component html file: 
+			<p>{{title}}</p>
+			<h1>{{ flag ? "PD Track" : "OS Track" }}</h1>
+			<img src="assets/imgs/{{ imgSrc1 }}" alt="" />
+	
+	- attribute (property) binding
+		- at component html file: 
+			<img [src]="imgSrc2" alt="image" />
+			[disabled]="isButtonDisabled"
+		- at component ts file: 
+			imgSrc2: string = 'assets/imgs/2.jpg'; 
+
+		
+	- class binding 
+		- from controller to view
+		- syntax: [class.className]
+		- example
+			[class.d-none]="prod.categoryId!=selectedId";  // the element will include the class d-none in case of the condition is true
+			[class.active]="i === currentPage"
+			[class.ckvnkcnvkcv]="condition"
+
+	- style binding
+		from controller to view
+		[style.background-color] = "(prod.quantity==0)?'yello':'red'"
+
+	- Event Binding
+	   - from view to controller(ts)
+
+	   - very important note: 
+       		- when event is fired js sends an event object as a parameter implicitly to the function that will be executed , 
+	 	  this object represent info about element that fire the event, when you add event at html element you add it by your self
+
+	        - Js example
+		   <p id = 'mainP'>hello from p</p>
+		   myP.addEventListener("click", test);
+		   function test(e){
+    			console.log(e.target);     // <p id = 'mainP'>hello from p</p>
+    			console.log("test says hello");
+		   }
+		   <button onclick="test(event)">click here</button> //event is a keyword that represent event object sent to the function
+
+
+	- Angular example 1
+	
+		- at HTML
+	   		<input (input)="getData($event)" type="text" class="form-control" placeholder="Enter Your Data"/>
+	   		<div>{{inputValue}}</div>
+
+	  	getData(e: Event) {
+    			let target = e.target as HTMLInputElement;
+    			this.inputValue = target.value;
+  	   	}
+	
+	- Angular example 2 
+		<< template variable , reference >>
+		note: the input value type is always string
+
+		- at HTML
+	   		<input type="number" #inputCount>  // << template variable , reference >>
+	   		<button class="btn btn-outline-sucess" (click)="calc(inputCount.value)">calc</button> 
+	   		<div>{{inputVal}}</div>
+	
+		- at typeScript
+	    		inputVal: number = 0;
+	    		calc(count: string){  this.inputVal = Number(count)*2;  console.log(Number(count)*2); }
+
+
+- note when you call the reference element you do not need the # mark
+----------------------------------------------------------------------------------------------------------------
+
+
+<< Forms Module [two ways binding] >> 
+
+- two ways binding: from view to controller and vice versa
+	- each change to any part reflects on the other
+
+- at typeScript
+
+import { FormsModule } from '@angular/forms';
+@Component({  
+  .....
+  imports: [FormsModule],
+  .....
+})
+testValue: string = '';
+
+at html
+<input
+      [(ngModel)]="testValue"
+      type="text"	
+      class="form-control"
+      placeholder="Enter Your Data"
+    />
+
+<p class="mt-4 lead fs-3">Your Data : {{ testValue }}</p>
+
+- if [(ngModel)] is used inside a form tag, the form control must be defined as standalone  
+	<select class="form-select" [(ngModel)]="searchType" [ngModelOptions]="{standalone: true}" >
+
+------------------------------------------------------------------------------------------------------------------------
+
+<< directives >>
+
+- the element can not has many direcetives
+
+- directives categories
+	- built-in directives: Structural directive, Component directive, Attribute directive
+	- custom directives
+
+- Structural directive --> ngFor, ngIf, ngSwitch
+
+	- you can not perform two structural directive at the same element
+
+	- need CommonModule --> import { CommonModule } from '@angular/common';
+
+	- *ngFor
+	   <div *ngFor="let x of names; let i = index; let count = count; let first = first" class="bg-light m-3 p-3 rounded text-dark"></div>
+		- provides access to several template input variables
+			- index, count, first, last, even, odd 
+		- *ngFor behavior: it automatically regenerates the DOM elements when changes (updates) occured in the list of items
+                  the solution: to regenerate only the changed element, you have to track each element with unique value (will use the id)
+			div *ngFor="let item of arr; trackBy: trackItem"></div>
+				- trackItem is call back function --> trackItem(index:number, item: Iproduct){ return item.id; }
+
+	- *ngIf
+		- add or remove from dom based on condition
+		- <div *ngIf="prod.Quantity!=0>hello</div>
+		
+		- <ng-container></ng-container> it does not rendered on the page, it's useful for applying structural directives
+		- <ng-template></ng-template>   it does not rendered on the page,
+			- its content does not appear, to make it appear add reference to ng-template
+			
+		- example
+	    		<div *ngIf="prod.quantity!=1 else second">hello</div>
+    	    		<ng-template #second> second</ng-template>
+	  		- if the condition provided to *ngIf evaluates to false, the element and its children are not added to the DOM 
+
+	- [ngSwitch]
+		at ts file --> flag:number = 0;
+		<ng-container [ngSwitch]="flag">
+    			<button *ngSwitch="0" class="btn bt">flag is true</button>
+    			<button *ngSwitch="1" class="btn bt">flag is true</button>
+    			<button *ngSwitchDefault>default</button>
+		</ng-container>
+
+
+- Components (Control Flow) directive
+
+	-- for
+	   - @for (item of Tracks; track item.id; ) {
+		<div>{{item}}: {{$first}}: {{$index}}: {{$last}}: {{$odd}}: {{$even}}</div>
+		// Tracks at typescript file --> Tracks:string[]=['sd','pd'];
+		// sd: true : 0: false: false: true
+		// pd: false: 1: true: true: false
+	      }
+	
+	   - @for(){}
+             @empty{<p>no products</p>}		 
+
+	--  @switch (flag) {
+    		@case (0) { <div>flag = 0</div>}
+    		@case (1) { <div>flag = 0</div>}
+    		@case (2) { <div>flag = 0</div>}
+    		@default { <div>default</div>  }
+	   }
+	
+	- @if (flag==0) {<div>true if condition</div>}
+	  @else if (flag==1) {<div>true else if</div>}
+	  @else {<div>else activated</div>}
+  
+- Attribute directive [ngCalss], [ngStyle], [ngModel]
+    - need CommonModule --> import { CommonModule } from '@angular/common';
+
+   -  [ngClass]="{ 'className':condition }"
+      example 1
+	<div [ngClass]="{
+    		'bg-success': flag==1,
+   		'bg-danger': flag==2,
+    		'classStyle': flag==3,
+	   }">Ahmed Mohamed</div>
+	
+	- class binding review to notice the difference
+		- [class.cssClassName] = "condition"
+		- example
+			.classStyle { font-size: 25px; color: darkgrey; font-weight: bolder; background-color: black; }
+			flag:number = 1;
+			<div [class.classStyle] = "flag!=0">Ahmed Mohamed</div>
+			// the difference is -> at class binding we can assign class if the condition is true but at [ngClass] we can assign more than condition
+
+      - example 2
+		[ngClass] = "(item.quantity==0)?'text-danger':'textlight'"
+		
+  - [ngStyle]
+	- example
+	 	[ngStyle] = "{ color: flag==true?'red':'blue', backgroundColor: flag==true?'red':'blue',}"
+	
+ 
+- custom directive
+	- ng g directive directive_name
+	- ng g directive highlightCard --skip-tests
+		- a class with name HighLightCardDirective and decorator @Directive({ selector: '[appHighLightCard]', standalone: true})
+	
+	- it need to be imported on component
+
+	- EX 1:
+	   @Directive({
+  	      selector: '[appHighlight]', // note that selector name is wrapped in []
+  	      standalone: true,
+	   })
+	  export class HighlightDirective {
+
+  	    constructor(element: ElementRef) 
+	    {
+    	 	element.nativeElement.style.background = 'grey';
+  	    }
+	    @HostListener(EventConst.MouserOver) over(){ this.element.nativeElement.style.backgroundColor = 'Pink' }
+  	    @HostListener(EventConst.MouseOut) out(){ this.element.nativeElement.style.background = 'grey' }
+          }
+
+	- at component that i want to use this custom directive --> imports: [HighlightDirective],
+	- at component element that i want to apply the directive on it --> <p appHighlight>This text is highlighted!</p>
+		- note: we use the directive selector name in paragraph
+		- once you add the directive on element , instance of directive will be created ,this element will be passed to constructor
+
+
+	EX2:
+	  export class HighlightDirective {
+	     @Input('appHighlight') defaultColor:string = '';
+	     @Input() hoverColor: string = '';
+
+	     constructor(private element: ElementRef) {}
+             ngOnChanges(): void { this.element.nativeElement.style.background = this.defaultColor; }
+  	     @HostListener(EventConst.MouserOver) over(){ this.element.nativeElement.style.backgroundColor = this.hoverColor }
+  	     @HostListener(EventConst.MouseOut) out(){ this.element.nativeElement.style.background = this.defaultColor }
+	 }
+
+	 <p appHighlight="green" hoverColor="blue"> sdsdsd </p>
+
+	
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+
+- <tr [attr.data-id]="item.id">
+
+
+----------------------------------------------------------------------------------------------------------------------
+
+<< component Interaction >>
+
+--- send data from parent to child
+	
+  - example 1:
+     - child
+	 @Input() valueSentByParent: string = '';			
+	 ngOnChanges(changes: SimpleChanges): void {
+    	    if (changes['valueSentByParent']) { this.valueSentByParent = changes['valueSentByParent'].currentValue; }
+  	 }
+	 - remember that ngOnChanges hooks is triggered when property with Input decorator is changed
+	 <p> hello from child component and the passed value is {{valueSentByParent}}</p>
+
+     - parent
+	<input [(ngModel)]="valueTobeSentToChild" >
+	<app-child [valueSentByParent]="valueTobeSentToChild"></app-child>
+
+
+--- send data from child to parent
+   - at child:  define event, fire-event, send data via event
+   - at parent: event-binding, define function, store data
+
+   - Example 1:
+      - at child: 
+	@Output() onTotalPriceChanged: EventEmitter<number>;  // event Definition
+  	DataTobeSentToParent: number = 0;  // value to be emitted via event
+  	constructor() { this.onTotalPriceChanged = new EventEmitter<number>(); }
+  	sendtoParent(){ this.onTotalPriceChanged.emit(this.DataTobeSentToParent); }
+	
+	<input class="" [(ngModel)]="DataTobeSentToParent" (input)="sendtoParent()">
+
+     - at parent:
+	valueSentByChild: number;
+  	constructor(){ this.valueSentByChild = 0;}
+  	receiveValFromChild(val:number){ this.valueSentByChild = val; }
+	
+	<app-child style="background-color: blue;" (onTotalPriceChanged)="receiveValFromChild($event)"></app-child>
+  
+-----------------------------------------------------------------------------------------------------------------------
+
+<<  ts notes >>
+
+- any element at html its type in ts is of type ElementRef 
+
+- variable!: number  // non null assertion operator
+
+- intput value type is string
+
+- 
+
+- 
+
+- 
+
+------------------------------------------------------------------------------------------
+
+<<  reference (template reference  variable)  , @ViewChild() >>
+
+- template reference variable in ts is --> TemplateRef<any>
+
+- to access element in html --> add to its reference (template variable)
+
+	example 1 : 
+		<div #myElement>Some content</div>
+		<button (click)="myElement.style.display = 'none'">Hide Element</button>
+		button (click)="Show(myElement)">Hide Element</button> // the div element will be passed
+
+	example 2:
+		<input type="number" #inputCount>  // << template variable , reference >>
+	   	<button class="btn btn-outline-sucess" (click)="calc(inputCount.value)">calc</button>
+
+	example 3 using let:
+		let-modal creates a local template variable named modal
+
+- To access the element in the component class, you can use @ViewChild()
+	- example using ViewChild('refVariable')
+		<input value="input-val" #inputVar>
+		
+ 		@ViewChild('inputVar') input!:ElementRef;  // it tell angular, it is a member variable that will hold an html element
+		ngAfterViewInit(): void { console.log(this.input.nativeElement.value); }
+	
+	- example clarify how ViewChild decorator help us to access the child component that used in current component
+		<app-products> </app-products>
+		@ViewChild(ProductsComponent) PrdComponentObj! : ProdcutsComponent
+ 
+		ngAfterViewInit(): void {
+			console.log(this.PrdComponentObj.totalPrice);
+		}
+	 	- note: the changes occured at child ( let's say total price value is changed from 100 to 150 ) the parent can not reconcile these changes 
+		        ( will see total price value is 100 )
+
+- to access elements in the component class using @ViewChildren() 
+	<input value="55" #inputVar>
+	<input value="5" #inputVar>
+	<input value="15" #inputVar>
+	
+	@ViewChildren('inputVar') inputs!: QueryList<ElementRef>;	
+	ngAfterViewInit(): void { 
+    		let total:number = 0;
+    		let totalIndecis:number = 0;
+    		this.inputs.forEach((input, index, arr)=>{
+      			total+= Number(input.nativeElement.value);
+      			totalIndecis+= index;
+    		})
+    		console.log(total);	console.log(totalIndecis);
+   	}
+	
+
+
+----------------------------------------------------------------------------------------
+<< Angular Lazy Loading >>
+
+- without lazy loading all declared components are loaded when the application is bootstrapped. This can lead to slower initial load times, especially in large applications.
+
+- load component when i navigate to it
+	- { path: 'Products', loadComponent: () => import('./components/Products.component').then(obj => obj.ProductsComponent), },
+
+- Lazy loading in Angular is a design pattern that helps improve the performance of your application by loading modules only when they are needed
+
+- Setting Up Lazy Loading in Angular
+	- First, create the feature modules you want to lazy load. For example, let's create two feature modules: AdminModule and UserModule.
+	- at AppRoutingModule
+		
+		
+
+--------------------------------------------------------------------------------------------------------------------
+
+<< providers >>
+
+- They determine the scope and lifetime of a service instance
+- The recommended way to provide a service in Angular is by using the providedIn property in the @Injectable decorator. 
+- at service.ts
+	@Injectable({
+  		providedIn: 'root' // 'root' makes the service available application-wide	
+	})
+
+- providedIn: 'root' 		--> one isntancee of service is provided at the root level and is a singleton (one instance for the entire application).
+- providedIn: 'any'  		--> A new instance of the service is created for each lazy-loaded module that injects the service.
+- providedIn: SomeModule 	--> The service is provided at the module level and is a singleton within that module.
+
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------
+
+<< Angular Life Cycle hooks  for component>>
+
+-- Understanding the component lifecycle help in choosing the right place to implement different logic, 
+   such as initializing data, watching for changes, or performing actions after the component is rendered
+
+-- Constrcutor(){} 	
+	- The constructor is called when Angular initializes the component class
+	- used for initialization and injection, executed before render component
+	- Avoid trying to interact with the DOM or perform complex initializations here. 
+	- The component isn’t fully created yet, so the view (DOM elements) isn’t available, and input properties are not yet initialized.
+
+-- ngOnInit(): void{}
+	- run after angular has initialized all components inputs
+	- It runs after all @Input() properties have been assigned their values. 
+	- called explictly after constructor to execute a specific logic code, class implements OnInit
+	- Runs after Angular initializes the component, but before the view (DOM) is fully rendered	
+	- you could call the service to fetch initial data
+
+
+-- ngOnChanges(changes: SimpleChanges): void {} , class implements OnChanges, 
+	- Runs every time the component's inputs properties have been changed.
+	- It is triggered at least once before ngOnInit in case of you have properties with Input decorator
+	- ngOnChanges will only run when input properties change, so it's not triggered if there are no input properties in the component.
+	
+	
+-- ngAfterViewInit  --> implements AfterViewInit
+	- This hook is called After the view is fully initialized and loaded.
+	- Use this hook to perform actions that require access to the component’s rendered view or the DOM
+
+- ngAfterContentInit 
+	- triggers after component children have been initialized
+	- 
+
+-- ngAfterViewChecked --> implements AfterViewChecked
+	- is called after every change detection cycle, which means it runs after any change that Angular detects within the component’s view or the component itself
+
+-- ngOnDestroy
+	- runs once before the component is destroyed
+		- clear the interval
+		 
+--------------------------------------------------------------------------------------------------------------------------------
+
+
+<< Router Outlet >>
+
+- When a route is activated, Angular looks for the RouterOutlet in the DOM and places the routed component there.
+  The component associated with the current route is displayed inside this RouterOutlet.
+
+
+---------------------------------------------------------------------------------------------------------------------------------
+
+export const routes: Routes = [
+  {
+        path: 'admin',
+        component: AdminLayoutComponent,
+        children: [
+            { path: '', component: AdminDashboardComponent },
+            { path: 'home', component: AdminDashboardComponent },
+            { path: 'employees', component: EmployeesComponent },
+        ],
+    },
+    {
+        path: 'employee',
+        component: EmployeeLayoutComponent,
+        children: [
+            { path: '', component: AdminDashboardComponent },
+            { path: 'home', component: EmployeeDashboardComponent },
+        ],
+    },
+ ]
+-----------------------------------------------------------------------------------------
+
+<< Services >>
+
+- ng g s product --skip-tests
+
+export class ProductService {
+
+  ProductList: IProduct[] = [];
+  constructor() { 
+    this.ProductList = ProductList;
+  }
+
+  getAllProducts(): IProduct[] {
+    return this.ProductList;
+  }
+
+  getProdById(id:number){
+    return this.ProductList.find((x)=>x.id==id);
+  }
+
+  addProd(product:IProduct){
+    this.ProductList.push(product);
+  }
+
+  deleteProdById(id:number){
+    this.ProductList = this.ProductList.filter((product) => product.id != id);
+    return this.ProductList;
+  }
+
+  editProduct(prodId: number, product: IProduct) {
+    //console.log('id of element you want to edit is: '+prodId);
+    let prodIndex = this.ProductList.findIndex(x=>x.id== prodId);
+    console.log(prodIndex);
+    this.ProductList[prodIndex] = product;
+    console.log("-----------------------");
+    console.log(this.ProductList[prodIndex]);
+    
+  }
+}
+
+---------------------------------------------------------------------------------
+
+DeleteFromFav(prodUserIDs: ProdUser) {
+    const url = `${this.baseUrl}/your-endpoint`; // Replace with your actual endpoint
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+
+    // Create the HTTP DELETE request
+    const req = new HttpRequest('DELETE', url, prodUserIDs, { headers: headers });
+
+    // Send the request and return the Observable
+    return this.http.request(req);
+  }
+
+--------------------------------------------------------------------------------------------
+
+<< making service via consuming API  example >>
+
+-- at service.ts
+
+    getOrderTypes(): Observable<IOrderTypeDTO[]> {
+    	   const url = `${this.baseUrl}/OrderTypes`;
+    	   return this.http.get<IOrderTypeDTO[]>(url).pipe(catchError(this.handleError<IOrderTypeDTO[]>('getOrderTypes', [])));
+    }
+
+    - Observable: epresents a stream of data that can be observed 
+    - Observable<IOrderTypeDTO[]>: indicating that the response is array of IOrderTypeDTO
+    - get<IOrderTypeDTO[]> type of data that the HTTP request expects to receive as a response from the server.
+
+
+
+--------------------------------------------------------------------------------------------
+<< spinner using primeng  >>
+
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+
+imports:[ProgressSpinnerModule ]
+
+<ng-container *ngIf="isLoading">
+   <p-progressSpinner 
+         [style]="{width: '35px', height: '35px'}"
+         strokeWidth="4" 
+         strokeColor="red" >
+   </p-progressSpinner>
+</ng-container>
+
+
+-------------------------------------------------------------------
+<< toast message using Angular >>
+
+
+import { ToastModule } from 'primeng/toast';
+import { BrowserModule } from '@angular/platform-browser';
+
+
+imports: [ToastModule, BrowserModule]
+
+-----------------------------------------------------------------
+
+     confirm1(event: Event) {
+      this.confirmationService.confirm({
+          target: event.target as EventTarget,
+          message: 'Are you sure that you want to proceed?',
+          header: 'Confirmation',
+          icon: 'pi pi-exclamation-triangle',
+          acceptIcon:"none",
+          rejectIcon:"none",
+          rejectButtonStyleClass:"p-button-text",
+          accept: () => {
+              this.messageService.add({ severity: 'info', summary: 'Confirmed', detail: 'You have accepted' });
+          },
+          reject: () => {
+              this.messageService.add({ severity: 'error', summary: 'Rejected', detail: 'You have rejected', life: 3000 });
+          }
+      });
+  }
+
+---------------------------------------------------------------------------------------------------------------------
+<< error 
+
+The error message "SyntaxError: Unexpected token 'O', 'Order Added...' is not valid JSON"
+indicates that your Angular application is expecting a JSON response from the API,but it is receiving a plain text string instead. 
+This happens because the server is returning a plain text response instead of JSON, and Angular’s HttpClient is trying to parse it as JSON, which leads to a parsing error.
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<< ng container and ng template in angular >>
+
+- ng-container
+	- group elements and apply structural directives (like *ngIf, *ngFor, *ngSwitchCase)
+	- DOM Impact: It is a logical grouping that is not rendered as a separate element in the browser's DOM
+	- Use Case : avoid unnecessary wrapping elements that might affect styling.
+
+- ng-template
+	- Defines a reusable block of HTML content that is not rendered by default
+	- DOM Impact: The content within an ng-template is not rendered in the DOM unless explicitly demand it
+
+	- Exmaple 1 : Basic ng-template Example (Not Rendered by Default)
+		<ng-template #myTemplate>
+  			<div class="alert alert-info"> This content is inside ng-template!</div>
+		</ng-template>
+
+		<div *ngIf="show">
+  			<ng-container *ngTemplateOutlet="myTemplate"></ng-container>
+		</div>
+		- note we inject(outlet) the the ng-template using ngTemplateOutlet  and it renders the content
+
+	- Exmaple 2: Using ng-template for Conditional Rendering (Alternate Views)
+		<div *ngIf="isLoggedIn; else guestView">
+  			<h2>Welcome back, User!</h2>
+		</div>
+
+		<ng-template #guestView>
+  			<h2>Please login to continue</h2>
+		</ng-template>
+
+	- Ex3: Passing Context to Templates
+		<ng-template #itemTemplate let-itemmm="item">
+  			<div>{{ itemmm.name }} - {{ itemmm.price }}</div>
+		</ng-template>
+
+		<div *ngFor="let p of products">
+  			<ng-container *ngTemplateOutlet="itemTemplate; context: { item: p }"></ng-container>
+		</div>
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+<< environments >>
+
+- at Environments folder
+	
+	- Create environment.development.ts
+		export const environment = {
+    			production: false,
+    			'http://localhost:5299/api' ,  // change it as needed
+  		};	
+
+	- Create environment.production.ts	
+		export const environment = {
+    			production: true,
+    			apiUrl: 'https://api.production.com/',  // change it as needed
+  		};
+  
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<< debouncing >>
+
+
+- at html 
+	<input type="text" class="form-control rounded-0" placeholder="Enter keyword man" (input)="onSearchInputChange($event)">
+
+- at ts
+
+ private searchInputSubject = new Subject<HTMLInputElement>();
+
+ constructor
+      this.searchInputSubject.pipe(
+      debounceTime(1500),  
+    ).subscribe((searchInput: HTMLInputElement) => {   
+      this.performSearch(searchInput);  // Call your search function here
+    });
+
+
+  onSearchInputChange(event: Event) {
+    let target = event.target as HTMLInputElement;
+    this.searchInput.next(target.value);
+  }
+
+    performSearch(searchText: HTMLInputElement) {
+    console.log(`performSearch(${searchText.value}) is called`)
+
+    if(searchText.value.trim()!=""){
+
+    }
+  }
+
+  // implements OnDestroy
+  ngOnDestroy() 
+  {
+    this.searchInput.complete();
+  }
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+
+<< NGRX >>
+
+- it's a lib used when i have data that i need to be shared between components
+- it's not mendatory
+- used when we there many data like , arrays, counters, and i want these data to be editable and reconciled within each component
+- it's a State Management LifeCycle
+
+- NGRX Cycle
+	- Store    : where data is placed to be shared between components
+	- Selector : used by any compoenent to read data from store
+	- Dispatch action at component to change value in the store
+	- every dispatch action go through Reducers where the logic of changing values of store will be in, so changin values of store is performed using dispatch 
+	- every data in the store has its action and reducer
+	- effect : trigger if specific data is changed [optional]
+	- action used in reducer, reducer used in store
+
+- installation
+	- ng add @ngrx/store // it does not has the feature of effect, last version (ng add @ngrx/store@latest)
+	- ng add @ngrx/effect
+
+- At app.config.ts file
+	- provideStore() is added to providers array
+	- import { provideStore } from '@ngrx/store';
+	
+		
+
+
+- at app Create folder Store to placed NGRX files
+	- create counter folder
+		- counter.action.ts
+			import { createAction } from "@ngrx/store";
+			export const increaseCounterAction = createAction("increase"); // type of action is (increase), no other action has the same type
+			export const decreaseCounterAction = createAction("decrease");
+		
+		- counter.reducer.ts
+			import { createReducer, on } from "@ngrx/store";
+			import { increaseCounter }   from "./Counter.Action";
+			const initialState = 0;
+			export const counterReducer = createReducer(
+    				initialState, 
+    				on(increaseCounterAction , (state)=> state+1),
+    				on(decreaseCounterAction , (state)=>state-1),
+			)
+ 
+ 		- at config.ts
+		    - at providers:
+			provideStore({
+      				counter: counterReducer // component access the counter using the name(key)  
+    			})
+
+
+		- to read the store data at component
+		    counter!: Observable<number>
+  			constructor(private store: Store<{counter: number}>){
+   				this.counter = this.store.select("counter");    // the key at provider store existed at app.config, return observable
+			}
+		- to dispatch action	
+			increaseCounter(){ this.store.dispatch(increaseCounterAction()); }
+			decreaseCounter(){ this.store.dispatch(decreaseCounterAction()); }
+			
+
+
+
+--------------------------------------
+
+new variable
+	$event: is just a variable name that Angular uses to refer to the DOM event object.
+		It is not special syntax
+		It is not mandatory
+		you can name it like you want 
+	#inputCount
+		template variable
+		we call it without #
+	
+	
+new Types 
+	- HTMLInputElement
+		- let target = e.target as HTMLInputElement;
+	- Event
+	
+	- TemplateRef<any>
+		- This is the official Angular type for any <ng-template> reference.

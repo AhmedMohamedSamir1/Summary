@@ -1,0 +1,14 @@
+#a-sidebar.offcanvas {
+    max-width: 300px !important;
+}
+
+@media (min-width: 768px) {
+    #a-sidebar.offcanvas {
+        transform: none !important; /* always visible */
+        visibility: visible !important;
+        position: static !important;
+        width: 200px;
+        min-height: 100vh;
+    }
+}
+

@@ -1,0 +1,116 @@
+what is the difference between object and var and dynamic ?
+
+ال object :  هو ref DT وهو ال base type لـكل الدوت نت DT سواء كانت Value type  او ref type ,علشان كدا اقدر اخزن فيها اى value لاى DT 
+	: وبحتاج اعمل casting لو حبيت اعمل operation على ال Value المتخزنة فى ال object ده 
+         :  وبيحصل boxing و unboxing لما assign و retrive فالــيو DT لل object وده مش حلو ك performance لان انا بحط ال Value DT فى ال heap فده يعتبر expensive مقارنة لو انا شغال فى ال stack انا هنا بحتاج
+      additional info  لكل boxed value وده يعتبر Memory Overhead 
+     :  Useful for scenarios when you don't know the exact type until runtime 
+     : int number = (int)Convert.ChangeType(obj, typeof(int))
+  
+	
+ال var عبارة عن keyword : بتخلى ال Compiler يتعرف على نوع ال DT من خلال ال Right hand side expression ,
+		 لازم اعمل initialization او expression وانا ب declare ال variable باستخدام ال var
+		 يعنى بيحصل Type checking is done at compile time. 
+		وبستخدم لما أكون عايز اسهل عليا كتابة ال complex type declarations وممكن يكون عيب ان كدا الكود ممكن ميكونش Readable
+
+ال dynamic   :  ال type checking بيحصل فى ال runtime مش فى ال compile-time
+	  : you can assign a value of one type to a dynamic variable and later assign a value of a different type 	
+	  : Incorrect Method Invocation --> على سبيل المثال 
+	  : dynamic obj = "Hello, World	
+          : obj.NonExistentMethod(); // Runtime error: 'string' does not contain a definition for 'NonExistentMethod   	
+	  : does not require explicit casting. This is one of the main features that distinguishes dynamic from object. 
+	  : When you use a dynamic variable, the C# runtime handles the type resolution and any necessary casting for you
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+
+<< what is constructor types >>
+
+static constructor
+	- used to assign values to static members
+	- is not a public 
+	- it's generated implicitly and assign static variable with its default value [the default behavior of any constructor in c#]
+	- called implicitly only once when you start using class
+	- it must be parameterless
+	- you can write your own constructor
+	-  static test() { vv = x; }
+
+private constructor
+	- with singleton design pattern
+	- 
+default constructor
+	- generated automatically that used to initialize class fields with default values until you make user defined constructor it will not exist
+
+Parameterized Constructor
+	- 
+
+Copy Constructor
+	-  
+--------------------------------------------------------------------------------------------------------------------------------------------------
+when to use private constructor
+
+- Factory Method Pattern: the private constructor ensures that objects are only created through the factory methods
+- Singleton Pattern: that a class has only one instance
+- class with only static members(static class): often uses a private constructor to prevent instantiation,as creating instances of such classes is unnecessary
+- 
+---------------------------------------------------------------------------------------------------------------------------------
+ايه الفرق ما بين ال ref و out
+-- ref : ال ref parameter can not has a default value
+      : The variable passed as a ref argument must be initialized before it is passed to the method
+
+-- out : ال out parameter can not has a default value
+       : ref param msut assigned with value inside function so the it is not required to initialize the argumrnt before passing 
+
+---------------------------------------------------------------------------------------------------------------------------------
+-- ازاي اخلي فانكشن ترجع  اكتر من قيمة
+
+1. ref
+2. out
+3. public (int a, int b) GetValues() // the tuples
+
+--------------------------------------------------------------------------------------------------------------------
+const, static, readonly
+
+const
+  - The value of a const field is set at compile time and cannot be changed thereafter.
+  - fields are implicitly static, so you do not need to use the static keyword with them.
+  - only Primitive Types and Strings: You can only use const with primitive types (e.g., int, double) and strings.
+ 
+readonly
+  - Runtime Constant:The value of a readonly field can be set either at the time of declaration or in the constructor of the class then,it cannot be changed
+  - readonly fields can be static or non-static
+  - Can be used with any type
+
+static 
+  - fields or methods belong to the type itself 
+  - fields can be initialized in a static constructor, which is called once when the class is first accessed
+  - 
+---------------------------------------------------------------------------------------------------------------------
+struct, class	
+
+strcut
+  - Value DT which means stored in stack
+  - A struct can implement interfaces but cannot inherit from another struct or class.
+  - equal operator : deep copy  
+class
+  - ref DT which means it stored in heap
+  - Supports inheritance.
+  - equal operator : Shallow copy -> two references will refer to the same object (space) in heap 
+-----------------------------------------------------------------------------------------------------------
+what is the difference between app.Run, app.Use, app.Map
+
+app.run(): it does not pass the request to the next middleware component in the pipeline. it is used to add terminal middleware at the end of the middleware pipeline
+	ensuring that all requests are handled by the pipelines
+
+app.Use(): add middleware to middleware pipeline, can perform operations before and after passing request the next middleware
+app.Map(): It allows you to define separate middleware pipeline branch for different URL prefixes. 
+
+	
+
+
+
+
+
+
+
+
+

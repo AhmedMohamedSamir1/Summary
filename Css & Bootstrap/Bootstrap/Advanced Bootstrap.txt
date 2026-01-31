@@ -1,0 +1,68 @@
+<< nav class , nav-item class,  item-link>>
+
+--- nav class
+	- used when you want to build a navigation menu
+	- Most Common Usage: With <ul> element
+	
+	- css code
+	  .nav {
+  	    display: flex;
+  	    flex-wrap: wrap;
+  	    padding-left: 0;
+  	    margin-bottom: 0;
+  	    list-style: none;
+	  }
+
+	EX1:
+	<ul class="nav">
+  	  <li class="nav-item">
+    	    <a class="nav-link active" href="#">Home</a>
+  	  </li>
+  	  <li class="nav-item">
+    	    <a class="nav-link" href="#">Features</a>
+  	  </li>
+	</ul>
+	
+	-- Vertical Nav (Sidebar-style), Commonly used in sidebars
+	<ul class="nav flex-column">
+  	   <li class="nav-item">
+    	      <a class="nav-link" href="#">Dashboard</a>
+           </li>
+	</ul>
+
+
+
+--- nav-item class
+   - used to define items within a navigation menu
+   - commonly used with li
+   - it is always combined with nav-link.
+			
+.nav-item {
+   display: inline-block;
+   margin-right: 20px;
+}
+
+
+--- nav-link
+    - it is used with <a> element
+    - class active used with it
+
+.nav-link {
+    display: block;
+    padding: 0.5rem 1rem;
+    color: var(--bs-nav-link-color);
+    text-decoration: none;
+    background-color: transparent;
+}
+
+.nav-link:hover, .nav-link:focus {
+  color: var(--bs-nav-link-hover-color);
+}
+
+.nav-link.disabled {
+  color: var(--bs-nav-link-disabled-color);
+  pointer-events: none;
+  cursor: default;
+}
+
+

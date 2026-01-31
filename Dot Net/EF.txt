@@ -1,0 +1,1499 @@
+
+<< introduction >>
+
+- ORM : stands for object relational mapper 
+   - is a programming technique used to interact with a database using the object-oriented paradigm. 
+     Instead of writing SQL queries to perform database operations, developers can work with objects in their preferred programming language
+   - 
+   - عبارة عن تكنيك بيستخدم للتعامل مع الداتابيز من خلال الأبجيكتس فبدل ما الديفلوبر بيكتب سكول كويرز للتعامل مع الداتا بيز من خلال الاوه أر إم يقدر يتعامل مع الداتا بيز من خلال الابجيكتس 
+
+   - tool that get data from DB in the form of objects then you can do your changes on the objects
+    , then it will detect your changes and convert them into queries that applies on DB
+  
+   - ORM maps database tables to classes, table rows to objects, and columns to class properties.
+
+- the target of ORM is to make the developer focus more on the application not on problems of DB (tables and Columns names)
+
+- but you will need to query from object so  LINQ : give us an expressions that help developer to query from object
+
+- ORM like EF retrieve data from DB in the form of objects and with LINQ we can query from the object
+
+--------------------------------------------------------------------------------------------------------------------------------------------
+
+<< installation >>
+
+- to Install Entity Framework Core at your project: you need to install these packages 
+	install using package manager console: 
+		Install-Package Microsoft.EntityFrameworkCore.SqlServer
+		Install-Package Microsoft.EntityFrameworkCore.Tools
+
+-  to successfully run the EF Core commands like Add-Migration
+	the default (start up) Layer (e.g. ECommerce.API) must reference the layer that has the implementation of DbContext(ApplicationContext)
+	if you do not you will get for example this error
+	 	Could not load assembly 'OffbeatWiki.Infrastructure'. Ensure it is referenced by the startup project 'OffbeatWiki.API'.
+
+------------------------------------------------------------------------------------------------------------------------------------------------
+
+<< Entity Framework approaches >>
+
+- Entity Framework (EF) supports two main approaches for working with databases
+	- Database first: [reverse engineering]  used it when you have complete and stable database
+	- Code first : [code first from database] لو معندكش رؤية كاملة اوستراكشر كامل للداتا بيز [incremental]
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+
+<< Connection String >>
+
+"Server=.;Database=Studying;Trusted_Connection=True;TrustServerCertificate=True;"
+
+-- Server == Data Source
+     - You are telling your application: Connect to the SQL Server running on 
+     - values
+       - Local Server (Default Instance)
+	  - .           	 -> Local machine, default instance
+	  - local     	 	 -> Local machine, default instance
+	  - localhost   	 -> Local machine, default instance
+ 	  - MachineName 	 -> Your PC name, default instance
+	  - 127.0.0.1   	 -> is called the loopback IP address. It always refers to "this computer" — the local machine.
+	  - localhost,1433 -> Default instance on specific port
+		- every application that communicates over a network listens on a specific port
+		- SQL Server is a server application that listens on port 1433 by default for incoming TCP/IP connections.
+
+
+
+      - Local Server (Default Instance)
+	  - .\InstanceName		  -> Named instance on local machine , EX: Server=.\SQLEXPRESS;
+	  - localhost\InstanceName	  -> Named instance using localhost
+	  - 127.0.0.1\InstanceName	  -> Named instance using loopback
+	  - MachineName\InstanceName -> Named instance on local PC
+	
+      - Remote Server (Default Instance)
+	  - RemoteMachineName   -> Connect to remote machine's default instance
+		- Connect to a SQL Server running on machine, whose hostname is RemoteMachineName
+		- Conditions for Connecting to a Remote SQL Server
+			- That machine must have SQL Server installed.
+			- SQL Server must be configured to accept connections from other machines.
+			- valid Credentials 
+
+	  - IP_Address	       -> Connect using IP
+	  - DomainName	       -> If part of a domain
+	  - 192.168.1.100,1533 ->	Custom port for remote server
+
+     - Remote Server (Named Instance)
+	   - RemoteMachineName\InstanceName	Named instance on a remote machine
+	   - IP_Address\InstanceName	        Named instance via IP (requires SQL Browser)
+
+
+-- Database
+	- Database=DatabaseName;
+	- Initial Catalog=DatabaseName;
+
+
+-- Trusted_Connection 
+	- determines how your application authenticates when connecting to the SQL Server.
+	- Integrated Security=SSPI
+	- Values
+	    - True	it tells SQL Server to use Windows Authentication.
+	    - Yes	Same as True
+	    - SSPI	Also means Windows Authentication (used with Integrated Security)
+	    - False	Use SQL Server Authentication (requires User Id and Password)
+	    - No	Same as False
+
+-- TrustServerCertificate 
+	- your application will trust the SQL Server's SSL certificate
+	- SSL/TLS in SQL Server refers to the encryption protocol used to secure the data sent between your application (client) 
+          and the SQL Server over the network.
+
+------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+<<  Database first: [reverse engineering] >>
+
+--- when Database first:
+   - Scaffold-DbContext "Server=.;Database=ITI;Trusted_Connection=True;TrustServerCertificate=True;"Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models
+  	• the following command to create a model from the existing database
+  	• Scaffold-DbContext-> the command that make reverse engineering
+  	• Server -> DB Server name, if you have default instance you can use . , if server name contains / it means you don't have default instance
+  	• -OutputDir Models : generate files at Models folder
+
+-- if you get this error when you are writting the scaffold command
+	System.Globalization.CultureNotFoundException: Only the invariant culture is supported in globalization-invariant mode. 
+	See https://aka.ms/GlobalizationInvariantMode for more information. (Parameter 'name') en-us is an invalid culture identifier.
+	at System.Globalization.CultureInfo.GetCultureInfo(String name) at 
+	- the solution is make --> <InvariantGlobalization>false</InvariantGlobalization> instead of <InvariantGlobalization>true</InvariantGlobalization>
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<< code first >>
+
+- create ApplicationDbContext class existed at folder Data:
+	- is a crucial component in Entity Framework (EF)
+	- stablish connection between your application and database,
+	- acts as a bridge between your application and the database
+		
+- create DbSet<> that will be mapped as tables at DB
+	
+- ApplicationContext class inherits from DbContext class or any class that inherit DbContext
+
+- create ApplicationContext constructor
+
+   - public ApplicationContext(DbContextOptions<ApplicationContext> options): base(options){}
+      	- this is Constructor with DbContextOptions Parameter and it is the recommended approach
+	- It enables you to register the DbContext in IOC container and pass configuration options like the connection string, logging,
+	  lazy loading,and any other DbContext options
+	
+	- to register DbContext -> at program.cs
+	   - builder.Services.AddDbContext<ApplicationContext>(option => option.UseSqlServer(builder.Configuration.GetConnectionString("cs")));
+	       // with lazy loading	
+	   - builder.Services.AddDbContext<ApplicationContext>(option => option.UseLazyLoadingProxies().UseSqlServer(builder.Configuration.GetConnectionString("cs")));
+
+   - public ApplicationContext() : base()  // the not recommended
+	- Default Constructor (Without DbContextOptions)
+	- if you use the default constructor without passing DbContextOptions, you will need to configure the DbContext manually inside the class,
+	  either by providing the configuration in the constructor or by overriding the OnConfiguring method but This removes the benefits of DI.
+		- in the constructor
+			var optionsBuilder = new DbContextOptionsBuilder<ApplicationContext>();
+        		optionsBuilder.UseSqlServer("Server=.;Database=MyDb;Trusted_Connection=True;").UseLazyLoadingProxies()
+			base.OnConfiguring(optionsBuilder); Use the base constructor to pass options to DbContext
+
+		- by overriding the OnConfiguring method
+			protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder){
+				optionsBuilder.UseSqlServer("Server=.;Database=MyDb;Trusted_Connection=True;"); }
+			- it is called each time a new instance of the DbContext is created.
+
+---------------------------------------------------------------------------------------------------------------------------------------
+
+<< ApplicationContext syntax code >>
+
+- public virtual DbSet<Catalog> Catelogs { get; set; }   // virtual -> for lazy loading
+
+ 
+			
+public  class ApplicationContext>: DbContext  {}
+        
+public  class ApplicationContext>: IdentityDbContext<ApplicationUser> {
+
+	public ApplicationContext(DbContextOptions<ApplicationContext> options): base(options){}
+}
+
+  protected override void OnModelCreating(ModelBuilder builder) // in case of you inhreit from IdentityDbContext<ApplicationUser> 
+  {								// Basically the keys of Identity tables are mapped in OnModelCreating method of IdentityDbContext
+    	base.OnModelCreating(builder);
+  }
+
+
+-- ApplicationUser with integer id 
+	- public class ApplicationUser : IdentityUser<int>, IEntity {}
+	- public class ApplicationRole : IdentityRole<int> {}	
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<<< EF Syntax info >>>
+
+- Navigation Properties
+	- Single Navigation Property
+	- Collection Navigation Property
+	
+-- Eager Loading with Include()
+	- IQueryable<TEntity>.Include("NavigationPropertyPath");   // string-based way to eagerly load related entities.
+	- IQueryable<TEntity>.Include(x => x.Property);           // strongly type (more save)
+
+
+-- Query Execution Strategies
+   - IQuerable<TEntity>.AsSingleQuery() //returns a new query which is configured to return all related Data of entity in one single query at DB [with Small datasets]
+   - IQuerable<TEntity>.AsSplitQuery()  //returns a new query which is configured to return all related Data of entity in multiple queries at DB [Large datasets or complex relationships]
+   - IQuerable<TEntity>.AsQueryable()   //Returns the query as-is, without enforcing whether it should be a single or split query, it depends on query structure . 
+
+   - When you use Include() to load related data, EF Core decides whether to:
+	- Split the query: Execute separate SQL queries for the primary entity and each related entity.
+	- Use a single query: Execute a single SQL query that retrieves both the primary entity and its related data using JOINs.
+	- EF Core automatically determines whether to use split queries or a single query based on several factor
+
+-- Lazy-Loading
+  - public virtual DbSet<Catalog> Catelogs { get; set; }   // virtual  ==> for lazy loading
+
+- SaveChanges & Change Detection
+	- EF inspects the change tracker to determine the current state of each tracked entity.
+	- If AutoDetectChangesEnabled is true (context.ChangeTracker.AutoDetectChangesEnabled = true) , EF automatically calls DetectChanges() before saving.
+
+-- DbSet 
+	- DbSet<TEntity> Implements IQueryable<TEntity> by default
+	- context.Set<TEntity>()   // return DbSet<TEntity> that Implements IQueryable<TEntity> by default
+	- await context.Set<TEntity>().AddAsync(entity);
+
+-- EF Hleper class 
+	- When working with shadow properties (properties that exist in the database but not in your C# model).
+	- This is useful in generic repositories or when dealing with shadow properties.
+	    - EF.Property<TId>(e, "Id")!.Equals(id)
+		-  TId EF.Property<TId>(Object instance, string propertyName) // return the value of prop
+
+                                     
+-- DbContext Model Metadata
+	- DbContext.Model   // returns IModel
+	- context.Model.FindEntityType(typeof(TEntity)) // IEntityType
+	- context.Model.FindEntityType(typeof(TEntity)).GetNavigations();  // IEnumerable<INavigation>
+	
+
+- DbContext Member
+	- context.GetType() // return Type any DT of Type object has GetType Method 
+	- Type.GetProperties() // get the public properties of the current Type, returns ProprtyInfo[]
+	- context.GetType().GetProperties() //  Gets all public properties of the class (e.g., DbSet<User> Users, DbSet<Role> Roles).
+	- ProprtyInf.PropertyType.IsGenericType
+	- ProprtyInfo.PropertyType.GetGenericTypeDefinition()
+	- ProprtyInfo.PropertyType.GetGenericTypeDefinition() == typeof(DbSet<>)
+	- 
+-- ChangeTracker
+	- DbContext.ChangeTracker   // provide access to information and operations for entity instances this context is tracking
+        - ChangeTracker.Entries()   // retrun IEnumerable<EntityEntry>  --> each EntityEntry for each tracked entity
+
+	- Entity framework has change tracker and entities are stored and referenced in the change tracker using their primary key. 
+	  More precisely, dbcontext has a secret dictionary and it only allow to store one object of same type and same primary key. 
+	- It can not track two object of same type and same primary key.
+
+
+-- Entity States
+  public enum EntityState
+  {
+     Detached,         // The entity is not being tracked by the context.
+     Unchanged,        // The entity is being tracked by the context and exists in the database. Its property values have not changed from the values in the database
+     Deleted,          // The entity is being tracked by the context and exists in the database. It has been marked for deletion from the database.
+     Modified,         // The entity is being tracked by the context and exists in the database. Some or all of its property values have been modified.
+     Added             // The entity is being tracked by the context but does not yet exist in the database
+  }
+
+ 
+-- EntityEntry
+	- context.Entry<TEntity>(entity)  // return EntityEntry<TEntity> , that provide access to change tracking information for entity
+  	  context.Entry(entity)           // you do not need to determine the type of entry as it can be detected through the entity object
+
+	- context.Entry(entity).State = EntityState.Added;
+
+	- context.Attach(TEntity);
+        	- It essentially tells the ORM, "this entity already exists in the database; just track it in the Unchanged state."
+		- It marks the entity as "tracked" by the DbContext. This means EF Core is now aware of the entity and will monitor it for changes.
+		- used if you already know the entity's key and want to avoid fetching the full entity from the database.
+
+	- EntityEntry.Entity  // get the [object] entity being tracked by this entry-> ex: ((ITrackedEntity)(entityEntry.Entity)).CreatedDate=DateTime.Now;
+	- ex: var order = await _context.Orders.FirstOrDefaultAsync(o => o.Id == 1);  
+	      var entry = _context.Entry(order);
+	 
+	- EntityEntry.State   // Represents the current state of the entity (Added, Modified, Deleted, Unchanged, or Detached).
+
+	- EntityEntry.Property("PropName").CurrentValue;  // gets or sets a specific property’s value.
+
+	- EntityEntry.Collection("OrderItems").Load();    // Load collection navigation property.
+
+	- EntityEntry.Reference("Customer").Load();	  // Load single navigation property.
+
+	- EntityEntry.IsKeySet    // Indicates whether the primary key of the entity has been set.
+
+	- EntityEntry.Reload()     // Reloads the entity from the database.
+
+	- EntityEntry.Navigations   // return IEnumerable<NavigationEntry>, NavigationEntry provides access to change tracking info for navigation property of entity
+
+	- EntityEntry.Navigation("Customer");
+
+-- Navigation Entry
+	 - var entry = context.Entry(order).Navigation("Customer"); // return NavigationEntry
+		 if (!entry.IsLoaded)
+			Console.WriteLine("Customer data is not loaded."); // Customer data is not loaded.	
+	 	await entry.LoadAsync();  // Explicitly load Customer entity
+		   var customerEntry = navEntry.TargetEntry;  // Get the related Customer entity entry
+
+	- EntityEntry.Navigation("Customer"); 	// return NavigationEntry
+	- NavigationEntry.IsLoaded        	// Indicates whether the related data of the navigation property is loaded.
+	- NavigationEntry.LoadAsync()     	// Explicitly load the related data for the navigation property.
+	- NavigationEntry.EntityEntry     	// Returns the EntityEntry instance that owns this navigation property.
+	- NavigationEntry.TargetEntry     	// Gets the EntityEntry for the related entity if the navigation represents a single entity.
+	- NavigationEntry.Metadata.Name   	// Provides metadata about the navigation property, such as its name and relationship type.
+
+
+
+-- EF Core Limitations
+   - EF does not support multiple parallel operations on the same DB context instance, example you can not get all students and courses parallel at the time using same DB context instance
+	var studentsTask = context.Students.ToListAsync();
+	var coursesTask = context.Courses.ToListAsync();  // 🚨 This will cause an error!
+	await Task.WhenAll(studentsTask, coursesTask);
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<< new info >>
+
+public class Project 
+{
+    public int Id {get; set; }
+    public string Name { get; set; }
+    public List<ProjectItem> ProjectItems { get; set; }
+}
+
+ public class ProjectItem : BaseEntity
+ {
+     [ForeignKey("Project")]
+     public int ProjectId { get; set; }
+
+     [ForeignKey("Item")]
+     public int ItemId { get; set; }
+
+     public int Quantity { get; set; }
+
+     public Project Project { get; set; }
+     public Item Item { get; set; }
+ }
+
+
+ - if you have project object  
+	Project project = new Project() { Name="project1"}; 
+		- Name ="Project1"
+		- ProjectItems = null;
+		- Id = 0 // constructor init
+	project.ProjectItems = Items.Select(item => new ProjectItem() { ItemId = item.Id, Quantity = item.Quantity }).ToList()
+		- each projectItem object
+			- ItemId= IntValue
+			- Quantity= IntValue
+			- ProjectId = 0 // due to it mapped from Project
+	context.Set<Project>.().add(projectEntity)
+	context.saveChanges(); 
+		- it will add the project object to DB and Its Id will be generated
+		- project.Id = 23 // the generated value 
+		- ProjectId = 23  // each ProjectId of Project.ProjectItems will be also 23, each object of ProjectItems will be added also to database
+
+- very important note : if you try to add new object and this object has navigation property like List<ProjectItem> 
+                        and this List<ProjectItem> is not null, EF will try to add it also
+ 
+
+
+- What is decimal(precision, scale) in SQL Server?
+   - When defining a decimal column in SQL Server, you need to specify:
+	Precision – The total number of digits in the number (both before and after the decimal point).
+	Scale – The number of digits allowed after the decimal point.
+   
+   -  [Column(TypeName = "decimal(18,2)")]
+      public decimal HalfKiloPrice { get; set; } 
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+<< Data Annotation >>
+
+
+- to make an attribute as --> [Key]
+
+- automatically generate a unique value for the column when a new row is inserted. --> [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+
+- to prevent the default identity of primary key   --> [DatabaseGenerated(DatabaseGeneratedOption.None)]	 
+
+- to make attribute required(not allow null )  --> [Required]
+
+- 
+
+- 
+--------------------------------------------------------------------------------------------------------------------------
+
+
+- Add Migration and Update Database.
+		at package manager console: tools -> nuget package manger -> package manager console
+		add-migration v1
+		update-database			
+		
+		update-database 20240427173301_v5 // This runs the Down() of v6 and removes its row from __EFMigrationsHistory. 
+			- After rolling back, if you don’t need v6 anymore --> remove-migration 
+	
+		- v1 -> v2 -> v3 -> v4 -> v5 -> v6
+			- update-database v3   --> EF executes Down() of v6, then v5, then v4.
+			- update-database v5   --> EF executes Up() of v4 and v5
+
+- Data Annotation: it's a C# Attributes that give info to compiler during run-time
+	
+	
+	  
+
+	- to determine the length of nvarchar              -> [StringLength(50)]
+	
+	- 
+    	
+	- you can combine two data annotation together     -> [Required, StringLength(50)]
+	
+	- attribute you want it in the code only not in DB -> [NotMapped]
+	
+	- to determine the DT of attribute		   -> [Column(TypeName="Money")]  [Column(TypeName = "decimal(18,2)")]
+	
+	- [Column("password")] -> the name of attribute will be password
+	
+	- to make any column unique		           -> [Index(IsUnique = true)] -> became not supported
+	
+	- [Table("STUD", Schema="hr")]			   
+	
+	- any primary key in EF is identity by default
+	
+	
+	
+	- [ForeignKey("catalog")]  // where catalog is the name of navigation property
+          public int cat_id { get; set; }  
+ 
+	- regarding Data Annotation: you can add constrains if you override void OnModelCreating(ModelBuilder modelBuilder) at DbContext class
+	
+		// This method is typically used to configure entity relationships, keys, indexes, etc.
+		protected override void OnModelCreating(ModelBuilder modelBuilder)
+    		{
+			base.OnModelCreating(modelBuilder); // in case of your dbcontext inherit from another context
+        		
+			// to make constrains like unique
+			modelBuilder.Entity<YourEntity>().HasIndex(e => e.UserId).IsUnique();
+			modelBuilder.Entity<YourEntity>().HasIndex(e => new { e.OrderId, e.ProductId }).IsUnique();
+
+			// to make composite PK
+			modelBuilder.Entity<studentsubj>().HasKey("stid", "subid");
+
+			// while the database is created or migrated, these records will be inserted, but it can make a conflict
+			modelBuilder.Entity<Department>().HasData(new Department { dep_id = 1, name = "PD", manager = "ahmed mohamed" });
+			
+    		}
+
+------------------------------------------------------------------------------------------------
+
+<< Relationships >>
+
+- one to many
+   - student(N) -- department(1)
+ 	at student : 
+		[ForeignKey("dept")]
+        	public int dept_id { get; set; }
+		public virtual Department dept { get; set; }
+
+	at department :
+		public virtual List<Student> Students { get; set; } = new List<Student>();
+	
+
+- many to many
+   - student(M)--- subject(N)
+		public class studentsubj
+    		{
+        		[ForeignKey("Stud")]
+       			public int stid { get; set; }
+
+		        [ForeignKey("Subject")]
+	        	public int subid { get; set; }
+
+        		public virtual Student Stud { get; set; }
+        		public virtual subject Subject { get; set; }
+    		}
+		at Student Class
+			public virtual List<studentsubj> Studentsubjs { get; set; } = new List<studentsubj>();
+
+		at Subject Class
+			public virtual List<studentsubj> Studentsubjs { get; set; } = new List<studentsubj>();
+
+		at DB Context
+			protected override void OnModelCreating(ModelBuilder modelBuilder)
+        		{
+            			modelBuilder.Entity<studentsubj>().HasKey("stid", "subid");
+        		}
+		
+- one to one
+	- One-to-One Required
+	    - Example: Car ↔ Engine
+		Every Car must have exactly one Engine.
+		Every Engine belongs to exactly one Car.
+
+		public class Car {   
+    		   public Engine Engine { get; set; } // Required
+		}
+
+		public class Engine
+		{
+			public int CarId { get; set; }
+    			public Car Car { get; set; }
+		}
+
+	- One-to-One Optional
+	   - public class User
+	     {
+    		public string FullName { get; set; }
+    		public Passport? Passport { get; set; } // Optional
+	     }
+
+	   - public class Passport
+	     {	    
+	    	public int UserId { get; set; }
+    		public User User { get; set; }
+	     }	
+----------------------------------------------------------------------------------------------------------------------------------------------
+
+<< related data >>
+
+- related date == navigation property
+
+- In Entity Framework, eager loading, lazy loading, and explicit loading are three different strategies for loading related data
+		
+
+-- How to load Navigation property [Loading Related Data], There are three common O/RM patterns used to load related data.
+
+	1. Eager loading : 
+		- definition 
+			- is the process of loading related entities along with the main entity in a single query. 
+                  	  the main entity and its related date are loaded in one query
+		
+		- When to use
+			- used when I'm sure that i want to load the related data [navigation propoerty] with the main entity
+
+		- advantages
+			- Can improve performance by minimizing database round trips
+
+		- syntax
+			- You can use the Include method to specify related data to be included in query results.
+			- ThenInclude: to include the naviagtion property of included navigation property
+
+		- examples
+		   var blogs = context.Blogs
+			.Include(blog=>blog.Posts)
+			.Include(blog=>blog.Owners)
+			.ToList();
+
+		   var blogs = context.Blogs
+			.Include(blog=>blog.Posts)
+				.ThenInclude(psot=>post.Owners)
+			.ToList();
+				
+		- advanced example:
+		  // get hotel id == hotelId
+		  // load rooms navigator property of hotel,
+		  // load  GuestRooms navigator property of rooms navigator property 
+		  // load  RoomCategory navigator property of rooms navigator property 
+
+		  var hotel = hotelDbContext.Hotels
+      			.Where(x => x.Id == hotelId)
+      			.Include(x => x.Rooms!)
+          			.ThenInclude(g => g!.GuestRooms)
+      			.Include(x=>x.Rooms!)
+          			.ThenInclude(c=>c.RoomCategory)
+      			.FirstOrDefault();
+
+	2. lazy loading : 
+		- Definition: 
+			Related data is loaded only when it is accessed for the first time.
+		
+		- Behavior: 
+			The related entities are not loaded when the parent entity is queried. They are loaded automatically and on-demand when accessed.
+
+		- syntax
+			- Navigation property should be virtual
+			- you need to install -> Microsoft.EntityFrameworkCore.Proxies package
+			- UseLazyLoadingProxies().UseSqlServer()
+		
+		- When to use
+			When you don't know if you will need the related data.
+			When you want to minimize the initial load time and only load data as needed
+
+		- example
+			var student = context.Students.First(); // Only Students table is queried
+			var courses = student.Courses;          // Related Courses are loaded on access
+
+	3. explicit loading :
+
+		- Definition: Related data is loaded explicitly after the parent entity is already retrieved like lazy loading
+		- Explicit Loading is like manual Lazy Loading, where the developer takes explicit responsibility for when and what to load
+		
+		
+		- example
+		   var Blog = context.BLogs.Single(b=>b.Blogid==1);
+		   - if Navigation property is colloction -> context.Entry(blog).Collection(b=>b.Posts).Load(); // you here get all collection
+		   - if Navigation property is object    -> context.Entry(blog).Reference(b=>b.Posts).Load();
+		   - to get part of related data-> use query(): 
+			context.Entry(blog).Collection(b=>b.Posts).Query().Where(p=>p.Rating>5).ToList();	
+
+		- example 2
+		     	await _context.Set<T>().AddAsync(entity);
+			await _context.SaveChangesAsync();
+			if (entity != null)
+			{
+    				foreach (var navigationEntry in _context.Entry(entity).Navigations)
+    				{
+        				await navigationEntry.LoadAsync();  // note there is a DB trip for each navigation prop
+    				}
+			}
+			return entity;  
+			
+
+
+
+	4- you can hybrid between explicit and eager loading
+
+		var room = roomRepository.GetById(id);
+		var Reservations = hotelDbContext.Entry(room).Collection(b => b.GuestRooms)
+    			.Query()
+   			.Include(gr => gr.Guest)
+   			.Include(gr=>gr.Food)
+   			.ThenInclude(x=>x.Category)
+    .			Where(d => d.EndDate > TimeHelperClass.getCurrTime()).ToList(); 
+
+	
+
+-------------------------------------------------------------------------------------------------------
+
+<< code of EF >>
+
+
+<< ADD >>
+
+    public void Insert(TEntity entity)
+    {
+        context.Entry(entity).State = EntityState.Added;
+	  // is a way to mark an entity as "new" or "to be inserted" in Entity Framework's change tracker. When this is done, 
+	 // Entity Framework will generate an INSERT SQL statement for the entity when you call SaveChanges().
+
+	// or
+	context.add(entity);
+    }
+
+context.Entry(entity).State = EntityState.Added;
+	  - is a way to mark an entity as "new" or "to be inserted" in Entity Framework's change tracker. When this is done, 
+	  - Entity Framework will generate an INSERT SQL statement for the entity when you call SaveChanges().
+	  - context.Entry(entity) accesses the tracking information for the entity in the context
+	  - Setting the State to EntityState.Added informs EF that this entity should be treated as a new record.
+	  - When SaveChanges() is called, EF constructs and executes an INSERT command to add the entity to the database.
+	  - You need to ensure the entity is not being tracked by another DbContext instance to avoid errors.
+
+
+<< update >>
+
+    public void Update(TEntity entity)
+    {
+        context.Entry(entity).State = EntityState.Modified;
+
+	// or
+	context.update(entity); //  entity should has property Id
+    }
+
+<< Remove >>
+
+    public void Delete(TEntity entity)
+    {
+        context.Entry(entity).State = EntityState.Deleted;
+
+	// or
+	Context.Remove(emp);
+    }
+  
+	
+<< Get >>
+	• Context.Set<Employee>().toList();
+	• Context.Set<T>().toList();
+	• Context.Set<T>().Find(id); // Get One
+
+
+
+<< filteration and order >>
+
+
+Expression<Func<TEntity, bool>> filter
+Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy
+IQueryable<TEntity> query = context.Set<TEntity>();
+	- context.Set<TEntity>(); // is type of IQueryable<TEntity>
+
+    public async Task<TEntity?> GetFirstByFilter(
+            Expression<Func<TEntity, bool>> filter,
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null)
+    {
+        IQueryable<TEntity> query = context.Set<TEntity>();
+	  
+        if (filter != null)
+            query = query.Where(filter);
+
+        if (orderBy != null)
+            query = orderBy(query);
+
+            return await query.FirstOrDefaultAsync();
+    }
+
+
+to call GetFirstByFilter
+
+Func<IQueryable<Product>, IOrderedQueryable<Product>> orderBy = query => query.OrderByDescending(x => x.Price);
+
+var expensiveProduct = await repository.GetFirstByFilter(
+    filter: p => p.IsActive,
+    orderBy: orderBy
+);
+
+// OR
+
+var expensiveProduct = await repository.GetFirstByFilter(
+    filter: p => p.IsActive,
+    orderBy: q => q.OrderByDescending(p => p.Price)
+);
+-------------------------------------------------------------------------------------------------------------------
+
+<< very important note >>
+
+	Students.FirstOrDefault(std => std.id == 5);
+	filter can be executed either in-memory or at the database level, depending on the type of Students
+
+	  - at database level -> IQueryable<Students>
+		- if Students is an IQueryable<Student>  If Students comes from an Entity Framework DbSet (like _context.Students),
+	 	- translated and executed into a SQL query --> SELECT TOP(1) * FROM Students WHERE id = 5
+	 	
+	 - at memory level -> IEnumerable<Students>
+		- the entire collection (Students) is already in memory.
+	 	- the query is executed in the database.
+
+---------------------------------------------------------------------------------------------------------------------
+
+<< SQL Queries using EF>>
+
+var blogs = context.Blogs .FromSql($"SELECT * FROMdbo.Blogs") .ToList();
+var blogs = context.Blogs .FromSql($"EXECUTE dbo.GetMostPopularBlogsForUser {user}") .ToList();
+var rowsModified = context.Database.ExecuteSql($"UPDATE [Blogs] SET [Url] = NULL"); 
+context.Database.ExecuteSqlRaw("EXEC deleteQuestionChoices @questionId",new SqlParameter("@questionId", selectedQuestionId));
+
+
+var questionIdParameter = new SqlParameter("@questionId", SqlDbType.Int){ Direction = ParameterDirection.Output };
+context.Database.ExecuteSqlRaw("EXEC addQuestion @quest_content, @quest_type, @modelAns, @Course_id, @questionId",
+               new SqlParameter("@quest_content", txt_QuesContent.Text),
+               new SqlParameter("@quest_type", "TorF"),
+               new SqlParameter("@modelAns", cb_TorF_ans.Text),
+               new SqlParameter("@Course_id", (int)cb_Courses.SelectedValue),
+               questionIdParameter
+           );
+int questionId = (int)questionIdParameter.Value;
+
+---------------------------------------------------------------------------------------------------------------------------
+
+<< Registering DBContext >>
+
+-- 1
+  services.AddDbContext<ApplicationDbContext>(options =>options.UseSqlServer(Configuration.GetConnectionString("cs")));
+	- Registers ApplicationDbContext as a scoped service (a new instance per web request).
+
+
+-- 2
+  services.AddDbContextPool<ApplicationDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("cs")));
+	- similar to AddDbContext, but reuses DbContext instances from a pool.
+	- Still scoped per request, but with internal reuse for performance.
+	- Your app has high throughput, and you want better performance.
+
+
+-- 3
+  services.AddDbContextFactory<ApplicationDbContext>(options =>options.UseSqlServer(Configuration.GetConnectionString("cs")));
+	- Registers a factory that can create new instances of DbContext on demand.
+	- You get full control over when/how DbContext is created.
+	- Perfect for parallel operations or background tasks.
+
+	- injection
+		- private readonly IDbContextFactory<ApplicationDbContext> dbContextfactory;
+		  public MyService(IDbContextFactory<ApplicationDbContext> dbContextfactory)
+		  
+		  var gamesTask = gameService.getAllGames();         	  // Task<List<Game>> or similar
+		  var locationsTask = locationService.getAllLocations();  // Task<List<Location>> or similar
+		  await Task.WhenAll(gamesTask, locationsTask); 	  // Await both tasks
+		  var games = await gamesTask;
+		  var locations = await locationsTask;
+
+
+-----------------------------------------------------------------------------------------------------------
+
+<< entity framework Transactions >>
+
+- A transaction is a sequence of operations performed as a single logical unit of work
+
+- Transactions ensure that a series of operations either all succeed or all fail which helps maintain data integrity.
+
+- The transaction is atomic, which means that either all operations within the transaction are successfully applied to the database, or none of them are 
+- transaction includes number of operations
+
+- Transactions typically follow the ACID properties
+	- Atomicity: Ensures that all operations in the transaction are completed successfully; if any operation fails, the entire transaction is rolled back, leaving the database unchanged.
+	- Consistency: The database transitions from one consistent state to another consistent state 
+	- Isolation: The operations in a transaction are isolated from other transactions.
+	- Durability: Once a transaction is committed, its changes are permanent, even in the case of a system crash.
+
+- Transaction Management in EF Core: EF Core provides several ways to manage transactions:
+	a. Automatic [Implicit] Transactions
+		- By default, EF Core uses automatic transactions for each SaveChanges or SaveChangesAsync call.
+		- EF Core starts and commits a transaction for you. If an error occurs during the save operation, the transaction is rolled back automatically.
+
+	b. Explicit Transactions: for more control
+		using (var transaction = context.Database.BeginTransaction())
+    		{
+        		try
+        		{
+            			context.Add(new YourEntity { Property = "Value1" });
+            			context.SaveChanges();
+
+            			context.Add(new YourEntity { Property = "Value2" });
+            			context.SaveChanges();
+
+            			transaction.Commit(); // Commit the transaction
+        		}
+        		catch (Exception)
+        		{
+            			transaction.Rollback(); // Rollback the transaction if any error occurs
+				// 
+        		}
+    		}
+
+		- Using TransactionScope: allows you to manage transactions across multiple DbContext instances or other operations:
+		  using (var scope = new TransactionScope()) // starts a new transaction.
+		  {
+    			using (var context1 = new YourDbContext())
+    			{
+        			context1.Add(new YourEntity { Property = "Value1" });
+        			context1.SaveChanges();
+    			}
+
+    			using (var context2 = new YourDbContext())
+    			{
+        			context2.Add(new YourEntity { Property = "Value2" });
+        			context2.SaveChanges();
+    			}
+
+    			scope.Complete(); // to commit the transaction. If this line is executed, all changes made by context1 and context2 are committed to the database.
+					  // If an exception occurs or scope.Complete() is not called, the transaction is automatically rolled back
+		}
+
+		- Handling Transactions in Asynchronous Operations
+		  using (var transaction = await context.Database.BeginTransactionAsync())
+    		  {
+        		try
+        		{
+            			await context.AddAsync(new YourEntity { Property = "Value1" });
+            			await context.SaveChangesAsync();
+
+            			await context.AddAsync(new YourEntity { Property = "Value2" });
+            			await context.SaveChangesAsync();
+
+            			await transaction.CommitAsync(); // Commit the transaction
+        		}
+        		catch (Exception)
+        		{
+            			await transaction.RollbackAsync(); // Rollback the transaction if any error occurs
+            			// throwException you want
+        		}
+    		}
+-----------------------------------------------------------------------------------------------------------
+ITrackedEntity [Omer Offbeat]
+
+public interface ITrackedEntity
+{ 
+     public DateTime CreatedDate { get; set; }
+     public DateTime ModifiedDate { get; set; }   
+}
+
+- make the class you want implement ITrackedEntity
+	Game : ITrackedEntity
+
+- override the save changes at ApplicationContext class
+   public override int SaveChanges()
+   {
+     AddTimestamp();
+     return base.SaveChanges();         
+   }
+
+   public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+   {
+     AddTimestamp();
+     return base.SaveChangesAsync(cancellationToken);
+   }
+
+ private void AddTimestamp()
+ {
+     var entries = ChangeTracker.Entries().Where(e => e.Entity is ITrackedEntity).ToList();
+     foreach (var entity in entries)
+     {
+         if (entity.State == EntityState.Added)
+         {
+             ((ITrackedEntity)(entity.Entity)).CreatedDate = DateTime.Now;
+         }
+         ((ITrackedEntity)(entity.Entity)).ModifiedDate = DateTime.Now;
+     }
+ }
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+<< inheritance in EF >>
+
+ public class Vehicle
+ {
+    	public int Id { get; set; }
+    	public string Name { get; set; }
+ }
+	
+ public class Car : Vehicle
+ {
+    public int NumberOfDoors { get; set; }
+ }
+
+ public class Bike : Vehicle
+ {
+    public bool HasGear { get; set; }
+ }
+
+
+1- Table-per-Hierarchy (TPH)
+	- Single table for all entities.
+	- A discriminator column:  is used to distinguish between different derived types, Unused columns are NULL.
+	------ Code
+	  protected override void OnModelCreating(ModelBuilder modelBuilder)
+	  {
+    		modelBuilder.Entity<Vehicle>()
+		   .HasDiscriminator<string>("Discriminator")
+        	   .HasValue<Car>("Car")
+        	   .HasValue<Bike>("Bike");
+	  } 
+	  
+	 - ApplicationDbContext
+	     public DbSet<Vehicle> Vehicles { get; set; }
+    	     public DbSet<Car> Cars { get; set; }
+             public DbSet<Bike> Bikes { get; set; }
+
+	- Even though you have DbSet<Vehicle>, DbSet<Car>, and DbSet<Bike>
+          EF Core only creates one table named Vehicles, because TPH stores all entities in a single table.
+
+	- Add Code
+		var car  = new Car { Name = "Honda", NumberOfDoors = 4 };
+	 	var bike = new Bike { Name = "Yamaha", HasGear = true };
+		context.Vehicles.Add(car); 
+		context.Vehicles.Add(bike);
+
+	- Get Codes
+		- var vehicles = context.Vehicles.ToList(); // Get all requests
+		- var brandingRequests = context.Requests.OfType<BrandingRequest>().ToList(); // Get only BrandingRequests
+		- var cars = context.Cars.ToList();
+	- Casting EX
+		- var brandingRequest = (BrandingRequest)Request
+
+	- Pros: Better performance due to no joins.
+	- Cons: Lots of NULLable columns for properties that belong only to specific derived types.
+	
+
+	- Generated Table Structure 
+	  Id	Name	NumberOfDoors	HasGear	Discriminator
+	  1	Honda	    4	  	NULL	     Car
+	  2	Yamaha	   NULL		TRUE	     Bike
+
+2- Table-per-Type (TPT)
+	- Each entity in the hierarchy gets its own table.
+	- Base class properties are stored in a separate table, while derived classes have their own tables linked via foreign keys.
+	- primary key (PK) of each derived table is also a foreign key (FK) referencing the base table (Vehicle).
+	- Pros: No NULLable columns, good normalization.
+	- Cons: Performance impact due to joins.
+	
+	- Generated Tables
+	   - Vehicles Table	
+		Id	Name
+		1	Honda
+		2	Yamaha
+
+	   - Cars Table
+		Id	NumberOfDoors
+		1	    4
+	
+	   - Bikes Table
+		Id	HasGear
+		2	TRUE
+
+	-- DBContext code
+	   - ApplicationDbContext
+	 	public DbSet<Vehicle> Vehicles { get; set; }
+    		public DbSet<Car> Cars { get; set; }
+    		public DbSet<Bike> Bikes { get; set; }
+
+		protected override void OnModelCreating(ModelBuilder modelBuilder)
+    		{
+            	    builder.Entity<Vehicle>().UseTptMappingStrategy(); 
+    		}
+
+
+	--- Get Code
+		var requests = context.Requests.ToList();
+		SELECT ...
+		  FROM Requests r
+		  LEFT JOIN OpeningRequests o ON r.Id = o.Id
+		  LEFT JOIN BrandingRequests b ON r.Id = b.Id
+
+		var cars = context.Cars.ToList();
+		SELECT v.Id, v.Name, c.NumberOfDoors
+		FROM Vehicles AS v
+		INNER JOIN Cars AS c ON v.Id = c.Id
+
+	- Adding Code
+	     var car  = new Car { Name = "Honda", NumberOfDoors = 4 };
+	     var bike = new Bike { Name = "Yamaha", HasGear = true };
+	     context.Vehicles.Add(car); 
+
+- Table-per-Concrete-Class (TBC)
+	- Each concrete class gets its own table, including properties inherited from the base class.
+	- Important: Vehicle is abstract because in TBC, we don't store a separate table for the base class.
+	- No table for the base class so .
+	- Pros: Simple queries, avoids joins.
+	
+	- ApplicationDbContext
+		public DbSet<Car> Cars { get; set; }
+    		public DbSet<Bike> Bikes { get; set; }
+		protected override void OnModelCreating(ModelBuilder modelBuilder)
+    		{
+        	   modelBuilder.Entity<Vehicle>().UseTpcMappingStrategy();  // // Ensure that only concrete classes have tables
+    		}
+	
+	- Generated Tables
+		- Cars Table  --> Id	Name	NumberOfDoors
+		- Bikes Table --> Id	Name	HasGear
+
+	- Get Code
+	   var cars = context.Vehicles.ToList();
+		SELECT Id, Name, NumberOfDoors, NULL AS HasGear FROM Cars
+		UNION ALL
+		SELECT Id, Name, NULL AS NumberOfDoors, HasGear FROM Bikes
+
+	- Add Code
+	    var car = new Car { Name = "Honda", NumberOfDoors = 4 };
+	    var bike = new Bike { Name = "Yamaha", HasGear = true };
+	    context.Cars.Add(car);
+    	    context.Bikes.Add(bike);
+ 
+	
+	   
+	   
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+<< DbContextOptionsBuilder, DbContextOptions >>
+
+
+- DbContextOptionsBuilder
+
+- It’s an EF Core configuration object that contains everything EF needs to know:
+	The database provider (e.g., SQL Server, SQLite, PostgreSQL)
+	The connection string
+	Other settings like lazy loading, logging, etc.
+
+- Registeration
+	- builder.Services.AddDbContext<ApplicationDbContext>(option => option.UseSqlServer(builder.Configuration.GetConnectionString("cs")));
+		- Registers ApplicationDbContext 
+			- It tells ASP.NET Core: If someone asks for ApplicationDbContext, I know how to create it.
+			- Configures it: Uses SQL Server , Uses the connection string named "cs" from appsettings.json
+			- registers it as Scoped, Meaning: One DbContext instance per HTTP request, Shared across all services/controllers/pages in that request
+		- option here of type DbContextOptionBuilder that determine the configuration setting of object like SQL Server and connection string
+		- EF Core use DbContextOptionBuilder to build DbContextOptions<ApplicationDbContext> from it then
+		- base(dbContextOption) 
+			- Passes the configured DbContextOptions into the base class (DbContext) so EF Core can use it to Connect to the DB and do its Functionalities 
+		 
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<< OnModelCreating >>
+
+protected override void OnModelCreating(ModelBuilder builder){
+
+	base.OnModelCreating(builder);   // // in case of your dbcontext inherit from another context
+
+	builder.Entity<ProjectDependency>().HasKey("ProjectId", "DependencyId");	
+
+	builder.Entity<IdentityRole>().HasData(
+     	new IdentityRole { Id = adminRoleId, Name = Role.Admin.ToString(), NormalizedName = Role.Admin.ToString().ToUpper() },
+     	new IdentityRole { Id = userRoleId, Name = Role.User.ToString(), NormalizedName = Role.User.ToString().ToUpper() }
+ );
+
+}
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+
+<< OnDelete >>
+
+DeleteBehavior.Restrict : Don't allow me to delete the parent unless its children are gone first.
+DeleteBehavior.Cascade  : When the parent is deleted, all related children are automatically deleted.
+DeleteBehavior.SetNull  : When the parent is deleted, the child’s foreign key is set to null.
+DeleteBehavior.NoAction : Acts like Restrict. If there are related children, SQL Server will block deletion of the parent.
+	
+
+
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+
+
+<< Configure the relationships OnModelCreating methods >>
+
+public class Project : BaseEntity<int>
+{
+    public string Name { get; set; }
+   
+    [ForeignKey("Category")]
+    public int? CategoryId { get; set; }
+
+    [ForeignKey("Supplier")]
+    public int? SupplierId { get; set; }
+
+    public Category Category { get; set; }  	// each project related to one existed category
+    public Supplier Supplier { get; set; }  	// each project is owned by one existed supplier
+
+    public ProjectDetails ProjectDetails { get; set; }  // each project has projectDetails [ one to one]
+    public ExtraDetails ExtraDetails { get; set; }      // each project has Extra Details [one to one]
+
+    public List<Tag> Tags { get; set; }      		 // many to many                
+    public List<Technology> Technologies { get; set; }   // many to many  
+    public List<Item> Items { get; set; } 		 // project has many items
+}
+
+
+--- configuring the RelationShip using FLuent API
+
+protected override void OnModelCreating(ModelBuilder builder)
+{
+    base.OnModelCreating(builder);
+
+    // One-to-Many: category -- project
+    builder.Entity<Project>()
+        .HasOne(P => P.Category)            // Each Project has ONE Category
+        .WithMany(C => C.Projects)          // Each Category has MANY Projects
+        .HasForeignKey(P => P.CategoryId)   // Foreign key in Project table
+        .OnDelete(DeleteBehavior.SetNull);
+
+    // One-to-Many: Supplier <--> Projects
+    builder.Entity<Project>()
+        .HasOne(P => P.Supplier)
+        .WithMany(S => S.Projects)
+        .HasForeignKey(P => P.SupplierId)
+        .OnDelete(DeleteBehavior.SetNull);
+
+    // One-to-One: Project <--> ProjectDetails
+    builder.Entity<Project>()
+        .HasOne(P => P.ProjectDetails)
+        .WithOne(PD => PD.Project)
+        .HasForeignKey<Project>(P => P.ProjectDetailsId)
+        .OnDelete(DeleteBehavior.SetNull);
+
+    // One-to-One: Project <--> ExtraDetails
+    builder.Entity<Project>()
+        .HasOne(P => P.ExtraDetails)
+        .WithOne(ED => ED.Project)
+        .HasForeignKey<Project>(P => P.ProjectDetailsId)
+        .OnDelete(DeleteBehavior.SetNull);
+
+    // Many-to-Many: Project <--> Tags
+    builder.Entity<Project>()
+        .HasMany(P => P.Tags)
+        .WithMany(T => T.Projects)
+        .UsingEntity(j => j.ToTable("ProjectsTags")); // Specifies the join table
+
+    // Many-to-Many: Project <--> Technologies
+    builder.Entity<Project>()
+        .HasMany(p => p.Technologies)
+        .WithMany(t => t.Projects)
+        .UsingEntity(j => j.ToTable("ProjectsTechnologies")); // Specifies the join table
+}
+
+
+note: cascading paths SQL Server doesn't allow multiple cascading paths to affect the same table, even if those are the same effect
+Here’s example of how SQL Server views your delete operation:
+	- Path 1: Branch → Users (via User.BranchId) → SetNull
+	- Path 2: Branch → Stores (via Cascade) → Store → Users (via User.StoreId) → SetNull
+	- Two paths are trying to modify the same table (Users) when deleting a Branch. Even though both are SetNull
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<< notes which is very important >>
+
+
+- when i make existingproject.tags.add(new tag(){Id=55});
+
+	- EF Core will start tracking the new Tag entity (Id = 55) if existingProject is already being tracked by the DbContext.
+
+	- the state of this new tag will be << Added >> , it's recommended to attach it before adding it in case of it existed at database
+
+	- Recommendation: Always attach existing entities before adding them to a collection to avoid Modified state issues
+
+	- If existingProject was retrieved from the database but is not currently tracked, adding a new Tag does not automatically track it
+
+	- If EF Core is already tracking another Tag entity with Id = 55, adding a new instance of Tag { Id = 55 } will cause an error when saving changes
+	
+	- if you want to be 100 % explicit and safe, always do:
+		- var tag = new Tag { Id = 55 };
+		  context.Attach(tag);
+		  existingProject.Tags.Add(tag); 
+
+- Do not use Auto Mapper mapper.map(projectDTO, existingProject) with editing you will be fucked
+
+
+- remember: 
+	Attach Method make the entity state unchanged provided this entity must have an Id , if not that attach will mark this entity state as Added
+
+
+- existingProject.Tags.Add(new Tag { Id = 55 });
+	- If EF does not already track a Tag with Id = 55 -> it will try to insert a new record.
+	- If EF is already tracking a Tag with Id = 55    -> EF links that existing tracked Tag to the project and the Tag’s state stays Unchanged
+	- If you explicitly attach it using context.Attach(new Tag { Id = 55 })  -> EF treats it as existing, marks it Unchanged
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+<< Add, Edit  [one to many] >>
+
+--- here one shipment has many parcels
+
+	public class ShipmentDTO
+	{
+	   public string ConsigneeName { get; set; }
+    	   public List<ParcelDTO> Parcels { get; set; }
+	}
+	public class Shipment
+	{
+	   public string ConsigneeName { get; set; }
+	   public List<Parcel> Parcels { get; set; }
+	} 
+	
+	public async Task<bool> Add(ShipmentDTO shipmentDTO)
+	{
+    	   try
+    	   {
+		var shipment = mapper.Map<Shipment>(shipmentDTO);
+              	await this.ShipmentRepo.AddAsyncWithSave(shipment);
+        	   return true;
+           }
+    	   catch
+    	   {
+        	return false;
+    	   }
+	} 
+
+	public async Task<bool> Edit(int id, ShipmentDTO shipmentDTO)
+	{
+    	   var transaction = await ShipmentRepo.BeginTransactionAsync();
+    	   try
+    	   {
+        	var existingShipment = await ShipmentRepo.GetByIdAsync(id, false, "Parcels");
+        	if (existingShipment == null)
+            	   return false;
+
+        	unit.DeleteRange(existingShipment.Parcels); // this line can be optimized
+         	mapper.Map(shipmentDTO, existingShipment);
+
+        	await  ShipmentRepo.SaveAsync();
+        	await transaction.CommitAsync();
+        	return true;
+	   }
+    	   catch
+    	   {
+        	await transaction.RollbackAsync();
+        	return false;
+     	   }
+	}
+
+
+------------------------------------------------------------------------------------------------------------
+
+<< Add, Edit  [many to many] >>
+
+------ project has many tags, tags are related to more than one project 
+
+-- Add
+
+public async Task<bool> addProject(ProjectDTO projectDTO)
+{
+    try
+    {
+	var project = mapper.Map<Project>(projectDTO);
+        var id = context.HttpContext.User.FindFirst("id")?.Value!;
+        project.ProjectOwner = id;
+
+        foreach (var tag in project.Tags)
+        {
+            unit.TagRepository.Attach(tag);
+        }
+        foreach (var technology in project.Technologies)
+        {
+            unit.TechnologyRepository.Attach(technology);
+        }
+        foreach (var dependency in project.Dependencies)
+        {
+            unit.DependencyRepository.Attach(dependency);
+        }
+        unit.ProjectRepository.Add(project);
+        await unit.SaveChangesAsync();
+        return true;
+    }
+    catch
+    {
+       return false;
+    }
+}
+
+-- Edit
+
+public async Task<bool> editProject1(int id, ProjectDTO projectDTO)
+{
+
+    var transaction = await unit.BeginTransactionAsync();
+    try
+    {
+        var existingProject = await unit.ProjectRepository.GetByIdAndIncludeAsync(id, "Tags", "Dependencies", "Technologies");
+        if (existingProject == null)
+            return false;
+
+        existingProject.Name = projectDTO.Name;
+        existingProject.Description = projectDTO.Description;
+        existingProject.ProjectLink = projectDTO.ProjectLink;
+
+        var tagsToRemove = existingProject.Tags.Where(tag => !projectDTO.Tags.Contains(tag.Id)).ToList();
+        var depToRemove  = existingProject.Dependencies.Where(dep =>  !projectDTO.Dependencies.Contains(dep.Id)).ToList();
+        var techToRemove = existingProject.Technologies.Where(tech => !projectDTO.Technologies.Contains(tech.Id)).ToList();
+
+        foreach (var tag in tagsToRemove)
+        {
+            existingProject.Tags.Remove(tag);
+        }
+        foreach (var dep in depToRemove)
+        {
+            existingProject.Dependencies.Remove(dep);
+        }
+        foreach (var tech in techToRemove)
+        {
+            existingProject.Technologies.Remove(tech);
+        }
+
+        var newTagIds = projectDTO.Tags.Where(tagId => !existingProject.Tags.Any(tag => tag.Id == tagId)).ToList();
+        var newTechIds = projectDTO.Technologies.Where(techId => !existingProject.Technologies.Any(tech => tech.Id == techId)).ToList();
+        var newDepIds = projectDTO.Dependencies.Where(depId => !existingProject.Dependencies.Any(dep => dep.Id == depId)).ToList();
+
+        existingProject.Tags.AddRange(newTagIds.Select(tagId =>
+        {
+            var t = new Tag() { Id = tagId };
+            unit.Attach(t);
+            return t;
+        }));
+        existingProject.Technologies.AddRange(newTechIds.Select(techId =>
+        {
+            var t = new Technology() { Id = techId };
+            unit.Attach(t);
+            return t;
+        }));
+        existingProject.Dependencies.AddRange(newDepIds.Select(depId => {
+            var t = new Dependency() { Id = depId };
+            unit.Attach(t);
+            return t;
+        }));
+        
+        await unit.SaveChangesAsync();
+        await transaction.CommitAsync();
+        return true;
+    }
+    catch (Exception)
+    {
+        await transaction.RollbackAsync();
+        return false;
+    }
+}
+
+-------------------------------------------------------------------------------------------------------------------------
+
+
+<< Add, Edit to Entity that has all the above >>
+
+public class Project : BaseEntity<int>
+{
+    public string Name { get; set; }
+   
+    [ForeignKey("Category")]
+    public int? CategoryId { get; set; }
+
+    [ForeignKey("Supplier")]
+    public int? SupplierId { get; set; }
+
+    public Category Category { get; set; }  // each project related to one existed category
+    public Supplier Supplier { get; set; }  // each project is owned by one existed supplier
+    public ProjectDetails ProjectDetails { get; set; }  // each project has projectDetails
+    public ExtraDetails ExtraDetails { get; set; }      // each project has Extra Details
+
+    public List<Tag> Tags { get; set; }      // many to many                
+    public List<Technology> Technologies { get; set; }   // many to many  
+    public List<Item> Items { get; set; } // project has many items
+}
+
+
+public class ProjectDTO
+{
+    public string Name { get; set; }
+    public ProjectDetailsDTO ProjectDetails { get; set; }
+    public ExtraDetailsDTO ExtraDetails { get; set; }
+    public List<ItemDTO> Items { get; set; }  // project has list of items
+    public int CategoryId { get; set; }      // project related to CategoryId
+    public int SupplierId { get; set; }     // project related to supplierId
+    public List<int> Tags { get; set; }
+    public List<int> Technologies { get; set; }
+}
+
+-- Add
+
+public async Task<bool> Add (ProjectDTO projectDTO)
+{
+    try
+    {
+        var Project = mapper.Map<Project>(projectDTO);
+        unit.AttachMultiple(Project.Tags);
+        unit.AttachMultiple(Project.Technologies);
+        await unit.ProjectRepository.AddAync(Project);
+        unit.SaveChanges();
+        return true;
+    }
+    catch
+    {
+        return false;
+    }
+}
+
+
+
+-- Edit
+
+public async  Task<bool> Edit(int id, ProjectDTO projectDTO)
+{
+    var transaction = await unit.BeginTransactionAsync();
+    try
+    {
+        var existingProject = await unit.ProjectRepository.GetByIdAndIncludeAsync(id, "Tags", "Technologies", "ProjectDetails", "ExtraDetails","Items");
+        if (existingProject == null)
+            return false;
+        
+
+        existingProject.Name = projectDTO.Name;
+        existingProject.CategoryId = projectDTO.CategoryId;
+        existingProject.SupplierId = projectDTO.SupplierId;
+
+        mapper.Map(projectDTO.ProjectDetails, existingProject.ProjectDetails);
+        mapper.Map(projectDTO.ExtraDetails, existingProject.ExtraDetails);
+        
+        unit.RemoveRange(existingProject.Items);
+        existingProject.Items = mapper.Map<List<Item>>(projectDTO.Items);
+
+        var tagsToRemove = existingProject.Tags.Where(tag => !projectDTO.Tags.Contains(tag.Id)).ToList();
+        var techToRemove = existingProject.Technologies.Where(tech => !projectDTO.Technologies.Contains(tech.Id)).ToList();
+        foreach (var tag in tagsToRemove)
+        {
+            existingProject.Tags.Remove(tag);
+        }
+        foreach (var tech in techToRemove)
+        {
+            existingProject.Technologies.Remove(tech);
+        }
+        var newTagIds = projectDTO.Tags.Where(tagId => !existingProject.Tags.Any(tag => tag.Id == tagId)).ToList();
+        var newTechIds = projectDTO.Technologies.Where(techId => !existingProject.Technologies.Any(tech => tech.Id == techId)).ToList();
+
+        existingProject.Tags.AddRange(newTagIds.Select(tagId =>
+        {
+            var t = new Tag() { Id = tagId };
+            unit.Attach(t);
+            return t;
+        }));
+
+        existingProject.Technologies.AddRange(newTechIds.Select(techId =>
+        {
+            var t = new Technology() { Id = techId };
+            unit.Attach(t);
+            return t;
+        }));
+
+        await unit.SaveChangesAsync();
+        await transaction.CommitAsync();
+        return true;
+    }
+    catch
+    {
+        return false;
+    }
+}

@@ -1,0 +1,39 @@
+﻿.contact-item {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 1.5rem; /* mb-4 */
+    cursor: pointer;
+}
+
+.contact-item .contact-item-icon {
+    min-width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid;
+    border-color: darkslategrey;
+    border-radius: 50%;
+    flex-shrink: 0; 
+}
+
+.contact-item .contact-item-icon i {
+    font-size: 1.5rem;
+    margin-inline-end: 0; 
+    text-align: center;
+}
+
+.contact-item .contact-item-text {
+    padding-left: 0.75rem; /* ps-2 or pl-3 */
+    padding-inline-start: 0.75rem
+}
+
+.contact-item .contact-item-text p {
+    margin-bottom: 0;
+}
+
+.contact-item .contact-item-text p a {
+    text-decoration:none;
+    color:inherit;
+}

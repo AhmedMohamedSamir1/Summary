@@ -1,0 +1,37 @@
+
+<< PIPES>>
+
+- applied on value while directive applied on elements
+- used to display (transform) value in a desired format
+- it change the display of data
+
+- PIPES is categorized into 
+	- need to import commonModules directive
+	- built-in pipes
+		- {{ 123 | currency}}
+		- {{ 123 | currency : 'EUR' : 'code' }} // it will display the EUR instead of Euro symbol 
+		- {{ "welcomde" | uppercase }}
+		- {{ createdAt | date }}
+		- {{ createdAt | date: 'shortDate' }}  // 3/26/2024
+		- {{ item.createdDate | date: 'yyyy-MM-dd hh:mm:ss aa' }}
+		- {{ newProduct | json }}
+		- {{counter | async}}  // it will the subscripe step implicitly
+
+	- Custom pipe
+		- ng g pipe Square --skip-tests
+		- code 
+		   @Pipe({ name: 'square', standalone: true }) 
+		   export class SquarePipe implements PipeTransform {
+			transform (value: number , pow: number) :number  // this method is called when you apply this pipe in any value, value 
+			{
+				return Math.pow( value, pow );
+ 			}
+		   }	
+
+		- need to be imported to use it --> at imports: [SquarePipe],
+		- <p> {{num| square: 2}}</p>
+
+
+- pipe is a feature used to transform data directly within the template without modifying the original data model. Pipes allow you to format, transform, and manipulate data
+
+- 

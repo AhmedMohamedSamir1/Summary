@@ -1,0 +1,191 @@
+public class Project : ITrackedEntity
+{
+    [Key]
+    public int Id { get; set; }
+    public string Name { get; set; }
+   
+    public  List<Tag> Tags { get; set; }
+}
+
+
+public class Tag : ITrackedEntity
+{
+	public int Id { get; set; }
+	public string Name { get; set; }
+	public  List<Project> Projects { get; set; }
+}
+
+
+
+
+----------------------------------------------------------------------------------------------------------------------
+
+
+<< add element with collection >>
+
+public async Task<bool> addProject(ProjectDTO projectDTO)
+{
+    try
+    {
+        var id = context.HttpContext.User.FindFirst("id")?.Value!;
+        var project = mapper.Map<Project>(projectDTO);
+        project.ProjectOwner = id;
+
+        foreach (var tag in project.Tags)
+        {
+            unit.TagRepository.Attach(tag);
+        }
+        foreach (var technology in project.Technologies)
+        {
+            unit.TechnologyRepository.Attach(technology);
+        }
+        foreach (var dependency in project.Dependencies)
+        {
+            unit.DependencyRepository.Attach(dependency);
+        }
+        unit.ProjectRepository.Add(project);
+        await unit.SaveChangesAsync();
+        return true;
+    }
+    catch
+    {
+       return false;
+    }
+}
+
+--------------------------------------------------------------------------------------------------------------------------------------
+
+<< Edit element with collection [ the best one ] >>
+
+public async Task<bool> editProject1(int id, ProjectDTO projectDTO)
+{
+
+    var transaction = await unit.BeginTransactionAsync();
+    try
+    {
+        var existingProject = await unit.ProjectRepository.GetByIdAndIncludeAsync(id, "Tags", "Dependencies", "Technologies");
+        if (existingProject == null)
+            return false;
+
+        existingProject.Name = projectDTO.Name;
+        existingProject.Description = projectDTO.Description;
+        existingProject.ProjectLink = projectDTO.ProjectLink;
+        existingProject.Instructions = projectDTO.Instructions;
+        existingProject.WebsiteLink = projectDTO.WebsiteLink;
+        existingProject.Client = projectDTO.Client;
+        existingProject.Brand = projectDTO.Brand;
+
+        var tagsToRemove = existingProject.Tags.Where(tag => !projectDTO.Tags.Contains(tag.Id)).ToList();
+        var depToRemove = existingProject.Dependencies.Where(dep => !projectDTO.Dependencies.Contains(dep.Id)).ToList();
+        var techToRemove = existingProject.Technologies.Where(tech => !projectDTO.Technologies.Contains(tech.Id)).ToList();
+
+        foreach (var tag in tagsToRemove)
+        {
+            existingProject.Tags.Remove(tag);
+        }
+        foreach (var dep in depToRemove)
+        {
+            existingProject.Dependencies.Remove(dep);
+        }
+        foreach (var tech in techToRemove)
+        {
+            existingProject.Technologies.Remove(tech);
+        }
+
+        var newTagIds = projectDTO.Tags.Where(tagId => !existingProject.Tags.Any(tag => tag.Id == tagId)).ToList();
+        var newTechIds = projectDTO.Technologies.Where(techId => !existingProject.Technologies.Any(tech => tech.Id == techId)).ToList();
+        var newDepIds = projectDTO.Dependencies.Where(depId => !existingProject.Dependencies.Any(dep => dep.Id == depId)).ToList();
+
+        existingProject.Tags.AddRange(newTagIds.Select(tagId =>
+        {
+            var t = new Tag() { Id = tagId };
+            unit.Attach(t);
+            return t;
+        }));
+        existingProject.Technologies.AddRange(newTechIds.Select(techId =>
+        {
+            var t = new Technology() { Id = techId };
+            unit.Attach(t);
+            return t;
+        }));
+        existingProject.Dependencies.AddRange(newDepIds.Select(depId => {
+            var t = new Dependency() { Id = depId };
+            unit.Attach(t);
+            return t;
+        }));
+        
+        await unit.SaveChangesAsync();
+        await transaction.CommitAsync();
+        return true;
+    }
+    catch (Exception)
+    {
+        await transaction.RollbackAsync();
+        return false;
+    }
+}
+
+
+-------------------------------------------------------------------------------------------------------------
+
+<< Edit element with collection >>
+
+public async Task<bool> editProject2(int id, ProjectDTO projectDTO)
+{
+
+    var transaction = await unit.BeginTransactionAsync();
+    try
+    {
+        var existingProject = await unit.ProjectRepository.GetByIdAndIncludeAsync(id, "Tags", "Dependencies", "Technologies");
+        if (existingProject == null)
+            return false;
+
+        existingProject.Name = projectDTO.Name;
+        existingProject.Description = projectDTO.Description;
+        existingProject.ProjectLink = projectDTO.ProjectLink;
+        existingProject.Instructions = projectDTO.Instructions;
+        existingProject.WebsiteLink = projectDTO.WebsiteLink;
+        existingProject.Client = projectDTO.Client;
+        existingProject.Brand = projectDTO.Brand;
+
+        var tagsToRemove = existingProject.Tags.Where(tag => !projectDTO.Tags.Contains(tag.Id)).ToList();
+        var depToRemove = existingProject.Dependencies.Where(dep => !projectDTO.Dependencies.Contains(dep.Id)).ToList();
+        var techToRemove = existingProject.Technologies.Where(tech => !projectDTO.Technologies.Contains(tech.Id)).ToList();
+
+        foreach (var tag in tagsToRemove)
+            existingProject.Tags.Remove(tag);
+        
+        foreach (var dep in depToRemove)
+            existingProject.Dependencies.Remove(dep);
+        
+        foreach (var tech in techToRemove)
+            existingProject.Technologies.Remove(tech);
+        
+        var newTagIds = projectDTO.Tags.Where(tagId => !existingProject.Tags.Any(tag => tag.Id == tagId)).ToList();
+        var newTechIds = projectDTO.Technologies.Where(techId => !existingProject.Technologies.Any(tech => tech.Id == techId)).ToList();
+        var newDepIds = projectDTO.Dependencies.Where(depId => !existingProject.Dependencies.Any(dep => dep.Id == depId)).ToList();
+        
+        var newTags = mapper.Map<List<Tag>>(newTagIds);
+        var newTechs = mapper.Map<List<Technology>>(newTechIds);
+        var newDeps = mapper.Map<List<Dependency>>(newDepIds);
+        
+        unit.Attach(newTags);
+        unit.Attach(newTechs);
+        unit.Attach(newDeps);
+
+        existingProject.Tags.AddRange(newTags);
+        existingProject.Technologies.AddRange(newTechs);
+        existingProject.Dependencies.AddRange(newDeps);
+        
+
+        await unit.SaveChangesAsync();
+        await transaction.CommitAsync();
+        return true;
+    }
+    catch (Exception)
+    {
+        await transaction.RollbackAsync();
+        return false;
+    }
+}
+

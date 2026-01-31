@@ -1,0 +1,107 @@
+public static class ServerConfig
+{
+    public static readonly string Domain = "http://localhost:5000/";  // must ends with /
+}
+
+---------------------------------------------------------------
+
+public class HttpServer
+{
+    private readonly HttpListener listener;
+    private bool isRunning;
+    private int index = -1;
+
+    public HttpServer()
+    {
+        listener = new HttpListener();
+        listener.Prefixes.Add(AppConfig.ServerUrl);
+    }
+
+    public void Start()
+    {
+        if (isRunning)
+            throw new InvalidOperationException("The server is already running.");
+
+        listener.Start();
+        isRunning = true;
+
+        Console.WriteLine($"Server started at {AppConfig.ServerUrl}");
+
+        // Start listening for requests
+
+        Task.Run(() => HandleRequests()); // Run asynchronously to handle multiple requests
+
+
+    }
+
+
+    private async Task HandleRequests()
+    {
+        while (isRunning)
+        {
+            var context = await listener.GetContextAsync(); // Wait for an incoming request
+            var request = context.Request;
+            var response = context.Response;
+
+            Console.WriteLine($"Received request: {request.HttpMethod} {request.Url.LocalPath}");
+
+            if (request.HttpMethod == "GET" && request.Url.LocalPath == "/currentIndex")
+            {
+                await GetCurrentIndex(response);
+            }
+            else
+            {
+                response.StatusCode = 404;  // Not Found
+                response.Close();
+            }
+
+        }
+    }
+
+
+    public void Stop()
+    {
+        if (!isRunning)
+            return;
+
+        listener.Stop();
+        isRunning = false;
+
+        Console.WriteLine("Server stopped.");
+    }
+
+
+    public async Task GetCurrentIndex(HttpListenerResponse response)
+    {
+        int currentIndex = index;
+        index = -1;
+        var result = new { index = currentIndex };
+
+        string responseString = JsonSerializer.Serialize(result);       // Converts the result object into a JSON string.
+
+        byte[] buffer = Encoding.UTF8.GetBytes(responseString);   
+	 // Purpose: Encodes the JSON string (responseString) into a byte array using UTF-8 encoding. 
+	 // Reason :  the http reponse body required to be in the form of bytes to be sent over the network, not as a plain string.
+
+        response.StatusCode = 200; // OK
+        response.ContentType = "application/json";
+
+	// This header informs the client that the content of the response is in JSON format,
+
+        response.ContentLength64 = buffer.Length;
+	// Purpose: Specifies the length of the response body in bytes.
+	// Reason: The client uses this information to know how much data to read from the response. It’s a required header for many HTTP responses.
+
+        await response.OutputStream.WriteAsync(buffer, 0, buffer.Length);
+	// This sends the serialized JSON content as the response body to the client
+
+        response.Close();
+	// Reason: This is necessary to properly complete the HTTP response and release any resources associated with it.
+	// Without this, the client may hang, waiting for more data.
+    }
+
+    public void setCurrentIndex(int newIndex)
+    {
+        this.index = newIndex;  
+    }
+}

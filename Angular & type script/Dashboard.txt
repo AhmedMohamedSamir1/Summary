@@ -1,0 +1,73 @@
+<main class="container-fluid d-flex p-0">
+
+    <!-- ONE sidebar: works as offcanvas on from xs to sm, normal from md -->
+    <div class="offcanvas offcanvas-start d-md-block text-bg-light" tabindex="-1" id="a-sidebar">
+
+        <div class="offcanvas-header d-md-none">
+            <h5 class="offcanvas-title">Hebrak</h5>
+            <button class="btn-close" data-bs-dismiss="offcanvas"></button>
+        </div>
+
+        <div class="offcanvas-body p-0">
+            <ul class="nav flex-column p-2">
+                <li class="nav-item"><a routerLink="/dashboard/home" class="nav-link">Home</a></li>
+                <li class="nav-item"><a routerLink="/dashboard/about" class="nav-link">About</a></li>
+                <li class="nav-item"><a href="#" class="nav-link">Logout</a></li>
+            </ul>
+        </div>
+        
+    </div>
+
+    <div class="col flex-column page-content">
+
+      <div class="layout-header d-flex align-items-center text-bg-dark p-10" style="font-family: cursive;">
+          <button class="btn btn-primary d-md-none me-10 fs-4 me-2"  type="button" data-bs-toggle="offcanvas" data-bs-target="#a-sidebar">☰</button>
+          <p class="p-0 m-0 fw-bold fs-4">Hebrak</p>
+      </div>
+
+      <div class="fluid-container p-10">
+          <router-outlet></router-outlet>
+      </div>
+
+    </div>
+    
+</main>
+  
+  
+
+--- css code
+
+#a-sidebar.offcanvas {
+    max-width: 300px !important;
+}
+
+@media (min-width: 768px) {
+    #a-sidebar.offcanvas {
+        transform: none !important; /* always visible */
+        visibility: visible !important;
+        position: static !important;
+        width: 200px;
+        min-height: 100vh;
+    }
+}
+
+
+---- Ts code
+	 imports: [RouterOutlet, RouterLink],
+
+--- app.route.ts
+    {
+      path: 'dashboard', 
+      loadComponent: () => import('./Components/Layouts/dashboard/dashboard.component').then(m => m.DashboardComponent),
+      children:[
+          {
+             path:'home',
+             loadComponent: () => import('./Components/home/home.component').then(m => m.HomeComponent),
+          },
+          {
+             path:'about',
+             loadComponent: () => import('./Components/about/about.component').then(m => m.AboutComponent),
+          }
+        ]
+    },
+

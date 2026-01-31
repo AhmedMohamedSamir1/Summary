@@ -1,0 +1,66 @@
+
+- install SignalR Package
+	- npm install @microsoft/signalr
+
+
+- code at your service
+
+import * as signalR from '@microsoft/signalr';
+
+public hubConnection!: signalR.HubConnection;
+
+public StartConnection():Promise<void> {
+        this.hubConnection = new signalR.HubConnectionBuilder()
+        .withUrl("https://localhost:7128/projectHub", { withCredentials: true  }).build();
+        return this.hubConnection.start();
+}
+
+public CloseConnection():Promise<void> {
+     return this.hubConnection.stop();
+}
+
+
+------- dot net code
+
+  public class ProjectHub : Hub
+  {
+  	public async Task SendMessage(string message)
+    	{
+        	await Clients.All.SendAsync("ReceiveMessage", message);  // Sending the message to all clients
+    	}
+  }
+
+------ ts code
+
+ngOnInit(): void {  
+    this.startSignalRConnection();
+}
+
+startSignalRConnection(){
+  this.projectService.StartConnection().then(()=>{
+    console.log("SignalR Connected");
+    this.listen();
+  });
+}
+  
+public listen(){
+  this.projectService.hubConnection.on('ReceiveMessage', (message: string) => {
+    console.log('Notification receivedddddddddd :', message);
+    alert(message); // Display notification as an alert or update UI
+  });
+}
+  
+sendMessage(message: string): void {
+  if (this.projectService.hubConnection.state === HubConnectionState.Connected) {
+    this.projectService.hubConnection.invoke('SendMessage', message)
+    	.then(() => console.log('Message sent'))
+    	.catch(err => console.error('Error sending message:', err));
+  } 
+  else 
+    console.error('SignalR connection is not established.');
+}
+
+
+
+
+

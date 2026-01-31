@@ -1,0 +1,1876 @@
+
+------------------------------------------------------------------------------------------------------------------------------
+
+<< introduction to c# >>
+- we will work in c# 12
+
+
+- previously the computer screen was like cmd screen and if you want to rewrite something you didn't have the ability to copy/paste 
+  until Larry and Tim invented copy-paste while working at Xerox company
+
+- what's difference between c and c++
+	- the c++ support oop
+	- in c   : C   generates EXE which is consist of 0s and 1s [machine language]
+	  in c++ : C++ generates EXE and and group of dll [dynamic link library]
+	
+
+- DLL in C# 
+  - consist of one or more classes that can be used in another projects
+  - Yes, when you create a Class Library project in Visual Studio, you are indeed creating a DLL
+  - the main usage of DLL is to resue your code including classes and interface, ... etc. in another projects br referencing it
+  - By referencing the DLL, you gain access to the classes and functionality it provides,
+    allowing you to reuse your code without having to copy and paste it into multiple places
+
+- DLL in c++ has some problems
+- c++ is a standard and companies can use this standard to make its own version of c++ so
+  borland company makes borland c++ , gcc makes GCC c++, microsoft makes visual c++ , and these 3 version was not
+  compitible with each other which means for example the DLL of GCC works only on GCC and it's a problem so
+  they agreed to set COM [component object model] standards to follow to generate compitible DLL
+
+
+- what's the limitation of c and c++ that make microsoft wants new programming language 
+	- we need to make a application with GUI [desktop application] which is very difficult to make with c++  
+	- we need multi-purpose language that allow us to make different types of applications
+	- the generated output EXE file is not compitible cross-platform [not working in the same way in all platform] 
+	- not managed code : you are the one who need to free the dynamic allocation
+
+- sun-microsystem company produced java language in 1976
+- micrososft in 2002 produced .net family [group of programming language integrated together][63 language] like C#, F#, G# , VB.net 
+  integrated together means the DLL of any of these language can be used in any of other these 63 language
+
+- compilation proccess for c# or any language of .net family
+  It is done in two steps
+
+  [C# code] -------C# compiler------>[IL]--------link with BCL using CRL------>[final IL]- -----------------JIT---------------[ 0/1]
+  |								                |					          |
+  |--------------compile time coccured on developer machine---------------------|--------run time coccured on client machine------|
+
+- IL  : [ intermediate language ] , it is like assembly code but it's not assembly code
+      : it's the exe that i will be gived it to the user
+      : IL contains the code with the calling helper function call
+      : final IL  contains the code with the code of called helper functions 
+      : IL == EXE
+
+JIT : [ just in time ] , tool existed on client machine that resposible for converting IL to 0/1
+	there will be differernt types of JIT each one for differernt operating systems
+	for example there will be JIT for window that will convert IL to 0/1 that window can understand and so on 
+	and this how .net family is a cross platform
+	- IL called deployed version
+	- to make IL work in user: he will take the IL file .net standard (BCL, CLR) 
+
+- all software tools used to manage the exceution of code are placed under umbrella called CRL 
+
+- the execution of any code : take two places on memory, one for instructions and one for execution
+
+- CLR [common language run] : 
+	- software tools used to convert code to 0/1 and manage the exceution of code
+	- resposible for managing the execution of code
+	- tools are like JIT, Garbage collector, debuging engine and ETC.
+	- class loader: loads classes into ram at run time , 
+	- CLS [common language specifiaction]  : manages the rules[loop, conditio,syntax ,etc.] of .net family languages that will be converted to IL  
+	- CTS [common type specifiaction] :    : manages the data type of .net family languages , part of CTS
+
+- after converting your code into 0/1 if you were using c++ code there is tool in CLR called com marshal used to link c++ helper method
+
+
+BCL : [ base class library ] : to get the block of code of the helper function you call.
+
+- CLR + BCL : are called 
+	.net SDK(standard) [2020:2022] 
+	.net core 	   [2016:2020] 
+	.net framework     [2002:2016] 
+
+.net sdk run-time: for client only
+.net sdk for developer :
+
+
+- C# charachtertics :
+  - it's a managed code : it has garbage collector
+  - Full oop : you don't have stand-alone function in C#
+  - multi-purpose language : it can be used to make different types of application
+  - cross platform
+  - open source
+  - type safe : no rubbish data
+  - RICH Library : BCL
+  
+LTS : long time support
+STS : standard term support
+
+web services: API
+----------------------------------------------------------------------------------------------
+
+
+<< create project >>
+- solution explorer used to group more than project
+- project name, solution name map on namespace
+- place solution and project in the same directory => remove the check 
+  to make it available to make more than project in the same solution
+
+<<namespace >>
+
+- it's a logical container that orgainze your classes
+- namespace can contain namespaces , classes 
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------
+<< compilation process>> 
+
+- build + build solution -> to generate EXE (IL) file, DLL file
+
+--------------------------------------------------------------------------------------------------------------------------------------------
+<< to display DLL content>>
+1. open command prompt for VS 2022
+2. write -> ildasm
+3. select any dll you want
+
+-----------------------------------------------------------------------------------------------------
+
+to fusticate the your code (IL) you need to install premitive protection-dotFusticator
+
+vs installer + individual component + premitive protection - dotFusticator
+
+-------------------------------------------------------------------------------------------------------------------------------
+
+<< region >>
+
+- using to organize your code
+
+#region
+
+#endregion
+
+---------------------------------------------------------------------------------------------------------------------------------
+<< variables >>
+
+- int x;
+  Console.Write(x); 	//compile error can't use unassigned variable
+
+- int x;
+  int res = sum(5,x) // compile error can't use unassigned variable
+
+- Data types
+	Integral numeric types
+		sbyte x  // 1 byte   , byte
+		short    // 2 bytes  , ushort
+		int x    // 4 bytes  , uint
+		long x   // 8 bytes  , ulong
+
+	floating point numeric types
+		float    // 4 bytes
+		double   // 8 bytes
+		decimal  // 16 bytes , used with money
+
+	char    // 1byte
+
+int x = 521;    // the compiler always read the number on the right hand side as a integer
+
+long x = 521L; // L: it means suffix
+
+double x = 521.55;   // the compiler always read the the decimal value on the right hand side as a double
+double x = 521.55D;
+double x = 521.55d;
+
+float c  = 22.21f;   // the compiler will read the the decimal value on the right hand side as float
+float c  = 22.21F;
+
+decimal num = 2.6645m  // the compiler will read the the decimal value on the right hand side as decimal 
+decimal num = 2.6645M  // M for money
+
+
+bool b = true
+
+- to make the variable takes null value -> 
+	int? num
+	Nullable<int> x = null;
+
+int x = 1_000_000
+	  
+
+---------------------------------------------------------------------------------------------------------------------------
+
+<< default keyword >>
+
+int x = default(int);   // x = 0
+int x = default(int);   // x = 0
+
+int  x = default(int);      // x = 0
+long x = default(long);     // x = 0
+char x = default(char);     // x = '\0' , note '\0' != null
+string x = default(string); // x = null
+ComplexNum x = default(ComplexNum); // ComplexNum is a struct , it intializes the fields of x with its default values without calling constructor
+ComplexNum x = default(ComplexNum); // ComplexNum is a class , x == null
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+<< memory & DataDtype >>
+
+- memory is divded into stack and heap and no BSS [data segement]
+
+- When variables are allocated on the stack, their memory locations are typically known at compile time,
+
+- why we need to divide the memory ? because if we need to get value of any variable all memory space will be scanned to get this variable
+  so we divide the memory into stack[the small space] and heap[the large space] to achieve the fast access
+
+
+- value DT        : stored in stack
+- reference DT    : stored in heap
+- static variable : stored in heap
+
+
+- DT used to 
+	1. specifiy the size of variable
+	2. validation 
+	3. specifiy opertions
+
+
+- C# DTs are divided into 2 DTs , DT stands for Data type
+	- value DT : 
+		-> stored in stack
+		-> value DT used to store small size of data [single simple value] like int, float, struct and ENUM
+		-> equal operator : deep copy
+	- reference DT :
+		-> stored in heap 
+		-> has reference in stack
+		-> used to store large size like class object, array, string
+		-> equal operator : Shallow copy -> two references will refer to the same object (space) in heap 
+		-> the defaut value for reference DT is NULL 
+
+Complex C; // if Complex is class  , c is reference variable , 
+Complex C; // if Complex is struct , c is variable , 
+
+- all DTs in c# inherit from object
+ 
+-----------------------------------------------------------------------------------------------------------------------------------
+
+<< new keyword >>
+
+- new with reference DT
+	- no object created without new keyword
+
+	- Complex C; // Complex is a class => C is a reference variable stored in stack that will refer to another place(object) in heap
+	  C = new Complex();
+		- allocate space(object) in heap
+		- return a reference to space or object allocated in heap that will be stored in C (reference variable) 
+		- call constructor to give values to object fields
+
+
+- new with value DT
+	- Complex C // Complex is a struct => C is a variable 
+	- int x = new int(); // x=0, it call constructor that initialize the variable with default value
+	- int x = new int(5); // compile there is no constructor takes parameter 
+
+---------------------------------------------------------------------------------------------------------------
+
+<< string >>
+
+- string concatenation
+	decimal salary= 55;
+	string s = "ahmed salary: "+ salary;  
+	Console.WriteLine(s);   // ahmed salary: 55 , note that salary converted implicitly to string  
+
+- string holders
+	int id = 55;
+	decimal salary = 12457.23m;
+	string text = string.Format("salary={0}, id={1}",salary,id);
+	Console.WriteLine("salary={0}, id={1}",salary,id);
+
+- string interpolation 
+	int id = 55;
+	decimal salary = 12457.23m;
+	string text = $"id: {id}, salary: {salary}";
+	Console.WriteLine(text); // id: 55, salary: 12457.23
+
+\n  : escape sequence
+\\n : escape parsing
+@   : escape parsing for all string "E:\flutter syntax\art" 
+-----------------------------------------------------------------------------------------
+
+<<control statement >>
+
+- if(true)-> compile
+- if(1) -> compile
+- if you write body for switch case you must end it with break keyword
+- you can switch on any DT
+
+-----------------------------------------------------------------------------------------------------
+
+<< array >>
+
+- collection of data with a fixed size stored sequentially
+- int[]arr = arr2; // shallow copying
+
+- 1d array
+	int[] arr = new int[3];  
+	- it allocates array in heap , return a reference to arr, elements intialized with default value because of new keyword
+	- int[] arr = new int[3]{1,4,77}; 
+	- int[] arr = new int[]{1,4,77};
+	- int[] arr = {1,4,77,5};   // syntax suger
+	- int[] arr = [1,5,7];   // C#12
+	- unpacking 
+		int[] arr ={ 4,5,4,5};
+		int[] arr2 = [..arr];
+
+- to get the num of array elements
+	arr.Length;
+	
+
+- Array.Sort(array) // sort the array it self descending , don't return new array
+- Array.Reverse(array) // reverse
+
+- 2d array
+	- int[,] arr = new int[3,4]; //arr.Length=12;
+	- int[,] arr = new int[2,2]{ {1,5}, {5,7} };
+	- int[,] arr = { {1,5}, {5,7} } // syntax suger
+	- int[,] arr = { { 1, 5 }, { 5, } }; // compile error expected 2x2 array
+ 
+GetLength(0) // get the length of first dimesion
+GetLength(1) // get the length of the second dimension
+
+- Jacked[Jagged array] -> array of references or array of array 
+	- int [][] arr = new int[4][];  // arr.Length== GetLength(0) == 4
+	  arr is a reference variable in stack refers to array of 4 references stored in heap and each element of this array refer to another array in heap
+	- arr[0] = new int[5];		
+	- arr[1] = new int[3];
+	- arr[2] = new int[4,5];	
+
+-------------------------------------------------------------------------------------------------------------
+
+<< casting >>
+
+- implicit
+	- it done automatically
+	- converting from smaller type to a larger type size
+	- DTs are compitible=> (int, long ) , (float, double)
+	- int x= 55;
+	  long y = x;
+	  int x = 'A';  // x = 65 as character A has an ASCII code
+	  char a = 65   // compile
+- explicit
+	- converting from larger type to a smaller type size
+	- DTs are compitible=> (int, long ) , (float, double) 
+	- long x = 12345;
+	  int y = x;  // compile
+	  int y = (int)y // you must ensure that value of y in range of integer to avoid overflow 
+	- int x = int.MaxValue + 20 // arithmetic overflow
+	- to prevent overflow use check block -> checked{ int x = int.MaxValue + 20 } 
+	- char a = (char)65
+
+- helper method
+	- toString(); EX: x.toString();	
+	- Parse();    EX: int.Parse(variable)		      
+		//parse can't deal with null values return exception
+	- Convert();  EX: int x = Convert.ToInt32(variable);  
+		// convert can deal with null values, convert null value to default DT
+	- int x = int.Parse(null); // runtime error  Value cannot be null
+	- int x = Convert.ToInt32(null); // x=0
+- user defined casting
+
+------------------------------------------------------------------------------------------------------------------------ 
+
+<< user defined DT >>
+
+- complex DT it's a DT consists of more than one DT
+
+-> to define complex DT you can use class, struct, Enum, interface
+	struct -> size of members is small 
+	class  -> size of members is large
+	
+- struct : 
+	- it defines value DT
+	- default access modifier in struct is private
+	- ComplexNum c;  // c is variable stored in stack
+	- struct ComplexNum { int real; int img; public void setReal(); public void setImg(); }
+	    ComplexNum c;
+	    c.setReal(5); // compile as can't make an operation on unassigned variable
+	    to solve this problem we will use new keyword that will call default constructor of struct
+	- constructor with struct: there is always a default (parameterless) constructor generated automatically that used to
+	  initialize struct fields with default values , or you override it
+	- the behavior of any constructor is to intialize the fields with default values
+	- at IL file there is always a parameterless constructor will be existed
+	- struct does not has a user defined (explicit) inheritance but it inherits implicitly from sytem.object like any DT
+
+- class : 
+	- default access modeifier in class is private
+	- constructor with class: there is a default (parameterless) constructor generated automatically that used to initialize 
+	  class fields with default values until you make user defined constructor it will not exist 
+	  once you make parameterized constructor you need to override the parameterless constructor if you want to use it
+	- at IL file parameterless constructor could not exist
+
+- C# provide to us property: it's an encapsulated setter and getter, can be called like variable
+	public int Real { 
+            get { return real; } 
+            set {  real = value; }
+    	}
+	- the property can be set only or get only
+	- the set and get can have access modifier
+	  public int Real { 
+            private get { return real; } 
+            set {  real = value; }
+    	}	
+- C# provide to us also automatic property: it's encapsulated variable with its setter and getter, can be called like variable
+	- used  when you don't want validation on variable 
+	- public int dec { get; set; }
+
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+<< access modifier >>
+
+
+		     your---assembly------file	 | other assembly file  	      
+						 |
+		      class---inherited---other--| inheritedClass----other
+private		    : yes        		 |
+public 		    : yes-------yes--------yes---|    yes-----------yes   
+protected	    : yes-------yes		 |    yes
+internal(file level): yes-------yes--------yes---|    yes
+protected internal  : yes-------yes--------yes---| 
+private protected   : yes-------yes	
+
+class,struct default : private
+interface: public
+
+partial class : allow you to write your class on more than one file
+partial class test {}
+
+| Access Modifier      | Same Class | Same Assembly | Derived Class (same assembly) | Derived Class (other assembly) | Other Class (other assembly) |
+| -------------------- | ---------- | ------------- | ----------------------------- | ------------------------------ | ---------------------------- |
+| `private`            | ✅          | ❌             | ❌                             | ❌                              | ❌                            |
+| `protected`          | ✅          | ❌             | ✅                             | ✅                              | ❌                            |
+| `internal`           | ✅          | ✅             | ✅                             | ❌                              | ❌                            |
+| `protected internal` | ✅          | ✅             | ✅                             | ✅                              | ❌                            |
+| `private protected`  | ✅          | ✅             | ✅                             | ❌                              | ❌                            |
+| `public`             | ✅          | ✅             | ✅                             | ✅                              | ✅                            |
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+<< this keyword >>
+
+- this -> refer to the caller or reference to the current instance of the class
+- differ between member and parameter
+
+- used to chain constructor : example
+	public ComplexNum() { Console.WriteLine("hello from def const"); }      
+        public ComplexNum(int x):this()
+        {
+            Console.WriteLine("hello from param const");
+            this.real = x;
+            this.img = x;
+        }
+	output: 
+	hello from def const
+	hello from param const
+
+	public classConstructor():base() // base refers to parent class
+	{
+		base.parentMemeber // provided that member is accessable [not private]
+	} 
+	
+
+- indexer
+	- An indexer allows an instance of a class or struct to be indexed as an array
+
+	access_modifier return_type this [parameter1 , parameter2 ,......]
+	{
+  		get  { // get block code }
+  		set  { // set block code }
+	}
+	- example 1
+	class test
+    	{
+        	public int[] grade;
+		public [] string name;
+        	public test(int size=3)
+        	{
+            		grade = new int[size];
+        	}
+        	public int this[int index] {
+            		get { return grade[index]; }
+            		set { grade[index] = value;}
+        	}
+
+   	  test t = new test();
+ 	  t[0] = 55;
+ 	  Console.WriteLine(t[0]);       //55
+ 	  Console.WriteLine(t.grade[0]); //55
+
+	- EXAMPLE 2
+
+	class phonebook
+    	{
+        	public string[] names { get; set; }
+        	public string[] numbers { get; set; }
+        	public phonebook(int size = 10)
+        	{
+            		names = new string[size];
+            		numbers = new string[size];
+        	}
+        	public void add(int index, string name, string number)
+        	{
+            		names[index] = name;
+            		numbers[index] = number;
+        	}
+        	public string this[int index, string name]
+        	{
+            		set { add(index, name, value); }
+            		get
+            		{
+                	     if (names[index] != null)
+                    		return numbers[index];
+                	     else throw new Exception();
+            		}
+        	}
+        	public string this[string name]
+        	{
+            	   get
+            	   {
+                	for (int i = 0; i < names.Length; i++)
+                	{
+                    	   if (names[i] == name)
+                        	return numbers[i];
+                	}
+                	throw new Exception();
+            	   }
+         	}
+    	}
+	phonebook ph = new phonebook(10);
+	ph.add(0, "shady", "0125545444");
+	ph.add(1, "saleh", "0125482122");
+           
+	ph[5, "sameh"] = "0121514";
+	Console.WriteLine(ph["shady"]); // 0125545444
+
+---------------------------------------------------------------------------------------------------------------------------------------------------
+
+<< debuging >>
+
+- step into : go deeply
+- step over
+- step out
+- continue: continue execution until next break point
+- you can make a condition on break point
+-----------------------------------------------------------------------------------------------------------------
+
+<< destructor >>
+
+- the last function will be executed before garbage collection removes object from memory 
+- used to manage unmanaged resources like connection on DB , connection on file
+- it's a kind of saving the changes or closing the opened connections before object is removed from memory
+
+~className(){}
+
+--------------------------------------------------------------------------------------------------------
+
+
+<< type of >>
+
+
+typeof(ShipmentType);    return type
+Console.WriteLine(typeof(int));      // System.Int32
+Console.WriteLine(typeof(float));    // System.Single
+Console.WriteLine(typeof(double));   // System.Double
+Console.WriteLine(typeof(char));     // System.Char	
+Console.WriteLine(typeof(string));   // System.String  
+Console.WriteLine(typeof(Array));    // System.Array
+Console.WriteLine(typeof(int[]));    // System.Int32[]	
+Console.WriteLine(typeof(object));   // System.Object
+
+
+---------------------------------------------------------------------------------------------------------------------------
+	
+<< object datatype >>
+
+- int, float, double are struct	
+ 
+- all DT and user defined DTs inherit from ( object class ) that exists in system namespace
+
+- the methods defined in System.object class are
+	.toString();
+	.Equals();   
+	.GetType();
+	.getHashCode(); // hash code used to determine where to store the object
+
+- object is a reference DT 
+
+	object obj = 2;     -> // obj doesn't see 2 as integer ,  which means you can't poeform any operation of int on it , like obj++ // compile
+	object obj = "ali"; -> // obj doesn't see "ali" as string, 
+        //it's like reference of parent refer to object of child it only only see its members
+	
+	
+	int x = 123;
+	object obj = x;  // 	 [data is moved from stack to heap]	
+	object obj = new object(x);  ==> object obj = x; // syntax sugar	
+	
+	object s = 123;
+	int y = (int)s;  // unboxing [data is moved from heap to stack]
+	
+- boxing and unboxing are not prefered in c# : Allocating and freeing heap memory is slower and more complex than using the stack.
+
+- Equals();   
+	- the default behavior of Equals() is comparing the values of stack together as following
+	
+	Complex c1 = new Complex(2 , 5);
+	Complex c2 = new Complex(2 , 5);
+	- c1.Equals(c2);  
+		if complex is a calss  : false as it compares the references of c1 , c2 // shallow Comparison
+		if complex is a struct : true  as it compares the values of c1 , c2 	// deep Comparison
+	
+- GetType(); // return namespaceName.className
+	- can't be overriden 
+ 	- ComplexNum c1 = new ComplexNum(5);
+	- Console.WriteLine(c1.GetType());   // test.ComplexNum
+
+	- object obj = 5;
+ 	  Console.Write(obj.GetType()); // System.Int32	
+------------------------------------------------------------------------------------------------------------------------
+
+<< ENUM >>
+
+- it's a value DT
+- used to specify or limit a certain values for a variable like gender [email / female] , permission [read / write]
+   ليميت الفاريابل ب قيم معينة
+
+- used to 
+    enum Gender
+    {
+        male,
+        female
+    }
+	Gender g = Gender.female;
+	Console.WriteLine(g); 		// female
+	Console.WriteLine((Gender)1); 	// female
+	Console.WriteLine((int)g);  	// 1
+	Gender G = (Gender)3    // 3 because there is no value corresponding to 3 in ENUMERATION
+	
+
+- flag enumeration or bit-flag enumeration
+  - make to enum variable more than one value
+
+    [Flags] // this is a c# attribute
+    enum permission  // enum permission : byte  => to make enum stores byte for each value , default is int
+    {
+        read = 1,
+        write = 2,
+        execute= 4,
+        delete = 8,
+    }
+	Console.WriteLine((permission)1); // read
+	
+	permission p = permission.read;
+  	Console.WriteLine(p); // read
+	
+	permission p2 = (permission)3;  // if there is not a value corresponding to 3 it will try to make a combination of values
+ 	Console.WriteLine(p2);          //  read, write
+	
+	
+	permission p3 = (permission)7;  
+  	Console.WriteLine(p3); // read, write, execute
+	
+	permission p4 = (permission)22;  
+ 	Console.WriteLine(p4); // 22
+	permission p4 = 7; // compile error  
+
+  	permission p5 = permission.read ^ permission.write ^ permission.execute;
+  	Console.WriteLine(p5); // read, write, execute
+
+note: ^ is  xor ->  0,1=>1  ,  0,0=> 1
+
+- to convert Enum to string --> string statusName = Enum.GetName(typeof(OrderStatus), status) // OrderStatus is the DT, status is Enum Variable
+			       EnumValue.toString();
+
+- Enum.GetValues(typeof(ShippingType)).Cast<ShippingType>();
+	GetValues(): returns an array that contains the values of ShippingType Enum
+	Cast(): cast the Enumerable type to specified type
+
+
+
+- extension method to get the Description of the Enum value
+  public enum VisitingTarget
+  {
+    [Description("Fun")]
+    Fun =1,
+
+    [Description("Watch a rider")]
+    WatchRider = 2,
+  }
+
+public static  class EnumExtensions
+{
+    public static string GetEnumDescription(this Enum value)
+    {
+        FieldInfo field = value.GetType().GetField(value.ToString());
+        DescriptionAttribute attribute = field.GetCustomAttribute<DescriptionAttribute>();
+
+        return attribute == null ? value.ToString() : attribute.Description;
+    }
+}
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<< passing DATA &  Ref >>
+
+- passing value DT
+	- pass value by value     -> you send a copy of a variables   [ parameters and arguments have different memory location]
+	- pass value by reference -> you send references of variables [ parameters and arguments same memory location ]  
+		- The method receives a reference to the original variable’s memory location (not a copy).
+
+	- ref keyword allow us to make reference variable refers to another place in stack
+ 
+ 	int x = 22;
+ 	ref int y = ref x; // here i have two variables point to same memory locations
+ 	x = 55;
+ 	Console.WriteLine(y); // 55
+ 	y = 555;
+ 	Console.WriteLine(x); // 555
+ 	Console.WriteLine(y); // 555
+
+ 	ref int V ; // compile as reference variable must be initialized
+
+	example 1:
+ 	public void swap(ref int x , ref int y){
+ 	{
+     		int temp = _x;
+     		_x = _y;
+     		_y = temp;
+
+ 	}
+ 	swap(ref x , ref y) // x , y values will be swapped
+
+	// EX 2: this example show how can reference allows us to return multiple values.
+	static int operation(int x, int y ,  ref int num) {
+            num = x + y;
+            return x - y;
+        }
+	int sum=0; // used as reference variable so must be initialized
+	int sub = operation(12, 6, ref sum);
+	Console.WriteLine($"sum={sum},sub={sub}"); // sum=18, sub=6
+
+- with reference DT
+	- pass reference by value
+	- pass reference by reference
+
+        // pass reference by value
+	public void swapArr( int[] arr1,  int[] arr2)
+        {
+            int[] temp = arr1;
+            arr1 = arr2;
+            arr2 = temp;
+        }	
+
+	//pass reference by reference
+	public void swapArr22(ref int[] arr1,  ref int[] arr2)
+        {
+            int[] temp = arr1;
+            arr1 = arr2;
+            arr2 = temp;
+        }	
+	int[] arr1 = { 1, 2, 3, };
+ 	int[] arr2 = { 4,5, 6 };
+ 	
+ 	swapArr(arr1, arr2);
+ 	Console.WriteLine(arr1[0]); // 1 , the swap will not be done because you send a copy of references
+
+	swapArr22(ref arr1, ref arr2);
+ 	Console.WriteLine(arr1[0]); // 4
+ 
+---------------------------------------------------------------------------------------------------------------------
+<< parameters >>
+
+- reference 
+	- ref parameter can not has a default value
+	- The variable passed as a ref argument must be initialized before it is passed to the method
+
+	// EX : this example shows how can reference allow us to return multiple values.
+	static int operation(int x, int y ,  ref int sum) {
+            sum = x + y;
+            return x - y;
+        }
+	// int sum; XX compile as ref variable must has a value
+	int sum=0;
+	int sub = operation(12, 6, ref sum);
+	Console.WriteLine($"sum={sum},sub={sub}"); // sum=18, sub=6
+
+- out parameter
+	- out parameter can not has a default value
+	- must assigned with value inside function so the Variable is not required to initialize the out argument before passing
+	- it is similar to the reference-type used to return multiple values.
+	example
+	static int operation(int x, int y ,  out int num) {
+            num = x + y;
+            return x - y;
+        }
+
+	int sum;
+	int sub = operation(12, 6, out sum);
+	Console.WriteLine($"sum={sum},sub={sub}"); // sum=18, sub=6
+
+- default param
+
+- named parameter
+	- int sub = operation(num1: 55, num2:6, ref sum); // num1, num2 are parameters names
+	
+- params keyword
+	- it is useful when programmer don’t have the knowledge about the number of parameters to be sent
+	- Only one Params keyword is allowed 
+	- no additional Params will be allowed in function after a params keyword =>  
+		sum(params int[] arr, int d) // compile , sum (int y, params int[] arr) // ok
+	- static int sum (int y, params int[] arr)
+          {
+            int s = 0;
+            foreach(int x in arr)
+                s += x;
+            return s;   
+          }
+	  sum(11 , 1,2,3,4,5) // return 15
+
+
+----------------------------------------------------------------------------------------------------------------
+<< exception handling >>
+
+- you shouldn't display all exception details to user
+- you need to log the error [very important]
+
+- C# funcationalities that reduce the exception like : is, as, tryparse, check, uncheck
+
+- is : check the DT
+       object obj = 5;
+	if(obj is int)
+	   int x = (int)obj;  // unboxing [heap to stack]
+	
+ 	int x = 5; if(x is object) // true
+	if(x is null)
+	if(x is not null)
+	if(obj is student)
+		student s = (student)obj;
+	if(obj is student s) // if obj is student cast and assign it in s 
+			     // false: The variable s is not declared at all
+	
+
+- as :  
+	- check the DT
+	- student std = s1 as student // check if s1 is student, if true cast and return it , 
+		if false it returns null so it works only with reference DT
+ 
+- tryParse(): return bool ,
+	- is just a safe way to parse
+	private int? TryParseNullableInt(string? value)
+	{
+    	    return int.TryParse(value, out int result) ? result : (int?)null;
+	}
+	// out int result is declaring a new variable result and passing it as an out argument to TryParse.
+	   That’s a C# 7+ feature called inline out variable declaration.
+	// the scope of result is --> inside the expression block
+
+int x;
+	if(int.TryParse(Console.ReadLine(), out x)) { }
+	// Tries to parse the input obtained from Console.ReadLine() into an integer.
+	// If successful, it will update the value of x with the parsed integer value,
+	// and it will return true. If parsing fails, x will retain its previous value (55), and it will return false.
+
+- checked   { block of code } // prevent overflow by -> System.OverflowException
+- unchecked { block of code } // allow overflow, the default
+
+- try-catch-finally
+	try
+ 	{
+     		Console.WriteLine("enter number");
+     		int x = int.Parse(Console.ReadLine());
+     		int z = 100 / x;
+     		Console.WriteLine(z);
+ 	}
+ 	catch (FormatException ex)
+ 	{
+     		Console.WriteLine("error: you must enter number");
+ 	}
+ 	catch (DivideByZeroException ex)
+ 	{
+     		Console.WriteLine("error: zero is invalid number");
+ 	}
+ 	catch (Exception ex)
+ 	{
+     		//logging error in file 
+     		//time  , fun , descr ,target ,data , any notes
+     		Console.WriteLine("error");
+     		// Console.WriteLine(ex.Message);
+     		Console.WriteLine(ex.TargetSite);
+ 	}
+ 	finally
+ 	{
+     		Console.WriteLine("finally");
+ 	}
+	
+-------------------------------------------------------------------------------------------------------------------
+
+<< user defined exception >>
+
+- buit-in exception
+	- throw new ArgumentOutOfRangeException();	
+	- throw new DivideByZeroException();
+	- throw new FormatException();
+
+- user defined  
+    class InvalidAgeException : Exception
+    {
+        public int age { get; set; }
+        public InvalidAgeException(int age) : base(message: "invalid age : age must between 6 and 20")
+        {
+            this.age = age;
+        }
+    }
+
+    class student
+    {
+        public int id { get; set; }
+        public string name { get; set; }
+        int age;
+        public int Age
+        {
+            set
+            {
+                if (value >= 6 && value <= 20)
+                    age = value;
+                else
+                    //age = 6; // if you want to set a value for age when exception is fired
+                    throw new InvalidAgeException(value);
+            }
+            get { return age; }
+        }
+    }
+
+      try
+      {
+      	student s = new student();
+        s.Age = 5;
+      }
+      catch (InvalidAgeException ex)
+      {
+         Console.WriteLine($"{ex.Message} - you enter value={ex.age}");
+      }
+----------------------------------------------------------------------------------------------------------------
+
+<< static keyword >>
+
+- variable related to class
+- varaible shared on the level of class between all objects
+- static member loaded(stored) in heap when your app is running
+- public static int count=0;
+- static variable can be accessed using class name -> className.staticMember 
+- static methods can only access static members 
+- in c# object can't call static members , 
+- static constructor
+	- used to assign values to static members
+	- is not a public 
+	- it's generated implicitly and assign static variable with its default value [the default behavior of any constructor in c#]
+	- called implicitly only once when you start using class
+	- it must be parameterless
+	- you can write your own constructor
+	-  static test() { vv = x; }
+
+class test
+{
+    public static int vv;
+    static test() { Console.WriteLine("hello from static constr"); } // called only once when you start using the class
+    public test() { Console.WriteLine("hello from def constr");  }
+}
+
+Console.WriteLine(test.vv); 
+// hello from static constr
+// 0
+
+Console.WriteLine(test.vv);
+test t1 = new test();
+test t2 = new test();
+// hello from static constr
+// 0
+// hello from def constr
+// hello from def constr
+
+
+- static method
+	  can only access static members
+	  can't access local members
+
+  	    public static int sum(int n1, int n2)
+  	    {
+                // calc c = new calc();
+                return n1 + n2;
+            }
+
+
+- static property
+
+- static class 
+	- has only static members [static variables , static fucntion ]
+	- can't create object from it [cant't be instantiated ]
+	- can't inherit it
+
+----------------------------------------------------------------------------------------------------------------
+
+<< operator overloading >>
+- function must be public and static
+- you need to keep in mind the matching operators  [>, <] , [==, !=] , [>= , <=] 
+
+          // Complex c = c1+c2;
+	  // c +=c2 
+	  public static complex operator +(complex x, complex y)
+          {    
+             return new complex(x.real + y.real, x.img + y.img);
+          }
+
+	  // c1 > c2 
+	  public static bool operator >(complex x , complex y)
+          {
+              return x.real > y.real;
+          }
+	  // c1<c2
+          public static bool operator <(complex x, complex y)
+          {
+              return x.real < y.real;
+          }
+	
+	  // c++ or ++c
+          public static complex operator++(complex c)
+          {
+              c.real++;
+              return c;
+          }
+
+- not overloading
+	= , +=, -=, *=, /=, ?, !, &&, ||, (), []
+ 
+----------------------------------------------------------------------------------------------------------------
+<< user defined casting >>
+
+- you have the ability to make the user defined casting implicit or explicit but if you define it implicitly you can't
+  make another one explicitly
+
+	 int x = c1;
+         public static implicit operator int (complex c)
+         {
+             return c.real;
+         }
+
+	 // string str = (string)c1; 
+	 public static explicit operator string(complex c)
+         {
+              return $"complex:{c.real}+{c.img}i";
+         }
+	  // float n = (float)c1;
+         public static explicit operator float(complex c)
+         {
+              return (float)(c.real + (c.img * 0.1));
+         }
+
+----------------------------------------------------------------------------------------------------------------
+<< XML documentation >>
+
+- to generate XML document for summary comments
+	sol explorer + right click on the project + properties + build + output+ check the checkbox of documentation file 
+	+ specifiy the path of XML
+	+ build project
+----------------------------------------------------------------------------------------------------------------
+
+<< classes relations >>
+
+- HAS-A (aggregation) Relationship
+	- represents a relationship between two classes where one class "has" or "contains" another class
+	
+	- Aggregation is typically represented by a member variable in one class that holds a reference to 
+	  an object of another class
+	
+	- Aggregation is represented by a member variable in one class that holds a reference to an object of another class. 
+   
+	- aggregation is a weaker relationship, where the objects involved can exist independently of each other. like car - engine
+    class student
+    {
+        public int id { get; set; }
+        public string  name{ get; set; }
+        public int age { get; set; }
+        public subject[] mysubj { get; set; }
+    }	
+
+    - so we define the reference of data inside class and pass the data from outside in aggreagtion
+
+- CONSIST-OF  //composition
+      class processor { public processor(){}  }
+      class computer  { processor c = new processor(); }
+      // this representation of consist of is the worst due to
+	  1. modification : if the processor changed ->  public processor(int coreI){}  all classes that has [depend on] a processor need to be changed too
+	  2. sharing      : you can't share an object form processor and share it between more than one object of computer 
+	  3. unit testing : you have object inside object so you will not be able to determine the problem from what object
+        
+	the solution : you can use constructor dependency injection [inject the dependency in run time]
+		class processor { public processor(int coreI){}  }
+		class computer  { processor c;  public computer(processor c) { this.c = c; }  }
+		
+		main() {  processor p = new processor(7);  computer c1 = new computer(p); computer c2 = new computer(p); }
+		// the 3 problems is solved: the object c is shared between more than one object
+					     we can determine the problem from which object
+					     if the processor is changed we don't need to change all classes that depend on it 
+		// but keep in mind that we convert the representation of compoistion to aggregation to solve these problems
+	- so we define the reference of data inside class and pass the data from outside in aggreagtion
+- Uses A
+    // use class DT as a parameter inside method in another class
+    class employee {    }
+    class manager  { public void add(employee em) {        } }	
+
+- IS-A, Typt-OF, Generalization, Inheritance
+
+
+----------------------------------------------------------------------------------------------------------------
+
+<< inheritance :
+	new keyword
+	child-constructor
+	virtual keyword & ovveride
+	sealed keyword
+	abstract keyword
+>>
+
+- the child inherits all members within the parent except the constructor and destructor
+
+- new keyword : 
+	used to hide any member [field or function] class inherits from parent
+	it's a kind of overriding
+	class Parent {
+            int y;
+            public int x { get; set; }
+            public Parent() {}
+            public Parent(int x) { this.x = x;}
+	    public void show(){ Console.WriteLine($"x={x}"); } 
+        }
+	class Child : Parent{
+	   public new  string x { get; set; }
+	   public int z { get; set; }
+	   public Child () {}
+	   public new void show(){ base.show(); Console.WriteLine($"x={x}, z={z}"); base.x } 
+	}
+        
+	// new keyword can't be written but you will get warning , if you want to hide any member use the new keyword
+	// parant show() , child show() are existed in memory
+	// you can access the member of parent class using base keyword -> base.parentMember
+
+	   parent p = new child();  // all features of reference p [x ,y] exist on child [x,y]
+					       
+           child c = new parent(1); // xxx  c has a features dosn't exist in parent
+
+- child constructor :
+	- any child constructor calls the parameterless constructor by default or we can say it chained with parameterless constructor by default
+	- if you want child constructor call parameterized constructor
+		public child(int x, int z) : base(x) { this.z = z; }
+		
+- virtual keyword & override
+	- The virtual keyword allows a method or property in a base class to be overridden in a derived class.
+	- virtuality is important and must keeped in mind when reference of parent refers to object of child
+   
+   public static void display(parent p)
+   {
+      p.show(); // without virtuality show() method of parent is the one that will be called every time
+   }
+   // Program.display(new parent());    	     //parent p= new parent();     
+   // Program.display(new child(1, 2)); 	     //parent p= new child(1,2);      // ref of parent refers to object of type child
+   // Program.display(new subchild(1, 2, 3));        //parent p= new subchild(1,2,3);     // ref of parent refers to object of type child
+  
+   - If I have a reference of parent refers to object of type child and i want the method of child to be called rahter than parent
+	you need to make the method at parent virtual and ovveride the virtuality in the child
+
+   - override keyword used to extend the virtuality
+
+     class Parent
+     {
+         public virtual void show() { Console.WriteLine($"parent show "); }
+     }
+
+     class Child : Parent
+     {
+        public override void show() { Console.WriteLine($"child show "); }
+     }
+     class SubChild : Child
+     {
+        public new void show() { Console.WriteLine($"Sub child show "); 
+     }
+    
+      Parent p1 = new Parent();
+      Parent p2 = new Child();
+      Parent p3 = new SubChild();
+
+      p1.show();  // parent show
+      p2.show();  // child show
+      p3.show();  // child show
+        --------------------------------------------------------------------------
+	-------------------------------------------------------------------------
+
+	class Parent
+	{
+    		public virtual void show() { Console.WriteLine("parent show"); }
+	}
+	class Child : Parent
+	{
+    		public override void show() { Console.WriteLine("child show"); }
+	}
+	class SubChild : Child
+	{
+    		public override void show() { Console.WriteLine("Sub child show"); }
+	}
+
+	Parent p1 = new Parent();
+	Parent p2 = new Child();
+	Parent p3 = new SubChild();
+
+	p1.show();  // parent show
+	p2.show();  // child show
+	p3.show();  // Sub child show, --> no need to override show()  at Parent if no changes are needed
+
+
+   
+    class Parent
+    {
+        public virtual void show() { Console.WriteLine($"parent show "); }
+    }
+    class Child : Parent
+    {
+       public virtual void show() { Console.WriteLine($"child show "); }
+    } 
+    class SubChild : Child
+    {
+        public override void show() { Console.WriteLine($"Sub child show "); 
+    }
+    
+     Parent p1 = new Parent();
+     Parent p2 = new Child();
+     Parent p3 = new SubChild();
+
+     p1.show();  // parent show
+     p2.show();  // parent show
+     p3.show();  // parent show
+
+- the compiler looks for the show() method in the Parent class first.
+- In the Parent class, the show() method is defined as virtual, which means it can be overridden in derived classes.
+
+- sealed keyword :
+    1. sealed with method : 
+	 - at parent class ->  public sealed override void show(){} 
+	 	// this class will extend the virtuality but the child of this class can't extend the virtuality of method show()
+	- sealed virtual -> compile error : how on earth you want to do something like that 
+   2. sealed with class : class can't be derived or inherited but can be instantiated
+
+- abstract keyword
+	abstract class  : class can't be instantiated, can be derived or inherited , can inherit
+	abstract method : class must be abstract , method must be overrided in subclasses
+		          the default of abstract method is virtual so we must extend the virtuality
+		           EX: public abstract void dispaly();  at child : public override void dispaly(){}
+			       |----------- header-----------|
+- very important note   
+    sealed keywored : class will extend  the virtuality of method but the child of this class can't extend the virtuality of the method 
+    new keyword    : class can't extend the virtuality of method and child of this class also can't extend the virtuality of the method 
+
+- multiple inhertiance :
+	- in c# there is no multiple inheritance due to diamond problem
+	- there is multi-level inheritance ->> system.object <- parent class <- child class <- subclass
+
+-------------------------------------------------------------------------------------------------------------------------------------- 
+
+<< interface , built-in interface >>
+
+- top level of abstraction
+- it's a contract must be avhieved , class A is a typeA -> if class A implements members of typeA
+
+- class can implement more than 1 interface
+
+- interface can't be instantiated
+
+- it supports multiple types of -> class A can be  user and player
+			           class B can be  employee and manager
+
+- class implements the interface not inherit it
+
+- the default of methods within interface is abstract , therefore they must be implemented
+
+- you can write a method with body [default implementation] within interface and the class 
+  that inherits this interface will has a copy of this method and in this case you don't have to implement this method
+
+
+- if class implements many interfaces and all of these interfaces have a method show, 
+	you will need to implement show method only once
+
+- interface can't contains fields it but it can contain automatic property and you must implement this property as well
+
+- declaration
+    interface TypeA
+    {
+        public void show();
+    }
+    interface TypeB
+    {
+        public void show();
+        public void showB();
+    }
+    class Parent
+    {
+        public virtual void display() { Console.WriteLine($"parent show "); }
+    }
+    class Test : Parent, TypeA, TypeB  // inherit comes first then implement
+    {
+        public  void show()
+        {
+            Console.WriteLine("test");
+        }
+        public void showB()
+        {
+            Console.WriteLine("showB from test");
+        }
+    }
+
+  Test test = new Test();
+  test.show();      // test
+  test.display();   // parent show
+
+
+
+exmaple 2:
+
+    class Parent
+    {
+        public virtual void display() { Console.WriteLine($"hello from parent"); }
+    }
+
+    interface TypeA
+    {
+        public  void show();
+        public  void showA()
+        { Console.WriteLine("show22"); }
+    }
+
+    interface TypeB
+    {
+        public void show();
+        public void showB();
+    }
+
+    class Test : Parent, TypeA, TypeB
+    {
+        void TypeA.show(){}  // must be private
+        void TypeB.show(){}  // must be private
+        public void show() { Console.WriteLine("test"); }
+        public void showB() { Console.WriteLine("showB from test"); }
+
+    }
+    Test test = new Test();
+    test.show();  // test
+   //test.showA();  // compile error no definition of showA inside Test class
+   ((TypeA)test).showA(); // showA22
+   ((TypeB)test).showB(); // showB from test
+
+- built-in interface
+	- Icomparable interface : has a method ->  public int CompareTo(object? obj)
+	- int, float, double, string implement from Icomparable interface
+	- all user defined DT does not implement Icomparable interface
+	- Array.Sort(arr); // sort the elements of array using the Icomparable implementation of each element
+	- so if you need to sort an array of student using Array.Sort()  //you need to make elements of array of type Icomparable
+	  which done by implement Icomparable interface to student class 
+	  
+    class student : IComparable
+    {
+        public int age { get; set; }
+        public student(int age) { this.age = age; }
+        public int CompareTo(object? obj)
+        {
+            student student = obj as student;        
+           return age.CompareTo(student.age);    
+        }
+        public override string ToString()
+        {
+            return $"age : {age}";
+        }
+    }
+	
+    student[] arrr = new student[] { new student(35), new student(25), new student(50), new student(5) };
+    Array.Sort(arrr);
+    foreach(student r in arrr) { Console.WriteLine(r.ToString()); }
+
+- IDisposable interface
+	- using statement-> making(limit) a scope to object and call Dispose() at the end of scope provided that 
+			      this object is type of IDisposable so we need to make the class object implements IDisposable
+	- Dispose() used to manage unmanaged resources like connection on database and opened files
+	    using(student s= new student())
+            {
+                s.age = 5;
+                Console.WriteLine(s.ToString());
+            }
+
+----------------------------------------------------------------------------------------------------------------------- 
+
+<< when i can't make object from class >>
+
+- abstract class
+- static class
+- private constructor
+
+----------------------------------------------------------------------------------------------------------------------- 
+
+<< string builder >>
+
+- the behavior s+=" mohamed"; s is a string -> 
+	the compiler will allocate another space in heap and move the value on it 
+	so the DT that help you to append the coming value is StringBuilder
+
+StringBuilder SB = new StringBuilder("ahmed "); // it starts with initial space 16bytes
+SB.Capacity; // 16
+SB.append("mohamed");
+---------------------------------------------------------------------------------------------------------------------
+
+<< generic >>
+
+- generic method
+	 public static void swap<T>(ref T x, ref T y)
+ 	 {
+     		T temp = x;
+     		x = y;
+     		y = temp;
+ 	 }
+	 int x = 55;
+ 	int y = 66;
+ 	swap<int>(ref x, ref y); 
+ 	Console.WriteLine(x); // 66
+	------------------------------------------------
+	 public static void func<T1, T2>(T1 x, T2 y){}
+	
+- generic class
+	- class stack<T>{}  // stack<int> s = new stack<int>();
+	- u can make constrains on generic like this -> class stack<T> where T : struct {}
+	
+- generic interface
+      interface ItypA<T1,T2>
+      {
+          void play(T1 x);
+          T1 result(T1 id, T2 name);
+      }
+      class test : ItypA<int, string>
+      {
+          public void play(int x){    }
+          public int result(int id, string name) {        }
+      }
+      -------------------------------------------------------------------------------------
+      -------------------------------------------------------------------------------------
+     - class student:IComparable<student>{
+	  public int CompareTo(student? other) // you do not need to casting to student
+          {
+             return age.CompareTo(other.age);
+          }		
+       }
+
+     - class Test<T>:IComparable<T>{
+ 	  public int CompareTo(T? other) // you do not need to casting
+          {
+             // code
+          }	
+        } 
+---------------------------------------------------------------------------------------------------------------------
+<< collection >>
+
+
+- collection : not commonly used as it depends on object and need boxing and unboxing
+   using System.Collections
+	1. ArrayList : 
+	    ArrayList li = new ArrayList() { 5, 88, 44 };
+            //li[2]++;   // compile error : can't make this operation on type object
+            li.Add(5);
+            li.Add("mariam");
+            li[3] = 33;
+            li.AddRange(new int[] { 99, 88, 101 });
+            li.Remove(88);    // remove the first element with 8
+            li.RemoveAt(3);
+            li.RemoveRange(2, 3);    // from index 2 remove 3
+            Console.WriteLine(li[1]); //44 
+
+	2. HashTable
+	3. SortedList	
+	4. Stack
+	5. Queue
+
+- generic collection
+	1. List
+	2. Dictionary
+		DT of item of dictionary -> KeyValuePair<>
+	3. SortedList
+	5. Stack
+	6. Queue
+
+----------------------------------------------------------------------------------------------------------------
+
+<< singleton >>
+
+- one of design patterns 
+- used when i want to make only one object from class
+- we use private constructor to create the object within class and static method that guarantee returning the created elements
+
+EX: 
+    class test
+    {
+        public int x { get; set; }
+        test(int x=0){    this.x = x; } // private constructor
+        static test obj = null;
+
+        public static test gettest()
+        {
+            if(obj == null)
+                obj = new test();
+            return obj;
+        }
+    }
+    
+    test obj = test. gettest()
+----------------------------------------------------------------------------------------------------------------
+
+<< delegate >>
+
+- pointer to function , or variable carries function provided that function has the same signature of delegate
+- delegate is a DT which means can be instantiated [make object from it], this object refers to methods with the same signature
+- 
+
+- to define delegate 
+	public delegate int myDel(int x, int y); // this means that delegate must refer to methods with signature int fun(int, int)
+	
+- to make an object from delagate:
+	    static int sum(int x , int y){ return x + y;}
+
+	    myDel del1 = new myDel(sum);
+            myDel del2 = sum; // syntax sugar
+            myDel del3 = (int x, int y) => x + y;                   // inline method
+            myDel del4 = delegate (int x, int y) { return x + y; };  // Anonymous method using delegate keyword
+	    myDel del5 = (x,y)=> x+y;
+- to invoke the delegate
+	int s = d.Invoke(5,6);  // delegate invoking -> passing paramters to its assigned methods and calling them
+	int s = d(5,6);		// syntax sugar
+
+
+- delegate as a parameter
+	public void operation(int n1 , int n2, mydel d){
+            Console.WriteLine( d.Invoke(n1, n2));
+        }
+	operation(5,6, sum) // 11
+	
+- multi-casting delegate
+   - delegate can refer or point on more than one method
+   - myDel del = new myDel(sum);
+     del+=sub
+     del.Invkoke(5,6) // it will execute the methods sum , sub , but it will return the returned vlaue of last method executed, the method executed sequentially
+     del+=sub // you can repeat the methods that assigned to delegate
+     del+sub 
+     del-=sum // remove the assigned method sub , if there is 2 of methods sum it will remove the last one added
+
+     myDel D = d1+d2  // where d1,d2 are another delegates , valid operation and D will have the (methods) of d1 and d2
+     
+     myDel D = d1-d2   // all methods of d2 must be existed in d1 to allow subtraction operation else D will be equal d1
+     
+
+- Generic delegate
+	public delegate t mydel<t>(t x, t y);
+	mydel<int> d = clac.sum;
+
+- built-in delegate
+	 - Func delegate: return value
+	     Func<int, int, int> d1 = new Func<int, int, int>(sum);
+             Func<int, int, int> d2 = sum;
+             Func<int, int, int> d3 = delegate(int x, int y) { return x + y; };
+             Func<int, int, int> d4 = (int x, int y) => x + y;
+
+	- Action delegate // return void
+	- Predicate delegate // return bool
+
+
+- anynoums method using delegate keyword
+       - Func<int,int,string> d=delegate(int x, int y) { int s= x + y;   return s.ToString(); };
+         Console.WriteLine(d(6, 5));
+         note: the difference here that we don't need to define the function within class
+	     
+- anynoums method using arrow function
+	public delegate int myDel(int x, int y);
+	myDel del1 = (int x, int y) => x + y;
+ 	myDel del2 = ( x, y) => x + y;
+
+--- Example
+ 
+ void MyHandler(string msg)
+ {
+    Console.WriteLine(msg);
+ }
+ Action<string> myDelegate = MyHandler;   // assign
+ myDelegate("Hello");                     // invoke -> calls MyHandler("Hello")
+
+
+
+-------------------------------------------------------------------------------------------------------------
+
+<< event delegate>>
+
+- a special type of delegate
+- more encapsulated than regular delegate you can only call += and -=
+- Events are typically used to notify other objects when a specific action or change occurs.
+- you keep in mind: 
+	[publisher, publisher method that fire(invoke) delegate, you need to ensure that delegate is not a null to prevent null reference exception],
+	[subscriber, function assigned to delegate by which notify the delegate invoking ]
+
+
+- Example 1
+  delegate void mydel(Publisher p);
+  class Publisher //publisher [AboFlah]
+  {
+      public string txt { get; set; }
+      public event mydel upload;  //define event "sepcial ref from delegate"
+      public Publisher(string txt = "AboFlah"){ this.txt = txt;}
+      public void onUpLoadVideo() //method that fires event [upload video]
+      {
+          if (upload != null)
+             upload.Invoke(this);
+      }
+
+  }
+  class Subscriber//subscriber
+  {
+      public void display(Publisher p)
+      {
+          Console.WriteLine($"notification: {p.txt} has published a video");
+      }
+
+  }
+   Publisher publisher = new Publisher("AboFlah");
+   Subscriber subscriber = new Subscriber();
+   publisher.upload += subscriber.display;
+   publisher.onUpLoadVideo();  // notification: AboFlah has published a video
+
+- Example 2 :
+
+    delegate void mydell(button btn);
+    class button //publisher
+    {
+        public string txt { get; set; }
+        public event mydell click;//define event "sepcial ref from delegate"
+        public button(string txt = "button") {  this.txt = txt;}
+        public void onClick() //method =>fire event
+        {
+            if (click != null)
+                click.Invoke(this);
+        }
+    }
+    class page//subscriber
+    {
+        public void display(button btn)
+        {
+            Console.WriteLine($"you clicked on {btn.txt} button");
+        }
+    }
+
+- note : we can attach extra info with our delegate
+      public class examargs
+      {
+          public DateTime startTime { get; set; }
+          public string location { get; set; }
+          public examargs(DateTime startTime, string location)
+          {
+              this.startTime = startTime;
+              this.location = location;
+          }
+      }
+      public delegate void mydel(Exam ex , examargs e);  // defining delegate
+      examstart.invoke(this, new examargs(DateTime.Now.AddMinutes(5),"lec1"));  // at publisher method
+      public void answerexam(Exam ex ,examargs e){}		                // method that will assigned to delegate
+
+- event built-in delegate
+	delegate void eventhandler(object sender , eventargs e)
+        delegate void eventhandler<t>(object sender ,t e)	// generic where t must be of type eventargs 
+	
+-------------------------------------------------------------------------------------------------------------
+
+<< implicit type local variable >>
+
+- var keyword
+- var x; // compile must be initialized
+- var x = 132;
+- x = "ali"      // compile can't reassign it with different DT
+- var V = null;  // compile can't assigned with null because all DT can be nullable so compiler can not detect the DT
+- var V = (string)null;  // in this case the variable var is string
+
+- it's commonly used when the right hand side is an expression or using it to iterate on collection
+---------------------------------------------------------------------------------------------------------
+
+<< object-initializer >>
+
+- used when i want to use the property during intializing object
+  student s = new student { id = 1, name = "ali" }; // it assign values to properties during creation of object
+
+- it calls constructor first
+
+  class student
+  {
+      // these properties can be only set in initialization 
+      public int id { get;  init; }
+      public string fname { get; init; }
+  }
+  student s = new student{ id = 1, fname = "ali" };
+  s.id = 56 // xxx complile error the id of student can only be assigned in object intializer
+  
+
+- you can force the user to use the object initializer
+  	class student
+  	{      
+      		public required int id { get;  init; } // this property must be used when initializing object
+      		public string fname    { get; init; }
+  	}
+  	student s = new sudent(); // compile
+  
+-------------------------------------------------------------------------------------------------------------
+
+<< mutable and immutable datatype >>
+
+- mutable data
+	- In C#, a mutable data type refers to a data type whose instances can be modified after they are created 
+
+- immutable data types cannot be modified once they are created [once created can not changed]
+       class student
+       {
+           public int id { get; }
+           public string name { get; }
+
+           public student(int id, string name)
+           {
+               this.id = id;
+               this.name = name;
+           }
+       }
+	student s = new student(55, "ahmed")
+        s.id = 44;   // xxx compile error id property is read only
+       ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+       class student
+       {
+           public int id { get; init;}
+           public string name { get; init;}
+       }
+       any instance properties can only be assigned in object intializer
+	
+----------------------------------------------------------------------------------------------------- 
+
+<< anynoums object >>
+
+- it's an object without DT [class]
+
+- once created can not changed [immutable]
+
+- used for data projection purposes [displaying data]
+
+- to define anynoums object-> var + new + object initializer
+
+- var obj = new {num=5, name="ahmed"};
+   obj.num = 55;  // compile , it's a immutable DT once you create object from it you can't make any changes on the data
+
+
+- var obj1 = new { s.id, s.fname }; // it will make the propertis name with id , fname 
+  Console.WriteLine(obj1);
+
+- var obj1 = new { s.id++ } 	 // compile: once you make operation on value you must specify a name for property
+  var obj1 = new { id = s.id++ }  
+
+----------------------------------------------------------------------------------------------------------------
+
+<< extension method >>
+
+- method does not within the class [DT] but i want to invoke it like a class member
+- parameter will be the caller
+
+- conditions
+	static class && static method
+
+EX: 
+static class test{			
+  public static int wordCount(this string text) // this method becomes extension method for DT string
+  {
+	return text.Split(" ").Length;
+  }
+}
+string str = "ahmed mohamed samir";
+int c = str.wordCount();
+
+------------------------------------------------------------------------------------------------
+
+<< ? >>
+
+define nullable DT -->  ?
+	string? str = null;
+	int? x = null;
+
+ternary condition =>  ?:
+	int x = (expression) ? value1: value2
+
+null conditional operator
+	arr?.Length;   // if array is not null retrieve its length
+	arr?[1]        // check nullability
+
+null colasing operator
+	txt??"123"    // if txt equal null return "123"
+
+null colasging assign operator
+	txt??="ahmed"  // if text==null => text="ahmed"
+
+------------------------------------------------------------------------------------------------------
+
+<< typeof >>
+
+- typeof(TEntity).GetProperties().ToList();  // List<PropertyInfo>
+- PropertyInfo Properties
+	- Name
+
+
+
+----------------------------------------------------------------------------------------------------------
+
+<< yield >>
+
+- The yield keyword in C# is used inside an iterator method to provide values one at a time, instead of building and returning a full collection at once.
+
+- When you use yield return, the compiler generates a hidden state machine that remembers where execution left off and continues from there when the caller asks for the next value.
+
+
+- EX:
+
+public static IEnumerable<int> GetNumbers()
+{
+    yield return 1;
+    yield return 2;
+    yield return 3;
+}
+
+foreach (var n in GetNumbers()) { Console.WriteLine(n); } // Output: 1 2 3
+
+-- Without yield, you’d have to create a List<int> and return it. With yield, you don’t need to store everything in memory first.
+
+-- Think of yield return like a pause button:
+	- When you call the method, it runs until it hits a yield return.
+	- It gives that value back and pauses.
+	- When the caller asks for the next value, execution resumes from where it paused, not from the start.
+
+-- With yield return, values are produced on demand (lazy evaluation). You don’t need to store them all at once.
+
+
+---------------------------------------------------------------------------------------------------------------------------
+
+
+<< Assembly >>
+
+- is the compiled output of your project — usually a .dll (class library) or .exe (application).
+
+
+MySolution/
+│
+├── MyApi/               (ASP.NET Core project → outputs MyApi.dll)
+│   └── Program.cs
+│
+├── MyApp.ServiceLayer/  (Class library → outputs MyApp.ServiceLayer.dll)
+│   └── Validators/
+│       ├── TagValidator.cs
+│       └── ProductValidator.cs
+
+
+- Assembly.GetExecutingAssembly() // the assembly of the currently running project (in this case MyApi.dll)
+- typeof(TagValidator).Assembly   // the assembly that contains TagValidator (in this case  MyApp.ServiceLayer.dll)
+
+
+

@@ -1,0 +1,218 @@
+public class GenericRepository<TEntity> where TEntity : class
+{
+    ApplicationContext context;
+    public GenericRepository(ApplicationContext context)
+    {
+        this.context = context;
+    }
+
+    public async Task<List<TEntity>> GetAll()
+    {
+        return await context.Set<TEntity>().ToListAsync();
+    }
+
+    public async Task<List<TEntity>> GetAll(Expression<Func<TEntity, bool>> filter)
+    {
+        var query = context.Set<TEntity>().Where(filter);
+        return await query.ToListAsync();
+    }
+
+    public async Task<List<TEntity>> GetAllWithNoTracking()
+    {
+        return await context.Set<TEntity>().AsNoTracking().ToListAsync();
+    }
+
+    public IQueryable<TEntity> GetAllWithNoTrackingAsIQuerable()
+    {
+        return context.Set<TEntity>().AsNoTracking(); // Ensure this returns an IQueryable
+    }
+
+    public async Task<List<TEntity>> GetAllWithFilter(
+        Expression<Func<TEntity, bool>> filter,
+        Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null)
+    {
+        IQueryable<TEntity> query = context.Set<TEntity>();
+
+        if (filter != null)
+            query = query.Where(filter);
+
+        if (orderBy != null)
+            query = orderBy(query);
+
+        return await query.ToListAsync();
+    }
+
+    public async Task<List<TEntity>> GetAllWithOrder(
+        Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy)
+    {
+        IQueryable<TEntity> query = context.Set<TEntity>();
+
+        if (orderBy != null)
+        {
+            query = orderBy(query); // Apply the ordering
+        }
+
+        // Execute the query and return the results
+        return await query.ToListAsync();
+    }
+
+    public void Insert(TEntity entity)
+    {
+        context.Entry(entity).State = EntityState.Added;
+    }
+
+    public void Update(TEntity entity)
+    {
+        context.Entry(entity).State = EntityState.Modified;
+    }
+
+    public void Delete(TEntity entity)
+    {
+        context.Entry(entity).State = EntityState.Deleted;
+    }
+
+    public async Task<TEntity?> GetFirstByFilter(Expression<Func<TEntity, bool>> filter)
+    {
+        return await context.Set<TEntity>().FirstOrDefaultAsync(filter);
+    }
+
+    public async Task<TEntity?> GetById(int id)
+    {
+        return await context.Set<TEntity>().FindAsync(id);
+    }
+
+    public async Task<TEntity?> GetById(string id)
+    {
+        return await context.Set<TEntity>().FindAsync(id);
+    }
+
+
+    public async Task<List<TEntity>> FetchPageAsync(
+        int pageNumber,
+        int pageSize,
+        Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
+        Expression<Func<TEntity, bool>>? filter = null)
+    {
+        IQueryable<TEntity> query = context.Set<TEntity>();
+
+        if (filter != null)
+            query = query.Where(filter);
+
+        if (orderBy != null)
+            query = orderBy(query);
+
+
+        query = query.Skip((pageNumber - 1) * pageSize).Take(pageSize);
+
+        return await query.ToListAsync();
+    }
+
+
+    public async Task<int> GetCount()
+    {
+
+        return await context.Set<TEntity>().CountAsync();
+    }
+
+    public async Task<int> GetCountByFilter(Expression<Func<TEntity, bool>> filter = null)
+    {
+        var query = context.Set<TEntity>().Where(filter);
+        return await query.CountAsync();
+    }
+
+}
+
+----------------------------------------------------------------------------------------------------------------------------------------
+
+public interface IGenericRepository<TEntity> where TEntity : class
+{
+    public Task<List<TEntity>> GetAll();
+    public Task<List<TEntity>> GetAll(Expression<Func<TEntity, bool>> filter);
+    public Task<List<TEntity>> GetAllWithNoTracking();
+    public Task<List<TEntity>> GetAllWithFilter(
+        Expression<Func<TEntity, bool>> filter,
+        Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null);
+
+    public Task<List<TEntity>> GetAllWithOrder(
+        Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy);
+
+    public void Insert(TEntity entity);
+    public void Update(TEntity entity);
+    public void Delete(TEntity entity);
+
+    public Task<TEntity?> GetFirstByFilter(Expression<Func<TEntity, bool>> filter);
+    public Task<TEntity?> GetById(int id);
+    public Task<TEntity?> GetById(string id);
+
+    public Task<List<TEntity>> GetPaged(
+        int pageNumber,
+        int pageSize,
+        Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
+        Expression<Func<TEntity, bool>> filter = null);
+
+    public Task<int> GetCount();
+
+    public Task<int> GetCountByFilter(Expression<Func<TEntity, bool>> filter = null);
+
+}
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+<< generic repository Synchronous>>
+	
+public class GenericRepository<TEntity> where TEntity:class
+{
+    ApplicationContext _context;
+
+    public GenericRepository(ApplicationContext context)
+    {
+        _context = context;
+    }
+
+    public List<TEntity> GetAll()
+    {
+        return _context.Set<TEntity>().ToList();
+    }
+
+    public List<TEntity> GetAll(Func<TEntity, bool> filter)
+    {
+        var query = _context.Set<TEntity>().Where(filter);
+        return query.ToList();
+    }
+
+    public void Insert(TEntity entity)
+    {
+        _context.Entry(entity).State = EntityState.Added;
+	// _context.Set<TEntity>().Add(entity);
+    }
+
+    public void Update(TEntity entity)
+    {
+        _context.Entry(entity).State = EntityState.Modified;
+    }
+
+    public void Delete(TEntity entity)
+    {
+        _context.Entry(entity).State = EntityState.Deleted;
+    }
+
+    public TEntity GetFirstByFilter(Func<TEntity, bool> filter)
+    {
+        return _context.Set<TEntity>().FirstOrDefault(filter);
+    }
+
+    public TEntity GetById(int id)
+    {
+        return _context.Set<TEntity>().Find(id);
+    }
+    public TEntity GetById(string id)
+    {
+        return _context.Set<TEntity>().Find(id);
+    }
+
+    public TEntity GetById(params object[] keyValues)
+    {
+        return _context.Set<TEntity>().Find(keyValues);
+    }
+}
+

@@ -1,0 +1,108 @@
+- Host: Any device on a network with an IP address is considered a host, This can include computers, servers, routers,
+
+- web resources like HTML, CSS, JS, images, JSON, Video and Audio Files:
+
+- Web Application Files (resources): consists of files such as HTML, CSS, JavaScript, images, ETC.
+
+- client (like a web browser) makes an HTTP request to a server,and receives responses to display the web application's interface and content.
+
+
+- Server: The central processing unit that stores data, performs operations, and generates responses to client requests.
+
+- types of servers: web server, DB server, mail server
+
+- web server like IIS, APACHE
+	- the central repository of the web application (it hosts your application).          
+        
+        - When a client needs information or wants to perform an action (like submitting a form), it sends a request to the server. 
+          The server processes the request, generates a response, and sends it back to the client.
+
+	- is a software application responsible for storing, processing, and serving Web Application Files to clients
+	- generates an HTTP response, which includes web resources with headers containing metadata about the response.
+	- a software application responsible for handling incoming HTTP requests from clients and sending back responses.
+	
+
+- domain name : ip-adress, port_num
+- ip-address  : the identifier of machine, machine has many applications
+- port number : the identifier of any application for machine
+- any application on a network has port num
+- there are 65,535 ports on NIC device 
+	- ports : منافذ لدخول وخروج الداتا
+	- from 1 to 1023 assigned and controlled by ICANN
+	- the default port for web is 80 (HTTP)
+- HTTP
+   -> a protocol used for transferring web resources over the internet between client and server
+   -> web resources like HTML, CSS, JS, images, JSON, Video and Audio Files:
+
+
+- Request-Response Cycle with Web Server:
+    - The client (web browser) sends an HTTP request to the web server,
+    - The web server receives the request and determines how to handle it based on the URL and type of request (GET, POST, etc.).
+   	- If the request is for a static file (like an HTML,image,CSS),the web server locates the file on its storage and sends it back as the response.
+      	- If the request requires processing (such as executing server-side scripts or interacting with databases for dynamic content), 
+	  the web server communicates with application logic (like PHP scripts) or database servers which means 
+          If the web server identifies that a PHP script needs to be executed, it passes control to the PHP interpreter.
+
+
+
+- Localhost: 
+  - refers to the local machine itself. When you refer to "localhost" in a web context, you are referring to the computer you are currently using
+  - It is commonly used for testing and development purposes when running a web server locally on your machine.
+  - The IP address of localhost is usually 127.0.0.1.
+  - localhost == 127.0.0.1 refer to local (current) machine
+  - 
+
+- "Deployment" 
+	- refers to the process of making a software application available for use
+  	- in the context of web development, deployment specifically refers to taking the code and files of
+  	  a web application from a development environment to a production environment where users can access it over the internet.
+	-  Here are some common places where web applications are deployed:
+	   Cloud Platforms like AWS, microsoft azure
+
+- Hosting Provider: The company that provides server space and services to host the web application's files and make them accessible over the internet.
+
+- the production environment is where the final version of the software runs and serves its actual users
+
+
+- your machine consider localhost with more than one server You might have 
+	a web server    : Apache , IIS
+	appSever        : Node.js
+	Database Server : SQL Server
+
+
+- IIS : 
+	- web server(default), can work as FTP server,
+	- you can host your websites on IIS
+	- handle http request 
+
+- APACHE: 
+
+
+
+
+-------------------------------------------------------------------------------------------
+
+- IIS is a features downloaded with windows but it's disabled so if you want to enable it
+	go to control panel, program, at program and features (Turn windows featuers on or off), check internet information services
+
+
+- how to manage IIS
+	after you enable IIS from above steps
+	on start menu open [ Internet Information Services Manager ]
+
+- localhost is divided into
+	- Application Pools : for each web application there is Application Pools object to handle this application
+	- sites : websites files
+
+-----------------------------------------------------------------------------------------------------------------------------------
+
+<< host WebApi on IIS >>
+
+
+ - 
+
+ - make DB works with sql server user -> we will make user on DB 
+	right click on logins -> write login name , check sql server Authentication and make password, uncheck enforce password policy 
+	at left from select a page choose user mapping and choose database that user will have a permission on it and make him owner from role membership
+
+ - 

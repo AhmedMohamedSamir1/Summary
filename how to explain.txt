@@ -1,0 +1,7 @@
+هى tool بتدينا control على 
+
+هى ال standars اللى متحدد فيها ال syntax, rules 
+
+ال performance بتاع ال read بيبقى عالى
+
+و بكدا تكون قللت الـ Network Traffic قدر الامكان ..

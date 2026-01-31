@@ -1,0 +1,135 @@
+public interface IEmailService
+    {
+        Task<bool> SendEmailAsync(string toEmail, string subject, string body);
+
+    }
+
+public class EmailService : IEmailService
+{
+   private const string fromMail = "ahmedmohamedmvp@gmail.com";
+   private const string pass = "tcuwqywyuemfayuo";
+
+   public async Task<bool> SendEmailAsync(string toEmail, string subject, string body)
+   {
+      try
+      {
+         var client = new SmtpClient("smtp.gmail.com", 587)
+         {
+            EnableSsl = true,
+            Credentials = new NetworkCredential(fromMail, pass)
+         };
+
+         var mailMessage = new MailMessage(fromMail, toEmail, subject, body)
+         {
+            IsBodyHtml = true // Email body contains HTML content
+         };
+         //await client.SendMailAsync(mailMessage);  // Send the email
+         return true;
+      }
+      catch
+      {
+         return false;
+      }   
+   }
+}
+
+-----------------------------------------------------------------------------------------------------
+
+<< Sending Email >>
+
+-- SMTP (Simple Mail Transfer Protocol): specialized mail server that handles sending, receiving, and relaying emails across the internet
+
+-- install these packages
+	Install-Package MailKit
+	Install-Package MimeKit
+
+--- provide the data of mail provider at appSettings.json
+	- you could search about SMTP for gmail of you intend to use gmail as SMTP server
+	- setting SMTP for gmail 
+	  "MailSettings": {
+  	    "Email": "ahmedmohamedsamir33@gmail.com",
+  	    "DisplayName": "Ahmed channel",
+  	    "Password": "Arsenal_90180360540",
+  	    "Host": "smtp.gmail.com",
+  	    "Port": 587
+	  }
+	
+	- setting of SMTP for outlook
+	  "MailSettings": {
+  	     "Email": "AddYourEmail",
+  	     "DisplayName": "Hebrak",
+  	     "Password": "AddYourPassword",
+  	     "Host": "smtp-mail.outlook.com",
+  	     "Port": 587
+	  }
+
+--- create settings folder
+   public class MailSettings
+   {
+     public string Email { get; set; }
+     public string DisplayName { get; set; }
+     public string Password { get; set; }
+     public string Host { get; set; }
+     public int Port { get; set; }
+   }
+  services.Configure<MailSettings>(Configuration.GetSection("MailSettings"));
+
+--- service interface
+
+public interface IMailingService
+{
+    Task SendEmailAsync(string mailTo, string subject, string body, IList<IFormFile> attachments = null);
+}
+
+public class MailingService : IMailingService
+{
+    private readonly MailSettings _mailSettings;
+
+    public MailingService(IOptions<MailSettings> mailSettings)
+    {
+        _mailSettings = mailSettings.Value;
+    }
+
+    public async Task SendEmailAsync(string mailTo, string subject, string body, IList<IFormFile> attachments = null)
+    {
+        var email = new MimeMessage
+        {
+            Sender = MailboxAddress.Parse(_mailSettings.Email),
+            Subject = subject
+        };
+
+        email.To.Add(MailboxAddress.Parse(mailTo));
+
+        var builder = new BodyBuilder();
+
+        if (attachments != null)
+        {
+            byte[] fileBytes;
+            foreach (var file in attachments)
+            {
+                if (file.Length > 0)
+                {
+                    using var ms = new MemoryStream();
+                    file.CopyTo(ms);
+                    fileBytes = ms.ToArray();
+
+                    builder.Attachments.Add(file.FileName, fileBytes, ContentType.Parse(file.ContentType));
+                }
+            }
+        }
+
+        builder.HtmlBody = body;
+        email.Body = builder.ToMessageBody();
+        email.From.Add(new MailboxAddress(_mailSettings.DisplayName, _mailSettings.Email));
+
+        using var smtp = new SmtpClient();
+        smtp.Connect(_mailSettings.Host, _mailSettings.Port, SecureSocketOptions.StartTls);
+        smtp.Authenticate(_mailSettings.Email, _mailSettings.Password);
+        await smtp.SendAsync(email);
+
+        smtp.Disconnect(true);
+    }
+}
+
+
+

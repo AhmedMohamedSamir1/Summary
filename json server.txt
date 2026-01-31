@@ -1,0 +1,43 @@
+
+-- npm init		// a command used to create a new package.json file for your Node.js project
+
+-- npm json-server
+
+
+---------------------------------------------
+
+create data.json file and write 
+
+{
+  "products": [
+    {
+      "id": "5",
+      "name": "Mercedez",
+      "price": 200,
+      "quantity": 1
+    },
+    {
+      "name": "watch",
+      "price": 5000,
+      "quantity": 11,
+      "id": "e6da"
+    },
+    {
+      "id": "e385",
+      "name": "car",
+      "price": 555,
+      "quantity": 5
+    }
+  ]
+}
+
+ --package.json
+   "start": "json-server -w -p 3333 data.json"
+	• json-server: This is the command to start the JSON Server.
+	• -w or --watch: This flag tells the server to watch for changes in the file specified (data.json) data.json
+		 If the file is modified, the server will automatically reload.
+	• -p 3333 or --port 3333: This specifies the port number on which the server will listen. In this case, it is set to port 3333
+	• data.json: This is the file that contains your data, which JSON Server will use to create the REST API.
+
+
+-----------------------------------------

@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="stylesheet" href="css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/css-extension.css">
+  <link rel="stylesheet" href="css/cards.css">
+  <link rel="stylesheet" href="css/form-elements.css">
+  <link rel="stylesheet" href="css/uploadFile.css">
+  <link rel="stylesheet" href="css/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="css/timeline.css">
+  <link rel="stylesheet" href="css/intlTelInput.css">
+  <link rel="stylesheet" href="css/footer.css">
+  <link rel="stylesheet" href="css/tables.css">
+
+<!-- Font Awesome 6.x -->
+
+<style>
+  @media (min-width: 992px) {
+  .offcanvas-lg {
+    position: static;
+    transform: none;
+    visibility: visible !important;
+  }
+  .offcanvas-lg .btn-close {
+    display: none; /* hide close button on desktop */
+  }
+}
+</style>
+</head>
+<body>
+
+
+  <main class="custom-container">
+
+    <section class="my-120 mx-auto cards-container rounded-2" style=" width: 88%; margin: auto; background-color: bisque;">
+  
+      <div class="card-container col-12 col-md-6 col-lg-4 col-xl-3 ">
+        <div class="julia-card">
+          <img src="images/Toshiba.jpg" class="opacity-scale" alt="Thumbnail" />
+          <div class="julia-content ">
+            <h2 class="m-0 fw-semibold header-text">Toshiba</h2>
+            <div class="content-text">vehicles</div>
+          </div>
+          <a href="https://www.w3schools.com/css/css3_variables.asp"></a>
+        </div>
+      </div>
+  
+      <div class="card-container col-12 col-md-6 col-lg-4 col-xl-3 ">
+        <div class="julia-card">
+          <img src="images/Toshiba.jpg" class="opacity-scale" alt="Thumbnail" />
+          <div class="julia-content ">
+            <h2 class="m-0 fw-semibold header-text">Toshiba</h2>
+            <div class="content-text">vehicles</div>
+          </div>
+          <a href="https://www.w3schools.com/css/css3_variables.asp"></a>
+        </div>
+      </div>
+  
+      <div class="card-container col-12 col-md-6 col-lg-4 col-xl-3 ">
+        <div class="julia-card">
+          <img src="images/Toshiba.jpg" class="opacity-scale" alt="Thumbnail" />
+          <div class="julia-content ">
+            <h2 class="m-0 fw-semibold header-text">Toshiba</h2>
+            <div class="content-text">vehicles</div>
+          </div>
+        </div>
+      </div>
+  
+      <div class="card-container col-12 col-md-6 col-lg-4 col-xl-3">
+        <div class="julia-card">
+          <img src="images/Toshiba.jpg" class="opacity-scale" alt="Thumbnail" />
+          <div class="julia-content ">
+            <h2 class="m-0 fw-semibold header-text">Toshiba</h2>
+            <div class="content-text">vehicles</div>
+          </div>
+        </div>
+      </div>
+  
+      <div class="card-container col-12 col-md-6 col-lg-4 col-xl-3">
+        <div class="julia-card">
+          <img src="images/Toshiba.jpg" class="opacity-scale" alt="Thumbnail" />
+          <div class="julia-content ">
+            <h2 class="m-0 fw-semibold header-text">Toshiba</h2>
+            <div class="content-text">vehicles</div>
+          </div>
+        </div>
+      </div>
+  
+    </section>
+    
+    <!-- Form -->
+    <div class="form-container bg-dark-subtle rounded pt-20">
+      <h2 class="form-header position-absolute top-0 start-50 translate-middle m-0">Add Project</h2>
+
+      <form action="/project/add" method="post" enctype="multipart/form-data">
+          
+          <div class="row mt-20 p-2 mx-2">
+  
+              <div class="form-group col-12 col-sm-12 mb-3">
+                  <label class="ms-1">Name</label>
+                  <input class="form-control" type="text" placeholder="Enter your name" >
+                  <span class="text-danger">required</span>
+              </div>
+  
+              <div class="form-group col-12 col-sm-12 mb-3">
+                  <label class="ms-1">Category</label>
+                  <select class="form-select form-select-md" >
+                      <option selected disabled value="0">Choose Branch</option>
+                      <option value="1">Pillars</option>
+                      <option value="2">Booths</option>
+                  </select>
+                  <span class="text-danger">choose branch</span>
+              </div>
+  
+              <div class="form-group col-12 col-sm-12 mb-3">
+                  <label class="ms-1">Description</label>
+                  <textarea class="form-control" rows="3" style="resize: none;" placeholder="Enter Description" asp-for="ProjectDTO.Description"></textarea>
+                  <span class="text-danger">description</span>
+              </div>
+  
+              <div class="form-group col-12 col-sm-12 mb-3">
+                  <label class="ms-1">Thumbnail</label>
+                  <input class="form-control" id="thumbnailInput" type="file" hidden accept="image/*" placeholder="upload Thumbnail" asp-for="ProjectDTO.Thumbnail">
+                  
+                  <div class="custom-file-area w-100" id="fileBox">
+                      <div id="thumbnailList" class="row m-0">No file selected</div>
+                      <button type="button" class="btn btn-sm btn-outline-primary mt-3 col-12 col-md-3" data-target="thumbnailInput">Choose File</button>
+                  </div>
+                  <span class="text-danger">choose</span>
+              </div>
+  
+  
+              <div class="form-group col-12 col-sm-12 mb-3">
+                  <label class="ms-1">Project Media (Images/Videos)</label>
+                  <input class="form-control" id="mediaInput" type="file" hidden multiple accept="image/*,video/*"/>
+                  <!-- Custom file area -->
+                  <div class="custom-file-area w-100" id="fileBox">
+                      <div class="row m-0" id="mediaList">No file selected</div>
+                      <button type="button" class="btn btn-sm btn-outline-primary mt-3 col-12 col-md-3" data-target="mediaInput">Choose File</button>
+                  </div>
+                  <span class="text-danger">choose</span>
+              </div>
+
+              <button type="submit" class="btn btn-success col-6 col-md-4 m-auto fs-5">Submit</button>
+  
+          </div>
+  
+      </form>
+    </div>
+
+  <!-- intl-tel-input -->
+    <div class="mb-100"></div>
+     <div class="form-container bg-dark-subtle rounded pt-20">
+      <h2 class="form-header position-absolute top-0 start-50 translate-middle m-0">test phone</h2>
+
+      <form action="" method="post" enctype="multipart/form-data">
+          
+          <div class="row mt-20 p-2 mx-2">
+  
+              <div class="form-group col-12 col-sm-12 mb-3">
+                  <label class="ms-1">phone</label>
+                  <input class="form-control" type="text" placeholder="Enter your name" >
+                  <span class="text-danger">required</span>
+              </div>
+  
+              <div class="form-group col-12 col-sm-12 mb-3">
+	              <label class="ms-1">Contact Number <span class="text-danger">*</span></label>
+                <input type="tel" intl-phone placeholder="Enter your phone number" class="form-control">
+              </div>
+
+              <button class="btn btn-success col-6 col-md-4 m-auto fs-5" role="alert" type="button" id="checkBtn">Submit</button>
+  
+          </div>
+  
+      </form>
+    </div>
+
+
+    <div class="mb-100"></div>
+
+    <!-- timeline -->
+    <section class="timeline-container w-50 mx-auto my-60">
+        <div class="timeline mx-3">
+            <div class="timeline-step">
+              <div class="timeline-dot timeline-dot-completed">
+                <img src="images/created.png" alt="Picture">
+              </div> <!-- cd-timeline__img -->
+
+              <div class="timeline-content">
+                <h3>Created</h3>
+              </div> <!-- cd-timeline__content -->
+            </div>
+
+            <div class="timeline-step">
+              <div class="timeline-dot">
+                <img src="images/departed.png" alt="Picture">
+              </div> <!-- cd-timeline__img -->
+
+              <div class="timeline-content">
+                <h3>Departed</h3>
+              </div> <!-- cd-timeline__content -->
+            </div>
+
+            <div class="timeline-step">
+              <div class="timeline-dot timeline-dot-inactive">
+                <img src="images/arrived.png" alt="Picture">
+              </div> <!-- cd-timeline__img -->
+
+              <div class="timeline-content">
+                <h3>Arrived</h3>
+              </div> <!-- cd-timeline__content -->
+            </div>
+
+            <div class="timeline-step">
+              <div class="timeline-dot">
+                <img src="images/delivered.png" alt="Picture" style="width: 37px;">
+              </div> <!-- cd-timeline__img -->
+
+              <div class="timeline-content">
+                <h3>Delivered</h3>
+              </div> <!-- cd-timeline__content -->
+            </div>
+        </div>
+    </section>
+
+
+    <!-- responsive taable -->
+    <div class="w-75 mx-auto mb-25">
+      <table class="mudlike-table">
+      <thead class="table-light">
+            <tr>
+                <th>Full Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Status</th>
+                <th>action</th>
+            </tr>
+      </thead>
+      <tbody>
+            <tr>
+                <td data-label="Full Name">Ahmed Mohamed</td>
+                <td data-label="Email">ahmed@example.com</td>
+                <td data-label="Phone">01012345678</td>
+                <td data-label="Status">Active</td>
+                <td data-label="Actions" class="action-cell">
+                    <a class="btn btn-warning btn-sm" asp-action="Edit" asp-route-id="@invitee.Id">Toggle</a>
+                    <a class="btn btn-warning btn-sm" asp-action="Edit" asp-route-id="@invitee.Id">Toggle</a>
+                </td>
+            </tr>
+            <tr>
+                <td data-label="Full Name">Sarah Ali</td>
+                <td data-label="Email">sarah@example.com</td>
+                <td data-label="Phone">01098765432</td>
+                <td data-label="Status">Pending</td>
+                <td data-label="Actions" class="action-cell">
+                    <a class="btn btn-warning btn-sm" asp-action="Edit" asp-route-id="@invitee.Id">Toggle</a>
+                    <a class="btn btn-warning btn-sm" asp-action="Edit" asp-route-id="@invitee.Id">Toggle</a>
+                </td>
+            </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+    <!-- modal -->
+    <div class="w-75 mx-auto mb-25">
+
+      <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#Modal">Launch Modal</button>
+      <div class="modal fade" id="Modal" data-bs-keyboard="true" data-bs-backdrop="static" tabindex="-1">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h2 class="modal-title">are you sure</h2>
+              <button data-bs-dismiss="modal" class="btn-close"></button>
+            </div>
+            <div class="modal-body">.....</div>
+              <div class="modal-footer">
+                <button data-bs-dismiss="modal" class="btn btn-dark">close</button>
+                <button class="btn btn-success">Ok</button>
+              </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- offcanvas  -->
+    <div class="w-75 mx-auto mb-25">
+
+      <!-- Toggle button only for small screens -->
+      <button class="btn btn-primary d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#demo">Open offcanvas</button>
+
+      <!-- Offcanvas sidebar -->
+      <div class="offcanvas offcanvas-start" id="demo">
+        <div class="offcanvas-header d-lg-none">
+          <h5 class="offcanvas-title">Menu</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+        </div>
+        
+        <div class="offcanvas-body">
+          <p>This is the offcanvas content</p>
+        </div>
+      </div>
+
+    </div>
+
+
+  </main>
+  
+
+  <footer class="px-45 pt-35 bg-black color-darkgrayblue">
+		<div id="contact" class="container p-0">
+			<div class="row">
+				
+        <div class="col-md-3 col-sm-6 col-xs-12 text-center text-md-start mb-15">
+					<div class="content">
+						<div class="brand mb-15">
+              <img src="images/K_Logo1.png" class="width-50 align-middle border-0">
+            </div>
+						<p>We are a young diverse group of people aiming to create unconventional interactive experiences that add value and a long-lasting effect.</p>
+					</div>
+				</div>
+
+				<div class="col-md-2 col-sm-6 col-xs-12 text-center text-md-start mb-15">
+					<div class="content">
+						<h5 class="text-white">About</h5>
+						<ul class="list-unstyled m-0">
+							<li class="mb-10"><a href="#" class="text-decoration-none color-darkgrayblue"><i class="bi bi-person-circle me-10"></i></i>About us</a></li>
+							<li class="mb-10"><a href="" class="text-decoration-none color-darkgrayblue"><i class="bi bi-chat-left-text me-10"></i> Contact</a></li>
+							<li><a href="" class="text-decoration-none color-darkgrayblue"><i class="bi bi-list-stars me-10"></i> Portfolio</a></li>
+						</ul>
+					</div>
+				</div>
+        
+				<div class="col-md-4 col-sm-6 col-xs-12 text-center text-md-center mb-15">
+					<div class="content">
+						<h5 class="text-white">Contact Info</h5>
+						<ul class="list-unstyled m-0">
+							<li class="mb-10"><a href="" class="text-decoration-none color-darkgrayblue"><i class="bi bi-headset me-10"></i>info@offbeateg.com</a></li>
+							<li class="mb-10"><a href="" class="text-decoration-none color-darkgrayblue"><i class="bi bi-telephone-fill me-10"></i>+20 106 144 4031</a></li>
+							<li><a href="" class="text-decoration-none color-darkgrayblue"><i class="bi bi-gear-fill me-10"></i> Services</a></li>
+						</ul>
+					</div>
+				</div>
+
+				<div class="col-md-3 col-sm-6 col-xs-12 text-center text-md-start mb-15">
+					<div class="content">
+						<h5 class="text-white">Follow us</h5>
+						<ul class="social list-unstyled">
+							<li class="mb-10"><a href="https://www.facebook.com/OBinteractivesolutions" class="text-decoration-none color-darkgrayblue"><i class="bi bi-facebook me-10"></i>Facebook</a></li>
+							<li class="mb-10"><a href="https://www.facebook.com/OBinteractivesolutions" class="text-decoration-none color-darkgrayblue"><i class="bi bi-threads me-10"></i>Instagram</a></li>
+							<li class="mb-10"><a href="https://www.facebook.com/OBinteractivesolutions" class="text-decoration-none color-darkgrayblue"><i class="bi bi-linkedin me-10"></i>Linkedin</a></li>
+						</ul>
+					</div>
+				</div>
+			
+      </div>
+		</div>
+	</footer>
+
+  <div class="footer-bottom">
+		<span>Copyright © All Right Reserved</span>
+	</div>
+  
+
+ <script src="js/uploadFile.js"></script>
+ <script src="js/intlTelInputWithUtils.min.js"></script>
+<script src="js/utils.js"></script>
+
+  <script src="/js/initPhoneInput.js"></script>
+
+ <script src="js/uploadFile.js"></script>
+
+ <script>
+    initFileUploader({
+
+      thumbnailInput: {
+         inputId: 'thumbnailInput',
+          listId: 'thumbnailList',
+          maxFiles: 1
+      },
+      mediaInput: {
+          inputId: 'mediaInput',
+          listId: 'mediaList',
+          maxFiles: 12
+      }
+    })
+ </script>
+
+ <script src="js/bootstrap.min.js"></script>
+ <script>
+    function handleClick(e){
+      console.log(e);
+      console.log("handleClick()");
+    }
+ </script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
+
+
+</body>
+</html>

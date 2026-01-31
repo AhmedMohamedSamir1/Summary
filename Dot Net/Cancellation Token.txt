@@ -1,0 +1,11 @@
+
+
+- The CancellationToken in the SaveChangesAsync method is used to  handle cancellation requests for the asynchronous operation
+
+- This feature allows the operation to be canceled before it completes
+
+- Purpose: Allows the caller of SaveChangesAsync to cancel the database operation if it is no longer needed.
+
+- Default Value: If no CancellationToken is passed, the default value (CancellationToken.None) is used, meaning the operation cannot be canceled.
+
+- If a cancellation is requested via the token, the operation throws a TaskCanceledException, which can be caught and handled appropriately.

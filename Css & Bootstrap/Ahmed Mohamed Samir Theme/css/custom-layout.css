@@ -1,0 +1,44 @@
+
+
+/* start custom container */
+.custom-container {
+    max-width: 1300px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+@media (max-width: 576px) { 
+    .custom-container {
+        width: 98%;
+    }
+}
+
+@media (min-width: 576px) { 
+    .custom-container {
+        width: 94%;
+    }
+}
+
+@media (min-width: 768px) { 
+    .custom-container {
+        width: 92%;
+    }
+}
+
+@media (min-width: 992px) {     
+    .custom-container {
+        width: 95%;
+        max-width:100%;
+    }
+}
+
+@media (min-width: 1200px) {  
+    .custom-container {
+        width: 86%;
+    }
+}
+/* end custom container */
+
+
+
+    

@@ -1,0 +1,47 @@
+Install-Package BenchmarkDotNet
+
+----------------------------------------------------------------------------------
+
+- note: the method with [Benchmark] attribute will be executed more than 1500 times so take care of the conflict that may be occured in DB 
+
+ public class BechMarkTest
+ {
+     private  readonly ApplicationContext context;
+     GenericeRepo<Tag> repo;
+     public BechMarkTest()
+     {
+
+         var options = new DbContextOptionsBuilder<ApplicationContext>()
+    .UseSqlServer("Server=.;Database=PSMS;Trusted_Connection=True;TrustServerCertificate=True;")
+    .Options;
+
+         context = new ApplicationContext(options);
+
+        
+         repo = new GenericeRepo<Tag>(context);
+     }
+
+
+     [Benchmark]
+     public async Task AddWithSaveAndReturnRelatedDataAsync()
+     {
+        
+
+         Tag tag = new Tag()
+         {
+             Name = "sdsd"
+         };
+         await repo.AddWithSaveAsync(tag);   // 43.85
+
+     }
+
+
+     [GlobalCleanup]
+     public void Cleanup()
+     {
+        
+         context.Dispose(); // Dispose of your DbContext if necessary
+     }
+
+
+ }

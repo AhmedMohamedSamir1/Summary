@@ -1,0 +1,5 @@
+- at the layout    
+	<div class="loading"></div>
+
+if you don't want to the spinner to be displayed in a specific link just add data-no-spinner attribute
+	- <a href="/some-action" data-no-spinner>Do not show spinner</a>

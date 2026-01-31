@@ -1,0 +1,217 @@
+npm install tom-select
+
+"node_modules/tom-select/dist/css/tom-select.css"
+
+
+---------------------------------------------------------------------
+<< members >>
+
+- createFilter: (optionTxt) => { }   // listen for each press to filter the new created option 
+- create: (optionTxt) => {}          //  to custom the creation of new option, it calls createFilter() method at first implicitly
+- onItemAdd:()=>{ this.allTagsSelect?.setTextboxValue(''); } // called when an item is added (via typing and pressing Enter or selecting from the list)
+
+
+this.allTagsSelect?.addOption({ value: `${tag.id}`, text: `${tag.name}` });
+this.allTagsSelect?.getValue() // to access the selected items, return string | string[] | undefined
+	
+this.allTagsSelect?.addItems(tagsIds); // make the selected options tagsIds where tagsIds is array of strings 
+	- this.ProjectGetDTO?.tags?.map(tag => String(tag.id)) || [];
+
+this.allTagsSelect!.options
+this.allTagsSelect?.setTextboxValue('');
+
+----------------------------------------------------------------------
+
+
+-- html code
+
+<div class="form-group">
+        <label class="form-label">Tag Name</label>
+        <select class="mb-3 fw-bold" id="my-select" multiple>
+         
+          <option value="1">Ahmed Mohamed Samir</option>
+          <option value="2">Option 2</option>
+          <option value="3">Option 3</option>
+          <option value="4">Option 4</option>
+        </select>
+</div>
+
+
+
+---- ts code ----------------
+
+- at @component decorator --> add this line to be able to control the style of tom select
+ 	encapsulation: ViewEncapsulation.None
+
+  constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
+  
+  isPlatformIdRepresentsBrowserPlatform(): boolean{ 
+    return isPlatformBrowser(this.platformId);
+  }
+
+  ngAfterViewInit() {
+    if (this.isPlatformIdRepresentsBrowserPlatform())  // you must wrap the initialization of tom select inside this condition to aviod error
+    {
+      	this.loadRequiredDataAndInitializeDropdowns();  
+    }
+  }
+
+
+loadRequiredDataAndInitializeDropdowns(){
+    forkJoin({
+
+      projectData: this.projectService.getById(this.projectId),
+      technologiesData: this.technologyService.getAllTechnologies(),
+      tagsData: this.tagService.getAllTags(),
+      dependenciesData: this.dependencyService.getAllDependencies()
+    
+    }).subscribe({
+
+      next:({ projectData, technologiesData, tagsData, dependenciesData})=>{
+        this.ProjectGetDTO = projectData; 
+        this.allTags = tagsData;
+        this.allTechnologies = technologiesData;
+        this.allDependencies = dependenciesData;
+
+        this.initializeDropdowns();
+
+      }
+    })
+  }
+
+
+initializeDropdowns() {
+    this.initializeTagsSelect();
+    this.initializeTechnologiesSelect();
+    this.initializeDependenciesSelect();
+}
+
+
+initializeTagsSelect() {
+   this.allTagsSelect = new TomSelect('#select-tags', {
+      placeholder: 'Select tags',
+      plugins: ['caret_position', 'no_backspace_delete', 'remove_button'],
+      
+    createFilter: (optionTxt) => { 
+      const options = Object.values(this.allTagsSelect!.options);
+      for (let option of options) {
+        if (option['text'].toLowerCase() === optionTxt.toLowerCase())
+          return false;
+      }
+      return true;
+    },
+
+    create: (optionTxt) => {
+        console.log("create() is called: " + optionTxt);
+        this.createTag(optionTxt);
+        return true; 
+    },
+
+      onItemAdd:()=>{ this.allTagsSelect?.setTextboxValue(''); }
+    });
+  
+    // Populate dropdown options
+    this.allTags.forEach(tag => {
+      this.allTagsSelect?.addOption({ value: `${tag.id}`, text: `${tag.name}` });
+    });
+
+    // Set selected items  
+    const tagsIds = this.ProjectGetDTO?.tags?.map(tag => String(tag.id)) || [];
+    this.allTagsSelect?.addItems(tagsIds);
+
+  }
+
+
+
+createTag(optionText: string){
+    this.tagService.addTagAndReturn({name: optionText}).subscribe({
+      next:(response)=>{
+        if(response.success){
+          this.allTagsSelect?.addOption({ value: `${ response.data.id}`, text: `${ response.data.name}` });
+          this.allTagsSelect?.addItem(String(response.data.id));
+        }
+
+      },
+      error:(error)=>{showSweatAlert("error","error","error");}
+    })
+}
+
+--------------------------------------------------------------------------------------------------
+
+
+<<  >>
+
+this.allTagsSelect?.getValue()
+	- getValue() --> return DT is --> string | string[]
+	- it return the selected values in the form of array of string
+	- string | string[]
+
+
+toArrayOfNumber(input: string | string[] | undefined): number[] {
+
+    if (Array.isArray(input)) {
+      return input.map(Number); // If input is an array of strings, convert each item to a number
+    } else if (typeof input === "string") {
+     
+      return [Number(input)];  // If input is a single string, convert it to a number and wrap in an array
+    }
+    // If input is undefined or null, return an empty array
+    return [];
+  }
+
+let tags = this.toArrayOfNumber(this.allTagsSelect?.getValue());
+
+--------------------------------------------------------------------
+
+<< tom select options >>
+
+tomGameSelect.clear();
+tomGameSelect.clearOptions();
+tomGameSelect.addOption({ value: '0', text: 'Select Game' });
+tomGameSelect.addItem('0'); 
+
+tomGameSelect.getValue() // above section
+----------------------------------------------------------------------------------------------
+
+/* In styles.css */
+
+.ts-dropdown-content /* The drop down menu that appear*/
+{
+    font-size: 16px;
+    border: none;
+}
+
+.ts-control /* the container the hold the input */
+{
+    font-size: 15px;
+    padding: 0;
+    border: none;
+    min-height: 24px;
+}
+
+.ts-control input 
+{  
+    font-size: 1rem;
+}
+
+.ts-wrapper.multi .ts-control > div  /*div container that has the div selected item and a that represent x sign */
+{
+    padding: 5px;
+    border-radius: 5px;
+    font-size: 15px;
+    background-color: #030321;
+    color: white;
+    font-weight: bold;
+}
+
+.ts-wrapper.multi .ts-control > div.active /*WHEN I click on */
+{
+    background-color: red;
+    color: black;
+}
+
+--------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+

@@ -1,0 +1,283 @@
+oop: is a style of code that allow developers to group similar tasks into classes
+     it's one one programming paradigm (نوع من أنواع الاساليب البرمجية)
+------------------------------------------------------------------------------------------------------------
+
+  Everything is an Object. 
+  why we need oop: to group all attributes of an object together
+ 
+------------------------------------------------------------------------------------------------------------
+class  : is a blueprint ( design, تصميم أو مخطط ) that you can create object from
+-------------------------------------------------------------------------------------------------------------
+  primitive data type: store one single simple value like int, double, char.
+  reference data types, such as objects and arrays, reference types can have null value
+-----------------------------------------------------------------------------------------------------------
+
+ different btween struct and class
+
+ struct: is a value type, only has properties
+ class : is a reference type , could contain properties and method
+---------------------------------------------------------------------------------------------------
+
+A delegate is an object which refers to a method << not completed >>
+
+----------------------------------------------------------------------------------------------------------
+ namespace : can contain classes only
+ to invoke the classes of namespace in another namespace --> add--> using namespace_name
+
+
+------------------------------------------------------------------------------------------
+
+
+The parameters passed to function are called actual parameters
+whereas the parameters received by function are called formal parameters.
+
+argument --> actual parameters
+parameter --> formal parameter
+
+call by value :  Both the actual and formal parameters refer to the different memory locations
+
+call by reference :  Both the actual and formal parameters refer to the same memory locations
+
+----------------------------------------------------------------------------------------------------------
+
+Car c = new Car();
+
+c is a reference for object in the memory
+-----------------------------------------------------------------------------------------------------------
+
+	<<< constructor >>>
+
+-- constructor: responsible for creation of the object
+-- super constructor is always called before the child constructor 
+
+-- default constructor:  A constructor with no parameters is called a default constructor.
+			The default constructor initializes all numeric fields to zero and all string and object fields to null
+			default constructor is removed as soon as another constructor is created
+
+
+-- parameterized constructor: A constructor having at least one parameter is called as 
+
+-- Copy Constructor --> This constructor creates an object by copying variables from another object.
+	Its main use is to initialize a new instance to the values of an existing instance.
+
+-- Private Constructor: constructor is created with private specifier is known as Private Constructor
+			use private constructor when we have only static members.
+			It is not possible for other classes to derive from this class
+			it’s not possible to create an instance of this class.
+
+-- Static Constructor:  It does not take access modifiers or any parameters. 
+			It is invoked before the first instance constructor is run and it's executed only once. 
+			A static constructor is used to initialize static fields of the class . 
+-------------------------------------------------------------------------------------------------------
+
+ ---> inside class the variable or method that called inside static method should be static too
+--------------------------------------------------------------------------------------------------------
+
+prop + tab --> quick abbreviation to make setter and getter
+
+--------------------------------------------------------------------------------------------------
+
+
+encapsulation:  
+	- bundle your code into a single unit where you can determine accessability(scope) of each part of code.
+
+	- Encapsulation can be achieved by Declaring all the variables in the class as private and
+		 writing public methods in the class to set and get the values of variables
+		
+	- is the process of hiding data from another classes but these data can be access by some method like get
+
+	- the porpose of encapsulation is to prevent the direct access of class attributes.
+ 
+	- why we need to use setter and getter instead of using direct access ? to can make validation on variables
+	
+	- known as data-hiding or information hiding
+
+	-advantages: Data Hiding, Reusability, Testing code is easy
+
+
+Abstraction  :  << template for other classes , class made for other classes to Inherit prop & methods from it>>
+		
+		- can has an abstract method and non abstract method
+		- You are not allowed to declare the abstract methods outside the abstract class.
+		- abstract method (function without body) must be overrided in a subclass
+		- is the process of hiding the implementation of methods.
+		- An abstract class can have constructors
+		- C# and . NET support single inheritance only
+
+
+Inheritance  :  - class inherit the features(fields and methods) of another class
+		- Super Class: The class whose features are inherited is known as super class(or a base class or a parent class).
+		- Sub Class: The class that inherits the other class is known as subclass(or a derived class, extended class, or child class). 
+		- The subclass can add its own fields and methods in addition to the superclass fields and methods.
+		- it supports the concept of “reusability”, i.e. when we want to create a new class and there is already a class
+			that includes some of the code that we want, we can derive our new class from the existing class.
+			By doing this, we are reusing the fields and methods of the existing class.
+		- the child class can overrides any inherited mothod
+		- the class can only inherit one class
+		- the inheritance applied between classes that have  ( is A ) relationship
+		- class derived-class : base-class  {   // methods and fields  }.
+
+
+Polymorphism  : - one class can be used to create many objects
+		  mechanism that determines which method will be used when a method has been overridden.
+		- Runtime polymorphism is achieved by method overriding in subclass which is also known as dynamic binding or late binding.
+		- Compile time polymorphism is achieved by method overloading
+
+interface     : - template for other classes , class made for other classes to Inherit prop & methods from it
+		- can't be intanstiated (can't define object from it)
+		- method are abstract (without body), no need to write abstact key word.
+		- methods must be overrided in subclasses,
+		- variables must be initialized
+		- variables are public, static, final
+		- supports multiple inheritance.
+		- class A is able to do what inside class B
+
+when I use abtract : If we want to add new methods in the future, then an abstract class is a better choice.
+		     Because if we add new methods to an interface, you must implement it in all inherited class
+
+
+static class : - can't create object from it
+	       - its method and attributes must be a static
+	       - can't be inherited
+	       - used when your class has only a static methods and these methods just operate on input parameters like Math class that
+		 only contains methods that perform mathematical operations
+
+composition:  in composition we make a relation between objects ->  like car has an engine
+ 	      has a relationship	
+--------------------------------------------------------------------------------------------------------------------------------------------
+final keyword : prevent overriding of an method -> final public function say_hello(){}
+	      : final class --> it means other classes can't inherit from it
+--------------------------------------------------------------------------------------------------------------------------------------------
+
+super constructor --> public student(int age, string address): base (age, address){  }
+
+-------------------------------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------
+<< solid principles >>
+
+Advantages of SOLID
+	- style of code or standards allow programmers to create a code or system
+	  that is easy to test , easy to modify, easy to extend , easy to understand , easy to read
+	- provide lower coupling between classes
+	- software engineers to avoid issues
+
+S: sigle responsibility
+O: open closed principle
+L: liskov substitution
+I: interface segregation
+D: dependency inversion
+
+<< sigle responsibility >>
+ -- sigle responsibility: the class should have only single responsibility, it should one and only one reason to change
+    it does not mean that a class should have one method or one variable
+ -- its advantages: easy to test , lower coupling, organized, easy to understand , esay to change
+ -- if we need to make a change in a class having more responsibilities the change may affect the other functionality of classes
+ -- every responsibility like add_to_database , save_into_file, etc... should has the resposible class for it
+ -- the class with constructor , setter , getter , any methods that uses class attributes for only arithmetic operation is a single responsibility. 
+
+
+<< open closed principle >>
+ -- software entities (classes, method, modules)  should be open for extension (adding new behavior) 
+    but closed for modification , note for you the module is more than class
+ -- open closed principle executed by abstraction and Polymorphism  
+
+example:
+
+public class Square    { getter , setter }
+public class Rectangle { getter , setter }
+
+public class ShapePrinter   {
+  public void drawShape(Object shape){
+	if(shape is instance of Square)
+	   // draw square
+	if(shape is instance of Rectangle)
+	   // draw rectangle
+ }
+
+}
+
+// this example violate the open closed principle as if we add a new class such a triangle we will 
+   need to modify the method drawShape by adding
+ 
+   if(shape is instance of Rectangle){ // draw triangle}
+
+the solution is :
+
+public abtract class Shape{
+	abstract void draw();
+}
+
+public class Square extends Shape{
+
+ 	// getter , setter
+	
+	public void draw(){ console.log("square") } 
+}
+
+public class Rectangle extends Shape{
+
+ 	// getter , setter
+	
+	public void draw(){ } 
+}
+
+public class ShapePrinter{
+
+	public void drawShape(Shape shape){ shape.draw();}
+}
+
+there is no conflict between the class is opened for extension and single responsibility
+
+
+
+-------------------------------------------------------------------------------------------------------------------
+
+<< liskov substitution >>
+
+don't make parent has info the child doesn't need it
+
+if class S is a subtype of Class T, then objects of type T in a program may be replaced with objects of type S without getting problems
+
+---------------------------------------------------------------------------------------------------------------------
+
+<< interface segregation >>
+
+- splits interfaces that are very large into smaller and more specific ones , so you don't have to override unneeded method 
+
+------------------------------------------------------------------------------------------------------------------
+
+<< dependency inversion>>
+
+high level modules shouldn't depend on low level modules , both should depend on abstraction
+abstraction should not depend on details (concrete (normal) class )  , concrete class should depen on abstraction
+
+-----------------------------------------------------------------------------------------------------------------------------------
+
+<< design pattern >>
+
+- design pattern in general is created to provide solution for common problems
+- style of code or standards allow programmer to create a code that is easy to test , update
+- organize relationships between classes
+- Creating a pattern saves time and effort in the production process.
+- achieve consistency
+- 
+- There are mainly three types of design patterns:
+  1. Creational
+      	- factory
+	- singleton
+	- builder
+	- prototype
+  2. Structural
+	- adapter
+	- bridge
+	- decorator
+	- fly weight
+	- proxy
+  3. Behavioral
+	- chain of responsibility
+	- iterator
+	- observer
+	- strategy
+	- visitor
+	- memento

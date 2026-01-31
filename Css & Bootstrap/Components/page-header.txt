@@ -1,0 +1,15 @@
+<< page header 1 >>
+
+
+<div class="card-title d-flex justify-content-between mx-3 mt-3">
+
+    <h3 class="d-flex align-items-center mb-0">Projects Page</h3>
+    
+    <div class="me-2">
+        <a class="btn btn-outline-primary fs-5" href="/tag/Add">Add Tag</a>
+    </div>
+
+</div>
+
+
+---------------------------------------------------------------------------------------------------------------------------------

@@ -1,0 +1,101 @@
+public class TagService
+{
+    private readonly UnitOfWork unit;
+    private readonly IMapper mapper;
+
+    public TagService(UnitOfWork unit, IMapper mapper)
+    {
+        this.unit = unit;
+        this.mapper = mapper;
+    }
+
+    public async Task<bool> addTag(TagDTO tagDTO)
+    {
+        try
+        {
+            var tag = mapper.Map<TagDTO, Tag>(tagDTO);
+            unit.TagRepository.Insert(tag);
+            await unit.SaveChangesAsync();
+            return true;
+
+        }
+        catch (Exception ex)
+        {
+            return false;
+        }
+    }
+
+    public async Task<bool> editTag(int id, TagDTO tagDTO)
+    {
+        try
+        {
+            var existedTag = await unit.TagRepository.GetById(id);
+
+            if (existedTag == null)
+                return false;
+
+            mapper.Map(tagDTO, existedTag);
+            unit.TagRepository.Update(existedTag);
+            await unit.SaveChangesAsync();
+            return true;
+        }
+        catch (Exception ex)
+        {
+            return false;
+        }
+    }
+
+    public async Task<List<TagGetDTO>> getAllTags()
+    {
+        var tags = await unit.TagRepository.GetAll();
+        var res = mapper.Map<List<Tag>, List<TagGetDTO>>(tags);
+        return res;
+    }
+
+    public async Task<bool> deleteTag(int id)
+    {
+        try
+        {
+            var tag = await unit.TagRepository.GetById(id);
+            if (tag == null)
+                return false;
+            unit.TagRepository.Delete(tag);
+            await unit.SaveChangesAsync();
+            return true;
+        }
+        catch (Exception ex)
+        {
+            return false;
+        }
+    }
+
+    public async Task<List<TagGetDTO>> getAllTagsOrderByCreatedDate()
+    {
+        Func<IQueryable<Tag>, IOrderedQueryable<Tag>> orderBy = query => query.OrderByDescending(x => x.CreatedDate);
+
+        var tags = await unit.TagRepository.GetAllWithOrder(orderBy);
+        var res = mapper.Map<List<Tag>, List<TagGetDTO>>(tags);
+        return res;
+    }
+
+    public async Task<TagGetDTO?> getTagById(int id)
+    {
+      var tag = await unit.TagRepository.GetById(id);
+      if(tag != null)
+           return mapper.Map<Tag, TagGetDTO>(tag);
+      return null;
+    }
+
+    public async Task<List<ProjectGetDTO>> GetProjectsByPageAsync(int pageNumber,int pageSize){
+
+       Func<IQueryable<Project>, IOrderedQueryable<Project>> orderBy = query => query.OrderByDescending(x => x.CreatedDate);
+
+       var attempts = await unit.ProjectRepository.FetchPageAsync(pageNumber, pageSize, orderBy);
+
+       var res = mapper.Map<List<Project>, List<ProjectGetDTO>>(attempts);
+       return res;
+   }
+
+
+
+}

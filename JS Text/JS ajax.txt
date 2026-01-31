@@ -1,0 +1,104 @@
+
+<< ajax >>
+
+- Asynchronous java script and xml
+- approach to use many technologies together like [html , css , js]
+- it use XMLHttpRequest object to interact (send and receive) with the server
+- you can send data or fetch data without page refresh
+- XMLHttpRequest API enables you to make HTTP requests to a remote server using JavaScript.
+
+
+- XMLHttpRequest object properties:
+  1. onload	           : Defines a callback function to be called when the request is received 
+
+  2. onreadystatechange : Defines a callback function to be called when the readyState property changes
+			     The onreadystatechange event is triggered four times (1-4), 
+			     one time for each change in the readyState.
+
+  3. readyState : Holds the status of the XMLHttpRequest.
+	  - [0] request is not initialized
+	  - [1] server connection stablished
+	  - [2] request receieved
+	  - [3] processing request
+	  - [4] request is finished and response is ready
+	
+  3. status : return the status number of the request.
+	  - [200] response is successful
+	  - [404] not found
+
+  4. responseText : the request returned data , data in the form of string 
+  5. response     : the request returned data , data in the form of string
+
+
+
+open(method, url, async) // Specifies the type of request
+	method: the type of request: GET or POST
+	url: the server (file) location
+	async: true (asynchronous)[default] or false (synchronous)
+
+send()	       // Sends the request to the server (used for GET)
+send(string)   // Sends the request to the server (used for POST)
+
+
+// with post request
+	To POST data like an HTML form, add an HTTP headers with setRequestHeader(). --> setRequestHeader(header, value)
+	Specify the data you want to send in the send() method:
+
+	example from w3school
+	open("POST", "ajax_test.asp");
+	setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	send("fname=Henry&lname=Ford");
+
+
+----------------------------------------------------------------------------------------------
+
+<< too important methods >>
+
+- JSON.parse(Text) 	    => Convert Text Data To JS Object
+- JSON.stringify(JS_Object) => Convert JS Object To JSON
+-----------------------------------------------------------------------------------
+
+example 1: ===> 
+<button class="btn">test ajax</button>
+var btn  = document.querySelector(".btn");
+btn.onclick = tryAjax;
+
+function tryAjax(){
+    var req = new XMLHttpRequest();
+    // console.log(req.readyState); // 0
+    req.onreadystatechange = function(){
+        if(req.readyState==4){
+            if(req.status==200){
+                var res = JSON.parse(req.response);
+                console.log(res);
+            }
+        }
+    }
+    req.open("GET", "https://jsonplaceholder.typicode.com/users");
+    req.send()
+}
+
+/////////////////////////////////////////////////////
+
+exmple 2 : -->
+
+let req = new XMLHttpRequest();
+req.open("GET", "https://api.github.com/users/elzerowebschool/repos",true);
+req.send()
+req.onload = function(){
+
+    if(this.readyState===4&& this.status===200){
+        let jsData = JSON.parse(this.responseText)
+        for(let i = 0 ; i<jsData.length; i++){
+            let div = document.createElement('div');
+            div.innerText = jsData[i]['name'];
+            document.body.appendChild(div);
+            console.log(jsData[i]['name']);  
+        }
+    }
+}
+
+/////////////////////////////////////////////////////
+
+
+----------------------------------------------------------------------------------------------------------------------

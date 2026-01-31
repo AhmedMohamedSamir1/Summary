@@ -1,0 +1,63 @@
+
+<< enum with descriotion >>
+
+  public enum VisitingTarget
+  {
+    [Description("Fun")]
+    Fun =1,
+
+    [Description("Watch a rider")]
+    WatchRider = 2,
+  }
+
+----------------------------------------------------------------------------------------------------------------------------------------
+<< Enum Extension methods >>
+
+public static  class EnumExtensions
+{
+        public static string GetEnumDescription(this Enum value)
+        {
+            FieldInfo field = value.GetType().GetField(value.ToString());
+            DescriptionAttribute attribute = field.GetCustomAttribute<DescriptionAttribute>();
+
+            return attribute == null ? value.ToString() : attribute.Description;
+        }
+}
+
+-----------------------------------------------------------------------------------------------------------------------------------
+
+- to convert Enum to string --> EnumValue.toString();
+- to convert Enum to int    --> (int)EnumValue
+
+- Enum.GetValues(typeof(ShippingType)).Cast<ShippingType>();
+	GetValues(): returns an array of all the values of a given enum type , this array of System.Array type, where each element is of type object so we need to Cast() method
+		   : This method takes a "Type" object as a parameter
+		   : 
+
+	typeof(ShippingType): This returns the Type object corresponding to the ShippingType enum.
+
+	Cast(): converts the array from IEnumerable<object> to IEnumerable<ShippingType>
+	
+---------------------------------------------------------------------------------------------------------------------------------------
+
+<< in your application >>
+
+var userGenders = Enum.GetValues(typeof(Gender)).Cast<Gender>();
+foreach (var gender in userGenders)
+ {
+     <option value="@((int)gender)">@(gender.ToString())</option>
+ }
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+
+<< EnumExtensions >>
+
+ public class EnumExtensions
+ {
+     public static List<T> GetAllValues<T>() where T : Enum
+     {
+         return Enum.GetValues(typeof(T)).Cast<T>().ToList();
+     }
+ }
+
+-------------------------------------------------------------------------------------------------------------------------------------------------

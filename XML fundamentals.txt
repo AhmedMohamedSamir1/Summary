@@ -1,0 +1,191 @@
+<< intro >>
+
+XML stands for : extensible markup language
+
+what is XML : is a file based system , it isn't a database but we send data from DB with this format 
+
+
+XML tags : tag with your definition
+ 
+what is XML used for : send data from DBMS to different DBMS , data is sent in the form of XML -> like from SQL to ORACLE
+
+why we don't use HTML instead of XML : fixed tags , designed to present not to store
+
+
+How to write XML well
+1. xml declaration to ensure you write xml format -> <?xml version="1.1" encoding="UTF-8"?>
+2. you shouldn't write xml tag
+3. xml file should has one root 
+4. tag is case sensitive
+5. attribute must enclosed by "" ,''
+6. one tag must not contain 2 attrs with the same name
+7. overlapping is not supported
+
+----------------------------------------------------------------------------------------------------------------
+
+<< validate XML using DTD >>
+
+- DTD stands for document type definition
+- to link DTD with XML -> DTD/schema + assign DTD
+
+- #PCDATA represent content in xml,
+
+- Element occurences:
+	+ : at least 1
+	* : 0 or more
+	? : max 1  
+
+
+<< validate element >>
+
+- to define an element with string content in DTD file -> 
+	<!ELEMENT Uncle (#PCDATA)>  // this means that the XML file that will be mapped to DTD should have an element with name Uncle and content is string
+
+- to define an Family element with child element Father -> 
+	<!ELEMENT Family (Father)> 
+ 	<!ELEMENT Father (#PCDATA)> 
+
+- to define an Family element with 3 children elements [Father, Mother, Son]  
+	<!ELEMENT Family (Father, Mother, Son)>  // you should stick to the arrangement of Father, Mother, Son
+ 	<!ELEMENT Father (#PCDATA)> 
+	<!ELEMENT Mother (#PCDATA)> 
+	<!ELEMENT Son (#PCDATA)> 
+
+- to define an Family element with 3 children elements [Father, Mother, Son], Son appears at least 1, mother appear max 1, father can exist many times or not 
+	<!ELEMENT Family (Father*, Mother+, Son+)>  
+ 	<!ELEMENT Father (#PCDATA)> 
+	<!ELEMENT Mother (#PCDATA)> 
+	<!ELEMENT Son (#PCDATA)> 
+
+- to define an Family element with 3 children elements [Father, Mother, Son] don't care about arrangement
+	<!ELEMENT Family (Father | Mother | Son)*>  
+ 	<!ELEMENT Father (#PCDATA)> 
+	<!ELEMENT Mother (#PCDATA)> 
+	<!ELEMENT Son (#PCDATA)> 
+
+
+<!ELEMENT Family (Father, Mother, Son)+> elements Father, Mother, Son must appear together at least one  , you should stick to the arrangement
+<!ELEMENT Family (Father, Mother, Son)*> elements Father, Mother, Son together can appear 0 or many times, you should stick to the arrangement 
+<!ELEMENT Family (Father | Mother | Son)*>  any element can appear 0 or many times , don't care about arrangement
+<!ELEMENT Family (Father | Mother | Son)+>  one element of the three must appear 1 , don't care about arrangement
+
+
+<< validate attribute >>
+
+- <!ATTRLIST element_name attribute_name data_type #REQUIRED or IMPLIED(optional)>
+	data_type : CDATA , enumeration ( | | ) , NMTOKEN --> number, NMTOKENs --> 20 years old
+
+<!ATTLIST family loc CDATA #REQUIRED>
+<!ATTLIST father job CDATA #IMPLIED> 
+<!ATTLIST Father job CDATA "Engineer">  //default value
+<!ATTLIST mother job (Doctor | Teacher | Developer) #REQUIRED>   // job attribute is required and its value is one of the following 
+<!ATTLIST Father job (Engineer | Accountant | Doctor) #IMPLIED>  // job attribute is optional and its value is one of the following
+
+
+- mixed content : parent element and content
+	<!ELEMENT Grandfather (#PCDATA | Father | Uncle |Aunt)*>
+----------------------------------------------------------------------------------------------------------------
+
+<< validat XML using XML schema >>
+
+- what issues in DTD that lead to make xml schema 
+	1. limitation of datatypes that prevnet us to restrict the content type of element
+	2. complexity -> the syntax of DTD is difficult ,
+	3. does not XML rules
+	4. number of occurences
+	5. mixed content 
+	6. DTD is not standard
+
+- advantages of XML schema 
+	1. standard -> every developer know the xml schema
+	2. follow XML rules
+	3. variety of data type, int , float, string , etc.
+	4. determine the number of occurences
+	5. solve problem of mixed content
+	 
+
+- XML Schema elements
+	1. simple element  -> <son>ahmed<\son>
+	2. complex element -> any thing not like -> <son>ahmed</son>  
+
+
+--- to validate simple element in XML Schema ->  	<xs:element name="Son" type="xs:string"></xs:element>	
+
+--- to validate complex element -> <family> <son> ahmed </son> </family> 
+	<xs:element name="family">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element  name="son" type="xs:string"></xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>	
+
+
+--- to validate complex element -> <family> <father> <name> ahmed </name> <age>25<\age> </father> </family>
+	<xs:element name="family">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element  name="father" >
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element type="xs:string" name="name"></xs:element>
+							<xs:element type="xs:integer" name="age"></xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>	 
+ 
+
+--- to validate the complex element [2 sons] --> <father> <son> ahmed </son> <son> ahmed </son> </father>
+// note : the default ot any element -> maxOccurs="1" , minOccurs="1"
+
+	<xs:element name="father">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element type="xs:string" name="son" maxOccurs="2"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+-- to validate mixed type [mixed="true"] -> </father> ahmed <son>wael</son> </father>
+
+	<xs:element name="father">
+		<xs:complexType mixed="true">
+			<xs:sequence>
+				<xs:element type="xs:string" name="son"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+-- validate attribute of complex element add this after sequence-> <xs:attribute name="age" type="xs:integer"></xs:attribute>
+-- to make the attribute required        -> <xs:attribute name="age" type="xs:integer" use="required"></xs:attribute>
+-- to make deafualt value to attribute   -> <xs:attribute name="age" type="xs:integer" default="22"></xs:attribute>
+
+-- to validate the complex element -> <son age="24">ahmed</son>
+
+	<xs:element name="son">
+			<xs:complexType>
+				<xs:simpleContent>
+					<xs:extension base="xs:string">
+						<xs:attribute name="age" type="xs:integer"></xs:attribute>
+					</xs:extension>
+				</xs:simpleContent>
+			</xs:complexType>
+	</xs:element>
+
+
+- to make enumeration (custom type) 
+
+	<xs:simpleType name="sportDT">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="football"/>
+			<xs:enumeration value="tennis"/>
+			<xs:enumeration value="basketball"></xs:enumeration>
+		</xs:restriction>
+	
+	</xs:simpleType>
+
+// to use your sustom data type --> <xs:attribute name="sport" type="sportDT"></xs:attribute>	
+------------------------------------------------------------------------------------------------------------

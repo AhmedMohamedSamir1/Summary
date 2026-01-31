@@ -1,0 +1,25 @@
+
+
+stream: is a sequence of data that you can read from or write to — kind of like a pipe or a conveyor belt
+so you can refer to stream as --> data
+
+
+📦 Examples of streams:
+
+Stream Type	Description
+FileStream	Reads from or writes to a file
+MemoryStream	Uses RAM instead of a file
+NetworkStream	Sends or receives data over a network
+Stream (base)	Abstract base class for all streams
+
+
+
+
+
+chunk  = buffer
+
+When you're reading or writing large files, you don't read/write the whole file at once — you break it into smaller chunks (called buffers).
+
+
+
+

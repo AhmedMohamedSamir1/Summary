@@ -1,0 +1,449 @@
+<< JSON.parse(text) , JSON.stringify(JS_Object) >>
+
+JSON.parse(text) takes a JSON string and transforms it into a JavaScript object.
+JSON.stringify(JS_Object)	
+	- It serializes the object into a JSON string. 
+	- This is useful when you need to send data over the network, store it in a file,
+
+---------------------------------------------------------------------------------
+
+<< synchronous , Asynchronous >>
+
+ synchronous :
+ - operation runs in sequence
+ - each operation must wait for previous one to complete
+
+Asynchronous 
+ - operations runs in parallel
+ - an operation can occur while another one is still being processed
+
+
+example for synchronous 
+console.log(1); 
+console.log(2);
+alert("operation")
+console.log(1)
+
+example for Asynchronous
+console.log(1)
+console.log(2)
+setTimeout(function(){console.log(3)}, 4000);
+console.log(4)
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------
+<< call stack, web api, callback queueu, loop event >>
+
+-- browser api = web api --> like document
+
+- java script is single threaded language -> all operations is executed in single thread
+- js script uses call stack to manage the execution of context (function) 
+- call stack tracks all calls -> when function is called it added to stack , when function excecuted it removed from stack
+- code execution in stack is synchronous
+------> call stack: detect web api methods like( setTimeout() ) and leave it to the browser to handle it
+
+- when you call Asynchromous function it send to browser(web) api
+- Asynchromous function starts its own thread
+- browser api add the the callback to callback queue
+- event loop wait for call_stack to be empty and get callbcak from callback queue and add it to call_stack
+- callback queue follow fifo rule
+
+
+setTimeout(()=>{
+    console.log('web api method')
+},0);	
+
+console.log(1);
+console.log(2);
+console.log(3);
+
+// output 
+ 1
+ 2
+ 3
+ web api method
+ note: although there is timeout is zero the it executed at the end
+
+
+setTimeout(() => {
+        console.log("hello from myPromise 1");
+}, 6000);
+
+setTimeout(() => {
+        console.log("hello from myPromise 2");
+}, 2000);
+
+setTimeout(() => {
+        console.log("hello from myPromise 3");
+}, 3000);
+setTimeout(() => {
+        console.log("hello from myPromise 4");
+}, 0);
+
+hello from myPromise 4
+hello from myPromise 2
+hello from myPromise 3
+hello from myPromise 1
+----------------------------------------------------------------------------------------------------------------
+
+<< promise >>
+
+-> promise is the object that represent the status of an Asynchronous operation whether it complete or fail
+-> promise is something will occur in the future
+
+
+-> promise aviod callback hell or the "pyramid of doom // if you forget check your js function text file
+-> Callback Hell: when we have callbacks inside callbacks [nested callback]
+
+-> It allows you to handle asynchronous operations more easily
+
+-> a promise return object to which you attach callbacks, instead of passing callbacks into a function
+
+-> عبارة عن اوبجيكت بياخد كول باك فانشكن والفانشكن دى بتاخد اتنين كول باك فانشكن
+    promise state:
+    	pending : initial state
+      	fulfilled: completed successfully
+      	rejected:  failed
+
+While a Promise object is "pending" (working), the result is undefined.
+When  a Promise object is "fulfilled", the result is a value.
+When  a Promise object is "rejected" , the result is an error object.
+
+- the fullfilled and rejected method signature --> (value:any)=> void
+ 
+------------------------------------------------------------------------------------------
+
+example 1 :
+
+let testPromise = new Promise(function(resolveFun, rejectFun){
+    let connect = true;
+    if(connect){
+        resolveFun('connection stablished');  
+	// this line does not return anything immediately, it converts the Promise from pending to fullfilled, trigger .then()
+	// 'connection stablished' is stored inside the Promise.
+    }
+    else{
+        rejectFun(Error("connection failed"));
+    }
+});
+testPromise.then(
+        function(onFullfilled){console.log(`done ${onFullfilled}`)},
+        function(onRejected){console.log(`error ${onRejected}`)},
+    );
+
+// the output will be connection stablished, because connect = true;
+
+=============================================================================================
+
+
+example 2 : --->
+
+function myDisplayer(some) {
+  document.getElementById("demo").innerHTML = some;
+}
+
+let myPromise = new Promise(function(myResolve, myReject) {
+  let x = 0;
+
+// The producing code (this may take some time)
+
+  if (x == 0) {
+    myResolve("OK");
+  } else {
+    myReject(new Error("Error"));
+  }
+});
+
+myPromise.then(
+  function(value) {myDisplayer(value);}, // ok 
+  function(error) {myDisplayer(error);}   //
+);
+
+
+- then() takes two arguments, a callback for success and another for failure.
+	- callback for success: receives the resolved value as its parameter
+	- callback for failure: receives the rejected value as its parameter
+
+- Both are optional, so you can add a callback for success or failure only.
+- then() function returns a new promise, different from the original one
+
+==================================================================================================
+
+example 4 :
+
+
+function getData(){
+    let user = ["ahmed];
+    if(user.length)
+        return Promise.resolve("users found");
+    else
+        return Promise.reject("users not found");
+}
+
+getData().then(
+        (resolve)=>{console.log(resolve)}, // resolve = user found
+        (reject)=>{console.log(`rejected ${reject}`)},
+);
+
+
+example 5 :
+
+async function getData(){
+    let user = ["ahmed"];
+    if(!user.length)
+        return "users found"; //return resolved promise with value "users found"
+    else
+        throw new Error("users not found");
+}
+- The function getData is defined as an async function, which means it always returns a promise. 
+- Since this is an async function, throwing an error inside it will cause the returned promise to be rejected with that error.
+
+console.log( getData()); // rejected promise
+
+
+Example 6 :
+
+function getProductsList() {
+	var myPromise = new Promise(function (x, y) {
+		var products;
+		setTimeout(() => {
+			products = [100, 200, 424];
+			products ? x(products) : y("Error on getting products List");
+		}, 2000);
+	});
+	return myPromise;
+}
+
+function getProductDetails(productId) {
+	return new Promise(function (resolve, reject) {
+		setTimeout(() => {
+			var product = {
+				id: productId,
+				name: "book",
+				price: 300,
+			};
+			product ? resolve(product) : reject("Error on getting product Details");
+		});
+	});
+}
+function getPrice(product) {
+	return new Promise((resolve, reject) => {
+		let price = product.price;
+		price ? resolve(price) : reject("Error on getting price");
+	});
+}
+
+getProductsList()
+	.then((productsList) => {
+		return getProductDetails(productsList[0]);
+	})
+	.then(function (product) {
+		return getPrice(product);
+	})
+	.then((price) => {
+		console.log(price);
+	})
+	.catch((errorMsg) => console.log(errorMsg));
+
+// 300
+----------------------------------------------------------------------------------------------------------------------
+
+<< promise with XMLHttpRequest>>
+
+let getData = function(){
+
+    return new Promise((resolve, reject)=>{
+        let request = new XMLHttpRequest();
+        request.open("GET", "https://api.github.com/users/elzerowebschool/repos",true);
+        request.send();
+        request.onload  = function(){
+            if(this.status===200 && this.readyState===4){
+                resolve(this.responseText);
+            } else {
+                reject(Error("no data found"));
+            }
+        }
+    });
+}
+getData().then(
+        (resolveValue)=>{resolveValue.length = 8; return resolveValue}
+    ).then(
+        (resolve)=>{console.log(resolve);}
+    ).catch((rej)=>{console.log(rej)});
+    
+----------------------------------------------------------------------------------------------------------------------
+<< fetch >>
+
+// fetch(apiLink)  // fetch resources asynchronously across the network.
+	// accept url and return a respnose
+
+fetch("https://api.github.com/users/elzerowebschool/repos").then((resolve)=>{
+    console.log(resolve);
+    resolve = resolve.json(); // convert into promise
+    return resolve;
+}).then((resolve)=>{
+    resolve.length = 10;
+    for(let i = 0 ; i<resolve.length; i++){
+        let div = document.createElement('div');
+        div.innerText = resolve[i]['name'];
+        document.body.appendChild(div);
+        console.log(resolve[i]['name']);  
+    }
+});
+
+-----------------------------------------------------------------------------------------
+let myPromise1 = new Promise((resolve, rejected)=>{
+
+    setTimeout(() => {
+        resolve("hello from myPromise 1");
+    }, 7000);
+    
+}).then((resolve)=>{console.log(resolve)});
+
+let myPromise2 = new Promise((resolve, rejected)=>{
+    setTimeout(() => {
+        resolve("hello from myPromise 2");
+    }, 2000);
+    
+}).then((resolve)=>{console.log(resolve)});
+
+let myPromise3 = new Promise((resolve, rejected)=>{
+
+    setTimeout(() => {
+        resolve("hello from myPromise 3");
+    }, 1000);
+
+output
+    
+hello from myPromise 3
+hello from myPromise 2
+hello from myPromise 1
+
+----------------------------------------------------------------------------------------------
+<< promise.all() >>
+
+promise.all() :
+	take array of promises and return a Promise that is resolved with an array of results , or rejected with rejected value
+
+promise.allSettled()
+     take array of promises and return a Promise that is resolved with an array of results when all of the provided Promises resolve or reject.
+
+Promise.race()
+	take array of promises and return a Promise that's resolved or rejected with the first resolved or rejected value
+
+	
+let myPromise1 = new Promise((resolve, rejected)=>{
+
+    setTimeout(() => {
+        resolve("hello from myPromise 1");
+    }, 4000);
+    
+});
+
+let myPromise2 = new Promise((resolve, rejected)=>{
+    setTimeout(() => {
+        resolve("hello from myPromise 2");
+    }, 2000);
+    
+});
+
+let myPromise3 = new Promise((resolve, rejected)=>{
+
+    setTimeout(() => {
+        resolve("hello from myPromise 3");
+    }, 1000);
+    
+});
+
+Promise.all([myPromise1, myPromise2, myPromise3]).then(
+        (myRes)=>{console.log(myRes)}, // myRes = ['hello from myPromise 1', 'hello from myPromise 2', 'hello from myPromise 3']
+        (myRej)=>{console.log(myRej)}
+    );
+
+output: ['hello from myPromise 1', 'hello from myPromise 2', 'hello from myPromise 3']
+
+
+Promise.allSettled([myPromise1, myPromise2, myPromise3]).then(
+        (myRes)=>{console.log(myRes)},
+        (myRej)=>{console.log(myRej)}
+    );
+
+myRes =[
+	{status: 'fulfilled', value: 'hello from myPromise 1'} 
+	{status: 'fulfilled', value: 'hello from myPromise 2'}
+	{status: 'fulfilled', value: 'hello from myPromise 3'}
+       ]
+
+Promise.race([myPromise1, myPromise2, myPromise3]).then(
+        (myRes)=>{
+            console.log(myRes); // myRes = hello from myPromise 3
+        }, 
+    );
+
+output: hello from myPromise 3 
+	because it resolved first
+
+-------------------------------------------------------------------------------------------------------------
+
+<< async >>
+
+- async before any function means that this function return a promise
+
+async function getData(){
+    let user = ["ahmed"];
+    if(user.length)
+        return "users found";
+    else
+        throw new Error("users not found");
+}
+getData().then(
+        (resolve)=>{console.log(resolve)},  // users found
+
+        (reject)=>{console.log(`rejected ${reject}`)},
+    );
+
+--------------------------------------------------------------------------------------------------------
+
+<< await >>
+
+- await works only inside async function
+- make java script wait for the promise result
+
+
+function getData(){
+    return new Promise((resolve, reject)=>{
+        setTimeout(() => {
+            let user = ["ahmed"];
+            if(user.length)
+            resolve ("users found");
+            else
+            reject(Error("users not found"));
+        }, 2000);
+    })
+}
+
+async function test(){
+    console.log("before promise");
+    console.log(await getData());
+    console.log("after promise");
+}
+test();
+
+output:
+  before promise
+  users found
+  after promise
+
+
+async function test(){
+    console.log("before promise");
+    getData().then((res)=>{console.log(res)});
+    console.log("after promise");
+}
+
+output:
+  before promise
+  after promise
+  users found
+  
+----------------------------------------------------------------------------------------------------------------------------------
+

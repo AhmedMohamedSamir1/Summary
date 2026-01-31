@@ -1,0 +1,157 @@
+<< middleware >>
+
+- at presentation layer create folder Middlewares
+
+- handle HTTP requests and responses as they pass through the application
+- Middleware controls the flow of request by terminate it or forward it to next middleware
+- both request and response pass through the middlewares pipeline, where each middleware can inspect and modify both the incoming request and the outgoing response
+
+
+
+- Each piece of middleware can:
+	- Handle the request and decide how to respond
+	- Pass the request to the next middleware in the pipeline for further processing.
+	- Short-circuit the pipeline, which stops the execution of further middleware and immediately returns a response.
+
+- Each middleware component can perform operations before and after the next middleware is invoked.
+
+- Once the last middleware is reached (e.g., a controller), the response is generated and passed back through the middleware in reverse order.
+
+- When Does the Middleware Pipeline Start?
+	- it is set up after the application is built using the builder.Build() method. and a request is received
+
+
+- There are several common methods used to configure middleware:
+	- app.Use()
+		- allow adding middleware to middleware pipeline
+		- can process both before and after the next middleware in the pipeline is executed.
+	- app.Run()
+		- This method adds a terminal middleware component that does not call the next middleware.
+		- Once a middleware registered with Run is called, the pipeline ends, and no further middleware is executed.
+		- must be placed at the end of the pipeline.
+
+	- app.Map()
+		- is used to create branches in the middleware pipeline based on certain conditions, such as URL matching.
+		- Requests that match a specific path are routed through a custom pipeline.
+
+
+
+- The order of middleware is crucial, as certain middleware (like authentication) needs to happen before others (like authorization).
+
+- Common Middleware Components in ASP.NET Core
+	- app.UseHttpsRedirection();	 --> Redirects HTTP requests to HTTPS:
+	- app.UseAuthentication();	 --> Handles user authentication (e.g., cookies, JWT tokens):
+	- app.UseAuthorization();    	 --> Handles user authorization (checking permissions):
+	- app.UseStaticFiles();		 --> Serves static files (like CSS, JS, images) from the wwwroot folder
+	- app.UseRouting();
+		- Allowing ASP.NET Core to match incoming requests to a defined route.
+		  However, at this point, the request is only being matched to a route; no controller or endpoint logic has been executed yet.
+	- app.MapControllers()
+		- After app.UseRouting() has matched a route, app.MapControllers() ensures that the matched route is executed by mapping it to a specific controller method
+                  (based on attributes like [Route] and [HttpGet] in your controller classes).
+		
+
+- Workflow Breakdown:
+  
+  - app.UseRouting(): When a request comes in (e.g., GET /api/products), this middleware looks at the request path and matches it to a route (but does not execute it yet).
+
+  - app.UseAuthentication(): This middleware ensures that the user is authenticated before reaching the controller.
+  
+  - app.UseAuthorization(): Checks whether the authenticated user is authorized to access the requested route. 
+  
+  - app.MapControllers(): If everything passes, this middleware tells ASP.NET Core to execute the controller action associated with that route (e.g., ProductController.GetProducts()).
+
+
+
+- Middleware is typically a class with a method that has the signature Task InvokeAsync(HttpContext context). This method is called for each HTTP request that the application receives.
+
+
+- i want to make a middleware to handle exception globally
+
+public class ExceptionLoggingMiddleware
+{
+    private readonly RequestDelegate next;  // This represents the middleware in the middleware pipeline
+    private readonly LoggingService loggingService;
+
+    public ExceptionLoggingMiddleware(RequestDelegate next, LoggingService loggingService)
+    {
+        this.next = next;
+        this.loggingService = loggingService;
+    }
+
+    // This method is where the middleware's logic resides, catches exceptions that occur during request processing, not during application startup.
+    public async Task InvokeAsync(HttpContext context)
+    {
+        try
+        {
+            await next(context);  // you're passing request to the next middleware.
+        }
+        catch (Exception ex)
+        {
+            loggingService.LogError("An error occurred while processing the request.", ex);
+            throw; // Optionally rethrow or handle the exception
+        }
+    }
+}
+
+- app.UseMiddleware<ExceptionLoggingMiddleware>();  // 
+
+- app.UseMiddleware<T>() 
+	This is used to add a specific middleware class to the pipeline. The middleware is more structured and can encapsulate complex logic, often involving state or services.
+
+- app.Use()
+	- This is more flexible for quick or inline middleware implementations. It’s great for small, specific tasks that don’t need a dedicated class
+
+
+
+Process Flow
+	- The application is built, and middleware is configured. This includes registering services like controllers and dependencies, 
+          If any errors occur during startup, they will prevent the middleware from being invoked.
+	- After your application has successfully started and app.Run() has been called, the application is now listening for incoming HTTP requests.
+	- A user makes an HTTP request that targets a route handled by a controller that requires the missing service.
+	- The request enters the ASP.NET Core middleware pipeline. This includes all middlewares that have been registered, including your ExceptionLoggingMiddleware
+	- The middleware pipeline starts executing, InvokeAsync of ExceptionLoggingMiddleware is called with the current HttpContext.
+	- Inside InvokeAsync, the code typically contains await next(context), which passes control to the next middleware in the pipeline.
+	- If the request is routed to a controller action that requires the GameService, the ASP.NET Core framework tries to resolve this service from the DI container.
+	- Since GameService is not registered, the DI container throws an InvalidOperationException. 
+	  This occurs after next(context) is called, meaning it will happen while executing the controller action.
+	- The exception is caught by the catch block in InvokeAsync of your ExceptionLoggingMiddleware.
+	- After logging the error, you can decide to rethrow the exception or handle it by returning a specific HTTP response (e.g., a 500 Internal Server Error).
+
+
+
+------------------------------------------------------------------------------------------------------------------------------------
+
+<< to custom the response of unauthorized parts >>
+
+ public class CustomAuthorizationMiddlewareResultHandler : IAuthorizationMiddlewareResultHandler
+ {
+     private readonly AuthorizationMiddlewareResultHandler _defaultHandler = new AuthorizationMiddlewareResultHandler();
+
+     public async Task HandleAsync(
+         RequestDelegate next,
+         HttpContext context,
+         AuthorizationPolicy policy,
+         PolicyAuthorizationResult authorizeResult)
+     {
+         // If the user is not authorized, customize the response
+         if (authorizeResult.Forbidden || authorizeResult.Challenged)
+         {
+             context.Response.StatusCode = StatusCodes.Status403Forbidden;
+             await context.Response.WriteAsJsonAsync(new
+             {
+                 Status = 403,
+                 Message = "You are not authorized to perform this action.",
+		 Success= false,
+             });
+         }
+         else
+         {
+             // Let the default handler process anything else
+             await _defaultHandler.HandleAsync(next, context, policy, authorizeResult);
+         }
+     }
+ }
+
+
+  builder.Services.AddSingleton<IAuthorizationMiddlewareResultHandler, CustomAuthorizationMiddlewareResultHandler>();

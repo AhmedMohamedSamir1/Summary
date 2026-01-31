@@ -1,0 +1,191 @@
+
+// js code
+
+function initFileUploader(config) {
+    const fileInputs = {};
+
+    for (const [key, { inputId, listId, maxFiles }] of Object.entries(config)) {
+        const input = document.getElementById(inputId);
+        const listContainer = document.getElementById(listId);
+        const selectedFiles = [];
+
+        fileInputs[key] = { input, listContainer, selectedFiles, maxFiles };
+
+        // ?? Handle file input change
+        input.addEventListener('change', () => {
+            const newFiles = Array.from(input.files);
+            newFiles.forEach(newFile => {
+                const isDuplicate = selectedFiles.some(f =>
+                    f.name === newFile.name &&
+                    f.size === newFile.size &&
+                    f.lastModified === newFile.lastModified
+                );
+                if (!isDuplicate && selectedFiles.length < maxFiles) {
+                    selectedFiles.push(newFile);
+                }
+            });
+
+            updateInputFiles(key);
+            renderFileList(key);
+        });
+
+        // ?? Handle choose button click
+        const chooseBtn = document.querySelector(`button[data-target="${key}"]`);
+        if (chooseBtn) {
+            chooseBtn.addEventListener('click', () => {
+                input.click();
+            });
+        }
+    }
+
+    function updateInputFiles(key) {
+        const { input, selectedFiles } = fileInputs[key];
+        const dt = new DataTransfer();
+        selectedFiles.forEach(file => dt.items.add(file));
+        input.files = dt.files;
+    }
+
+    function renderFileList(key) {
+        const { selectedFiles, listContainer, maxFiles } = fileInputs[key];
+        listContainer.innerHTML = '';
+
+        if (selectedFiles.length === 0) {
+            const emptyMsg = document.createElement('div');
+            emptyMsg.className = 'col-12 text-muted small';
+            emptyMsg.textContent = 'No file selected';
+            listContainer.appendChild(emptyMsg);
+        }
+
+        selectedFiles.forEach((file, index) => {
+            const col = document.createElement('div');
+            col.className = 'col-12 col-sm-6 col-md-6 col-lg-4 col-xl-3 p-2';
+
+            const card = document.createElement('div');
+            card.className = 'media-item border rounded p-2 shadow-sm';
+
+            const preview = document.createElement(file.type.startsWith('image/') ? 'img' : 'video');
+            preview.className = 'media-preview img-fluid';
+            preview.src = URL.createObjectURL(file);
+            preview.title = file.name;
+            if (file.type.startsWith('video/')) preview.controls = true;
+
+            const info = document.createElement('div');
+            info.className = 'file-name-size mt-2 text-break small';
+            const fileSizeKB = Math.round(file.size / 1024);
+            info.innerText = `${file.name} (${fileSizeKB}KB)`;
+
+            const removeBtn = document.createElement('button');
+            removeBtn.className = 'btn btn-sm btn-danger mt-2';
+            removeBtn.textContent = 'Remove';
+            removeBtn.onclick = () => removeFile(key, index);
+
+            card.appendChild(preview);
+            card.appendChild(info);
+            card.appendChild(removeBtn);
+            col.appendChild(card);
+            listContainer.appendChild(col);
+        });
+
+        // ? Toggle choose button visibility
+        const triggerBtn = document.querySelector(`button[data-target="${key}"]`);
+        if (triggerBtn) {
+            triggerBtn.style.display = selectedFiles.length >= maxFiles ? 'none' : '';
+        }
+    }
+
+    function removeFile(key, index) {
+        fileInputs[key].selectedFiles.splice(index, 1);
+        updateInputFiles(key);
+        renderFileList(key);
+    }
+
+    function preloadFile(key, url) {
+        const { selectedFiles, maxFiles } = fileInputs[key];
+        if (selectedFiles.length >= maxFiles) return;
+
+        const fileName = url.split('/').pop() || 'file';
+        const ext = fileName.split('.').pop() || '';
+        const mimeType = ext.toLowerCase() === 'mp4' ? 'video/mp4' : `image/${ext.toLowerCase()}`;
+
+        fetch(url)
+            .then(res => res.blob())
+            .then(blob => {
+                const file = new File([blob], fileName, { type: mimeType });
+                selectedFiles.push(file);
+                updateInputFiles(key);
+                renderFileList(key);
+            })
+            .catch(err => console.error('Preload failed', err));
+    }
+    return { preloadFile };
+}
+
+
+
+// ------ config
+
+ const uploader = initFileUploader({
+     thumbnailInput: //  thumbnailInput is is not required to match the actual inputId string value
+     {
+         inputId: 'thumbnailInput',
+         listId: 'thumbnailList',
+         maxFiles: 1
+     },
+     mediaInput: {
+         inputId: 'mediaInput',
+         listId: 'mediaList',
+         maxFiles: 12
+     }
+ });
+
+ // Preload example when editing
+ uploader.preloadFile('thumbnailInput', "@Url.Content($"~/MediaFiles/{Model.ProjectGetDTO.Id}_{Model.ProjectGetDTO.Name}/{Model.ProjectGetDTO.Thumbnail}")");
+
+ @foreach(var media in Model.ProjectGetDTO.MediaItems){
+     <text>
+         uploader.preloadFile('mediaInput', "@Url.Content($"~/MediaFiles/{Model.ProjectGetDTO.Id}_{Model.ProjectGetDTO.Name}/{media.FilePath}")");
+     </text>
+ }
+
+
+
+//------ css code ---------
+
+.custom-file-area {
+    border: 2px dashed #ced4da;
+    border-radius: 6px;
+    padding: 15px;
+    background-color: #f8f9fa;
+    min-height: 100px;
+    transition: border-color 0.3s ease;
+}
+
+.media-item {
+    background: #ffffff;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.03);
+}
+
+.media-preview {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+.file-name-size {
+    font-size: 13px;
+    word-break: break-word;
+}
+
+.remove-btn {
+    font-size: 13px;
+}
+
+
+
+
+

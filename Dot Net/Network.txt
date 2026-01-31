@@ -1,0 +1,19 @@
+
+- firewall: 
+	- network security barrier that monitors and controls incoming and outgoing network traffic based on predetermined security rules
+	- A security device or software that controls what traffic is allowed across a network boundary
+
+- network boundaries: A separation between two network zones
+
+
+Simple Analogy
+  Network boundary = a door between two rooms
+  Firewall = a security guard at that door checking who can pass
+
+- network node:
+	- is simply any device that is connected to a network and can send, receive, or process data like.
+		- Servers: Web server, Application server, Database server
+		- Clients:
+		- Networking Devices: Routers, Switches
+		- Virtual Machines / Containers: Docker container, 
+	

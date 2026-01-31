@@ -1,0 +1,9 @@
+<< query string using HttpParams() >>
+
+let QueryString = new HttpParams();
+searchString = searchString.append('catId', catId);
+searchString = searchString.append('size', 3);
+
+ return this.http.get<TagGetDTO>(url, {params: searchString} ).pipe(catchError(this.handleError<TagGetDTO>('getAllTags')));      
+
+

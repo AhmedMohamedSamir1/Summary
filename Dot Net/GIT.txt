@@ -1,0 +1,262 @@
+
+- install git
+
+- identify your user and email to your machine [configuration proccess of username and email]
+   git config --global user.name "Ahmed M Samir"
+   git config --global user.email "ahmed2017170572@cis.asu.edu.eg"
+
+
+- to ensure that your machine identify you device
+	git config user.name  -> output: Ahmed M Samir
+	git config user.email -> output: ahmed2017170572@cis.asu.edu.eg
+
+- to ensure that your machine identify you device
+   git config --list  // it will display some info inluding username, email
+
+
+------------------------------------------------------------------------------------
+
+- git init "myproject" 
+	- Initialize a Git repository locally in folder name myproject contains [ hidden git file ]
+	- you need to go inside  this repo -> cd myprojec
+
+- git init
+	Initialize a Git repository locally [ hidden git file ]
+
+- To go inside myrepo  
+	cd myrepo
+
+- To view the status of your repository 
+	git status
+	- it displays information about the current state of the repository including
+	  Files that have been modified or added since the last commit.
+	  Files that are staged (added to the index) for the next commit.
+	  Files that are untracked (not yet added to the repository).
+	  Branch information, such as the current branch
+
+- To create file into your repository
+	touch index.html
+
+- To add the file on stage area
+	git add index.html
+
+- To add more than one file on stage area
+	git add file1.html file2.html
+
+- git add .
+ 	- stages all files in the current directory for the next commit.
+	- once you use this command for the first time master branch is created.
+
+- git commit -m "Initial commit"
+	- To Commit the staged files to the local repository:
+	
+
+- How to create and add File into repo 
+	- File is tracked at first -> touch index.html
+	- File is staged 	   -> git commit -m"index commited"
+	- File is committed 	   -> git commit -m"index commited"
+
+	
+- Once you change at file, we here change index.html file
+	git add index.html
+	git commit -m"index page changed"
+
+
+- git log
+	- display a list of commits in that repository.
+	- Each commit is shown with information including the commit hash (a unique identifier for the commit),
+	  the author, the date and time of the commit, and the commit message.
+	- Note that last commit Is Displayed first
+
+- go back to specific commit
+	git checkout  commit_hash  
+
+
+
+- To enter a specific branch
+	git checkout branchName
+	
+- merge the current branch with ahmedversion
+		git merge ahmedversion
+
+
+- git remote add origin https://github.com/AhmedMohamedSamir1/test2.git	
+	- To stablishes a connection between your local Git repository and the remote repository hosted on GitHub
+	- the remote repo is added to your machine, origin is the name of remote repo on your machine 
+	- origin is the default name if you do not determine it
+	
+- git remote –v  // check if there is a connection with remote repo
+
+
+
+
+
+---------------------------------------------------------------------------------------------
+F:/professional web developement/101_summary/.git/
+
+- git init
+	Initialize a Git repository locally [ hidden git file ]
+
+- git add .
+ 	- stages all files in the current directory for the next commit.
+	- once you use this command for the first time ,master branch is created if there is no branch.
+
+- git commit -m "Initial commit"
+	 - To Commit the staged files to the local repository:
+
+- git remote add origin https://github.com/AhmedMohamedSamir1/final_test.git
+	- the remote repo is added to your machine, origin is the name of remote repo on your machine 
+	- To stablishes a connection between your local Git repository and the remote repository hosted on GitHub
+
+- git push -u origin master
+	- push your changes(commits) from the local current branch to the master branch on the origin
+
+- git push origin tryAgain
+	- This will push your local tryAgain branch to the remote repository as a new branch.
+	- This leads to creating a pull request on github platform, you can merge this new branch with default remote branch
+
+- git pull origin ahmed
+	fetches changes from the remote repository's ahmed branch and merges them into your current local branch.
+
+- git fetch origin ahmed
+	- To fetch a remote branch(ahmed) without merging it into your current local branch
+
+- git fetch origin
+	- Fetch the Latest Changes from the Remote Repository
+	
+- git merge origin/ahmed
+	- To merge changes from a remote branch(ahmed) into your current local branch
+
+- git fetch --all
+	used to fetch all branches 
+
+- git branch -a
+	- diplay local/remote branch
+
+- git branch -l
+	- diplay local branch
+
+- git branch -r
+	- diplay remote branch
+
+- git checkout -b fatma
+	create a new branch named "fatma" and switch your working directory to that branch.
+
+-  git branch -M main
+	rename currnt local branch to main
+
+- git checkout development
+	to enter a specific local branch called development
+
+- git branch ahmedversion 
+	- To make new branch ,  new branch will be a copy from current branch
+
+- git branch -D reservation-details
+	- to delete the local branch reservation-details
+
+- git ls-files
+	list files of branch
+
+- git push origin design:dev
+	pushing your local design branch to the dev branch on the remote repo.
+
+- git push origin creating-entities
+	- this command need creating-entities branch to be existed locally
+	- it will make a pull request in repo
+
+---------------------------------------------------------------------------------------------
+
+<< github in visual studio >>
+
+
+- it’s generally recommended to commit (or at least stash) your changes before switching branches in Git.
+
+
+- to delete a specific commit locally in a a specific branch, use reset which has two option
+	- reset and keep changes   : delete commit and keep the changes
+	- reset and delete changes : delete commit and delete the changes  // think twice before it
+	
+- to make a new commit that undoes the changes use revert
+	- for example: 
+	  You made commit abc123 that added a file test.txt.
+	  If you revert abc123, Git will create a new commit that removes test.txt,
+ 	  so the repository looks like the commit never happened.
+
+- when checkout from branch to another and you have uncommited files
+	- 
+----------------------------------------------------------------------------------------------------------
+
+
+
+<< github syntax >>
+
+-- header
+	# header1
+	## header2
+	### header3
+	#### header4
+	##### header5
+	###### header6
+
+
+-- bullet
+	- bullet1
+	- bullet2
+----------------------------------------------
+
+
+- netsh wlan show profile name="network_name" key=clear
+
+
+- Unable to copy file "D:\Apps_projects\visual studio\Khoury_Stand\Khoury_Stand\obj\Debug\net9.0\apphost.exe" 
+  to "bin\Debug\net9.0\Khoury_Stand.exe". The process cannot access the file 'bin\Debug\net9.0\Khoury_Stand.exe' 
+  because it is being used by another process.
+
+	- Open PowerShell and run:
+	- Get-Process | Where-Object { $_.Name -like "*Khoury*" }  --> you will git info about the proccess like name
+	- Stop-Process -Name "Khoury_Stand" -Force
+
+
+---------------------------------------------------
+
+
+ Console.WriteLine("branch1 code");
+ Console.WriteLine("branch1 code");
+ Console.WriteLine("branch1 code");
+
+ Console.WriteLine("branch1.0 code");
+ Console.WriteLine("branch1.1 code");
+
+ Console.WriteLine("branch222 code");
+ Console.WriteLine("branch2222 code");
+ Console.WriteLine("branch2 code");
+
+ Console.WriteLine("branch 2.1");
+ Console.WriteLine("branch 2.2");
+ Console.WriteLine("branch 2.3");
+ Console.WriteLine("branch 2.4");
+ Console.WriteLine("branch 2.5");
+
+
+ Console.WriteLine("branch 2.0.0");
+ Console.WriteLine("branch 2.0.1");
+ Console.WriteLine("branch 2.0.2");
+ Console.WriteLine("branch 2.0.3");
+
+
+ Console.WriteLine("branch 2.1.0");
+ Console.WriteLine("branch 2.1.1");
+ Console.WriteLine("branch 2.1.2");
+ Console.WriteLine("branch 2.1.3");
+
+ Console.WriteLine("branch 2.2.0");
+ Console.WriteLine("branch 2.2.1");
+ Console.WriteLine("branch 2.2.2");
+ Console.WriteLine("branch 2.2.3");
+
+
+
+
+
+=AND($A1<>"",ISERROR(FIND(",,",$A1)),ISNUMBER(SUMPRODUCT(LEN(SUBSTITUTE($A1,",","")))))
+

@@ -1,0 +1,162 @@
+
+- at Entities folder + Base folder
+
+	public interface IEntity
+	{
+    		public int Id { get; set; }
+	}
+	
+	public interface ITrackedEntity
+	{
+    		public DateTime CreatedAt { get; set; }
+    		public DateTime UpdatedAt { get; set; }
+	}
+
+	public class BaseEntity : IEntity, ITrackedEntity
+    	{
+        	[Required, Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        	public int Id { get; set; }
+        
+		[Required]
+        	public DateTime CreatedAt { get; set; }
+        
+		[Required]
+        	public DateTime UpdatedAt { get; set; }
+	}
+
+
+------- at Entities folder
+
+public class ApplicationRole : IdentityRole<int> { }
+public class ApplicationUser : IdentityUser<int>, IEntity { }
+
+public class Evidence : BaseEntity
+{
+    public string FileLink { get; set; }
+    public string Comments { get; set; }
+
+    public int ProjectId { get; set; }
+    public Project Project { get; set; }
+
+    public int SupplierId { get; set; }
+    public Supplier Supplier { get; set; }
+}
+
+public class Project : BaseEntity
+{
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public ProjectStatus Status { get; set; }
+        public string? PO { get; set; }
+        public List<Supplier> Suppliers { get; set; } 
+        public List<Quotation> Quotations { get; set; }
+        public List<Evidence> Evidences { get; set; }
+}
+
+ public class Quotation : BaseEntity
+ {
+     public string FileLink { get; set; }
+     public string Comments { get; set; }
+     public bool? IsWinner { get; set; }
+
+     public int ProjectId { get; set; }
+     public Project Project { get; set; }
+
+     public int SupplierId { get; set; }
+     public Supplier Supplier { get; set; }
+
+ }
+
+
+ public class Supplier : BaseEntity 
+ {    
+    public string Name { get; set; }
+    public int ApplicationUserId { get; set; }
+
+    public ApplicationUser ApplicationUser { get; set; }
+    public List<Tag> Tags { get; set; }
+    public List<Project> Projects { get; set; }
+    public List<Quotation> Quotations { get; set; }
+    public List<Evidence> Evidences { get; set; }
+ }
+
+ public class Tag : BaseEntity
+ {
+    public string Name { get; set; }
+    public List<Supplier> Suppliers { get; set; }
+ }
+
+-------- at ApplicationDbContext
+
+    public override int SaveChanges()
+    {
+        AddTimeStamp();
+        return base.SaveChanges();
+    }
+
+    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        AddTimeStamp();
+        return base.SaveChangesAsync(cancellationToken);
+    }
+
+    private void AddTimeStamp()
+    {
+        var entries = ChangeTracker.Entries()
+            .Where(e => e.Entity is ITrackedEntity && (e.State == EntityState.Modified || e.State == EntityState.Added));
+        foreach (var entry in entries)
+        {
+            var now = DateTime.UtcNow;
+            if (entry.State == EntityState.Added)
+            {
+                ((ITrackedEntity)entry.Entity).CreatedAt = now;
+            }
+            ((ITrackedEntity)entry.Entity).UpdatedAt = now;
+        }
+    }
+
+
+--------------------------------
+
+public interface IAsyncRepository
+{
+    Task<bool> SaveAsync();
+}
+
+public interface IAsyncRepository<T> : IAsyncRepository where T : IEntity
+{
+    Task<T?> GetByIdAsync(int id, CancellationToken cancellationToken, bool includeAll = false, string expression = "");
+    Task<T?> GetFirst(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken, string expression = "");
+    Task<IReadOnlyList<T>> ListAllAsync(CancellationToken cancellationToken, Expression<Func<T, bool>>? SearchQuery = null, string expression = "");
+    Task<IReadOnlyList<T>> ListAllAsync(int perPage, int page, CancellationToken cancellationToken);
+    Task AddRangeAsync(IEnumerable<T> entity, CancellationToken cancellationToken);
+    Task AddAsync(T entity, CancellationToken cancellationToken);
+    Task<T> AddAndReturnAsync(T entity, CancellationToken cancellationToken);
+    Task<bool> Exists(int id, CancellationToken cancellationToken);
+    Task<bool> Any(CancellationToken cancellationToken);
+    Task<int> Count(CancellationToken cancellationToken);
+    Task UpdateAsync(T entity, CancellationToken cancellationToken);
+    Task<T> UpdateAndReturnAsync(T entity, CancellationToken cancellationToken);
+    Task DeleteAsync(T entity, CancellationToken cancellationToken);
+    Task<PagedList<T>> GetPagedListAsync(BaseResourceParameters<T> resourceParameters);      
+}
+
+public class EFRepository : IAsyncRepository
+{
+    protected readonly ApplicationDbContext _context;
+
+    public EFRepository(ApplicationDbContext context)
+    {
+        _context = context
+            ?? throw new ArgumentNullException(nameof(context));
+    }
+
+    public virtual async Task<bool> SaveAsync()
+    {
+        return (await _context.SaveChangesAsync() > 0);
+    }
+}
+
+
+
+public class EFRepository<T> : EFRepository , IAsyncRepository<T> where T : class, IEntity {}

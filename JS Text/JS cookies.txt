@@ -1,0 +1,57 @@
+function setCookie(cookieName , cookieValue, noOfdayToExp=5,){
+
+    var date = new Date();
+    date.setDate(date.getDate+noOfdayToExp);
+    if(arguments.length>=2){
+        document.cookie= `${cookieName}=${cookieValue};expires=${date}`;
+        return true;
+    }
+    return false
+}
+
+function getCookie(cookieKey){
+    var cookies = document.cookie.split(";");
+    for(var i =0; i<cookies.length; i++){
+        var c = cookies[i].split("=");
+        if(cookieKey===  c[0].trim()){
+            return c[1];
+        }
+    }
+}
+
+function hasCookie(cookieName){
+    var cookies = document.cookie.split(";");
+    for(var i =0; i<cookies.length; i++){
+        var c = cookies[i].split("=");
+        if(cookieName===  c[0].trim()){
+            return true;
+        }
+    }
+    return false;
+}
+
+function deleteCookie(cookieKey){
+    var expireDate = new Date();
+    expireDate.setDate(expireDate.getDate() - 3);
+    document.cookie= `${cookieKey}='ddd';expires=${expireDate}`;
+}
+
+function getAllCookies(){
+    var allCookie = {};
+    var cookies =  document.cookie.split(";");
+    for(var i =0; i<cookies.length; i++){
+        var c = cookies[i].split("=");
+        allCookie[c[0].trimStart()] = c[1];  
+    }
+    return allCookie;
+}
+
+function deleteAllCookies(){
+    var expireDate = new Date();
+    expireDate.setDate(expireDate.getDate() - 3);
+    var cookies =  document.cookie.split(";");
+    for(var i =0; i<cookies.length; i++){
+        var c = cookies[i].split("=");
+        document.cookie= `${c[0].trimStart()}='ddd';expires=${expireDate}`;
+    }
+}

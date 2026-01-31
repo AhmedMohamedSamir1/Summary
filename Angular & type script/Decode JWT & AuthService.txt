@@ -1,0 +1,75 @@
+
+you have an token from back-end you want to extract the claims from it
+
+install 
+npm install jwt-decode
+
+
+-- at Enums folder
+	export enum StorageKeys {
+    	   UserToken = 'userToken',
+	}
+
+
+-- at Services folder create AuthService.ts
+
+import {jwtDecode} from 'jwt-decode';
+
+export class AuthService {
+
+    static getToken(): string | null {
+      return localStorage.getItem(StorageKeys.UserToken);
+    }
+
+    static setToken(token: string): void {
+        localStorage.setItem(StorageKeys.UserToken, token);
+    }
+
+    static removeToken(): void {
+        localStorage.removeItem(StorageKeys.UserToken);
+    }
+
+    static getUserClaims(): IUserClaims | null {
+      const token = this.getToken();
+      if (!token) 
+        return null;
+      
+      try {
+        const userClaims: IUserClaims | null = jwtDecode<IUserClaims>(token);      
+        return  userClaims;
+
+      } catch (error)  
+      {
+        console.error('Invalid token:', error);
+        return null;
+      }
+    }
+
+    static isAdmin(): boolean{
+      const userToken = this.getToken();
+      if(userToken!=null){
+        if(this.getUserClaims()?.role == AppRoles.Admin)
+          return true;
+        return false;
+      }
+      return false;
+    }
+
+    static isAuthenticated(): boolean{
+      const userToken = this.getToken();
+      if(userToken!=null)
+          return true;     
+      return false;
+    }
+
+
+    static isUser(): boolean{
+      const userToken = this.getToken();
+      if(userToken!=null){
+        if(this.getUserClaims()?.role == AppRoles.User)
+          return true;
+        return false;
+      }
+      return false;
+    }
+}

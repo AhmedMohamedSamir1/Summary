@@ -1,0 +1,59 @@
+--- Creating the Generic Repository Interface
+
+public interface IGenericRepository<T> where T : class
+{
+    Task<IEnumerable<T>> GetAllAsync();
+    Task<T?> GetByIdAsync(int id);
+    Task AddAsync(T entity);
+    void Update(T entity);
+    void Delete(T entity);
+    Task SaveAsync();
+}
+
+
+-- Implementing the Generic Repository
+
+public class GenericRepository<T> : IGenericRepository<T> where T : class
+{
+    protected readonly AppDbContext _context;
+    protected readonly DbSet<T> _dbSet;
+
+    public GenericRepository(AppDbContext context)
+    {
+        _context = context;
+        _dbSet = _context.Set<T>();
+    }
+
+    public async Task<IEnumerable<T>> GetAllAsync() => await _dbSet.ToListAsync();
+
+    public async Task<T?> GetByIdAsync(int id) => await _dbSet.FindAsync(id);
+
+    public async Task AddAsync(T entity) => await _dbSet.AddAsync(entity);
+
+    public void Update(T entity) => _dbSet.Update(entity);
+
+    public void Delete(T entity) => _dbSet.Remove(entity);
+
+    public async Task SaveAsync() => await _context.SaveChangesAsync();
+}
+
+-- Creating a Specific Repository
+	- Although the generic repository works for most cases, we can create specific repositories for custom queries.
+
+
+public interface IProductRepository : IGenericRepository<Product>
+{
+    Task<IEnumerable<Product>> GetProductsByCategoryAsync(int categoryId);
+}
+
+public class ProductRepository : GenericRepository<Product>, IProductRepository
+{
+    public ProductRepository(AppDbContext context) : base(context) { }
+
+    public async Task<IEnumerable<Product>> GetProductsByCategoryAsync(int categoryId)
+    {
+        return await _dbSet.Where(p => p.CategoryId == categoryId).ToListAsync();
+    }
+}
+
+

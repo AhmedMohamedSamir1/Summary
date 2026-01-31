@@ -1,0 +1,35 @@
+enum SearchType {
+    Name = 1,
+    Owner,
+    Tag,
+    Technology,
+    Dependency,
+}
+
+
+(SearchType["Name"]); // 1
+console.log(SearchType[1]);      // Name
+
+console.log(Object.keys(SearchType));  // ['1', '2', '3', '4', '5', 'Name', 'Owner', 'Tag', 'Technology', 'Dependency']
+
+- note : Enums in TypeScript are technically objects where :
+		Keys are strings.
+		Values are numbers (if it's a numeric enum) or strings (if it's a string enum).
+
+---------------------------------------------------------------------------------------------------------------
+
+
+export interface IEnum{
+    Text: string;
+    Value: number|string;
+}
+
+
+export function FromEnumToArrOfObject( enumObj: { [key: string]: string | number } ): IEnum[] {
+  return Object.keys(enumObj)
+    .filter(key => isNaN(Number(key)))
+    .map(key => ({
+     Text: key,
+     Value: enumObj[key]
+    }));
+}

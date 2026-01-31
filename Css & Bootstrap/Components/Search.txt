@@ -1,0 +1,33 @@
+<< search input with search icon >>
+
+<div class="row">
+    <div class="col-12 col-sm-6 col-md-4">
+        <div class="input-group">
+            <input type="text" class="form-control" placeholder="Search">
+            <span class="input-group-text"><i class="bi bi-search"></i></span>
+        </div>
+    </div>
+</div>
+
+- input-group --> flex, wrap, 100%, relative
+
+-----------------------------------------------------------------------------------
+
+
+<< search with select input and search icon >>
+
+<div class="col-12 col-sm-12 col-md-8 col-lg-6">
+   <div class="input-group div-search">
+        <select class="form-select" style="flex: 0 1 110px;">
+            <option value="" selected>Name</option>
+            <option value="">Owner</option>
+            <option value="">Tag</option>
+            <option value="">Technology</option>
+            <option value="">Dependency</option>
+        </select>
+        <input  type="text" class="form-control input-search" placeholder="Search" name="SearchText">
+        <button class="btn btn-info text-white"><i class="bi bi-search"></i></button>
+   </div>
+</div>
+
+-----------------------------------------------------------------------------------

@@ -1,0 +1,47 @@
+// swapping cases : elZERo -> ELzerO
+
+let str = 'elZERo'
+    console.log(str.split("").map((element)=> 
+        element===element.toUpperCase()?element.toLowerCase():element.toUpperCase()
+).join(''));
+---------------------------------------------------------------------------------------------------
+
+//inverting numbers in array
+
+let arr = [1 , -55 , -44 , 77 , 12];
+
+console.log(arr.map((ele)=>-ele));
+
+------------------------------------------------------------------------------------------------------
+// ignoring a number from string as example Elz123er4o -> Elz123er4o
+
+let str = "Elz123er4o";
+  console.log(str.split("").map((element)=> isNaN(element)?element:"").join(""));
+
+-----------------------------------------------------------------------------------------------------
+
+<< longest word >>
+
+find the longest word of array using reduce function
+
+let arr = ['ahmed', 'mohamed', 'samir', 'encyclopedia'];
+
+console.log(arr.reduce(function(acc , curVal){
+
+    return acc.length>curVal.length?acc:curVal;
+
+}));
+
+----------------------------------------------------------------------------------------------------------------
+
+let str = "1,2,3,EE,l,z,r,o,_,W,e,b,_,S,cc,h,o,o,l,2,0,7"; // Elzero Web School; using split , reduce , filter , map
+
+console.log(str.split(',').filter(
+    (ele)=> isNaN(ele)
+).map(
+    (ele)=> ele.length>1?ele[0]:ele
+).reduce(
+    (accum, curval) => curval==='_'?accum+' ': accum+curval 
+));
+
+---------------------------------------------------------------------------------------------------------------------

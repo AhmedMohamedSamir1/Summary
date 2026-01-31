@@ -1,0 +1,13 @@
+
+
+npm install @ng-select/ng-select
+
+
+<ng-select [items]="items"
+           bindLabel="name"
+           bindValue="id"
+           [multiple]="true"
+           placeholder="Select items">
+</ng-select>
+
+

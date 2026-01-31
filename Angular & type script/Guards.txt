@@ -1,0 +1,90 @@
+<< guards >>
+
+- ng g g auth
+
+- Guards types
+	- CanActivate: Executed when I go to specific component
+	- CanDeActivate : Executed when I Go out of spedific component
+	- 
+
+
+
+
+-----------------------------------------------------------------------
+
+import { inject } from '@angular/core';
+import { CanActivateFn, Router } from '@angular/router';
+import { AuthService } from '../Services/AuthService';
+
+export const adminGaurd: CanActivateFn = (route, state) => {
+  const router = inject(Router);
+
+  const userToken = AuthService.getToken();
+  
+  if(AuthService.isAdmin()){
+    return true;
+  }
+  else{
+    router.navigate(['/login']);
+    return false;
+  }
+
+};  
+
+
+
+--- << info about code >>
+
+const router = inject(Router);
+	- retrieves the Router instance provided by Angular's dependency injection system. 
+	- This enables you to use the Router service without needing to declare it in a constructor.
+
+
+- CanActivateFn
+	function or service that decide whether a user is allowed to navigate to a specific route.
+	CanActivateFn signature --> (route: ActivatedRouteSnapshot, state: RouterStateSnapshot) => Observable<boolean> | Promise<boolean> | boolean
+		- route: ActivatedRouteSnapshot --> Contains information about the route the user is trying to access (like route parameters or query strings).
+		- state: Contains information about the current state of the router (like the URL the user is navigating to).
+		- Return Value:
+			- true: Allow navigation.
+			- false: Block navigation.
+			- It can also return Observable<boolean> or Promise<boolean> for asynchronous checks.
+
+----------------------------------------------------------------------------------------------------
+
+
+at app.routes
+        {
+           path: 'admin',
+           canActivate: [adminGaurd],
+           component: AdminLayoutComponent,
+	}
+
+-----------------------------------------------------------------------------------------------------
+
+<< Example CanActivateFn Guard>>
+
+
+import { inject } from '@angular/core';
+import { CanActivateFn, Router } from '@angular/router';
+import { AuthService } from '../Services/AuthService';
+
+export const adminGaurd: CanActivateFn = (route, state) => {
+  
+  let _UserAuthService = inject(UserAuthService); // we have instance of service
+  let router = inject(Router);
+
+  if(_UserAuthService.isAdmin()){
+    return true;
+  }
+  else{
+    router.navigateByUrl(['/login']);
+    return false;
+  }
+
+};  
+
+
+-----------------------------------------------------------------------------------------------------
+
+

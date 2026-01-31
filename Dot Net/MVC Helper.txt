@@ -1,0 +1,556 @@
+<< URL >>
+
+full URL: http://www.example.com:80/path/to/resource?param1=value1&param2=value2
+	http: protocol
+	www.example.com : domain name or host name, the address of the server where the resource is hosted, translated into an IP address via DNS
+	80: port number
+	path/to/resource: Path
+	param1=value1&param2=value2: Query String
+
+
+href= "/name" replace the current path of URL with href
+href= "name"  last path segement is removed and href is appended to path
+
+--------------------------------------------------------------------------------------------------------------------------------------------
+
+<< notes >>
+
+- once you give an to action verb param like this --> [HttpGet("{id}")] it will not be found you must make it --> [HttpGet("project/edit/{id}")]
+
+- to get the route param
+	- var controller = ViewContext.RouteData.Values["controller"];
+    	- var action     = ViewContext.RouteData.Values["action"];
+
+    	- var id = ViewContext.RouteData.Values["id"];
+		- Retrieve the `id` route parameter, id will be in the form of object
+		- This assumes that your route is defined like:
+			- app.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}")
+	
+	- var id = int.Parse(ViewContext.HttpContext.Request.RouteValues["id"].ToString());
+ 	- var id = int.Parse(ViewContext.RouteData.Values["id"].ToString());
+
+	string searchText = ViewContext.HttpContext.Request.Query["SearchText"];
+
+<img src="@Url.Content($"~/MediaFiles/{project.Id}_{project.Name.ToLower()}/{project.Thumbnail}")" alt="Thumbnail" />
+
+
+- attribute value based on c# condition
+	- selected="@(category.Id.ToString() == CategoryId ? "selected" : null)"
+	- class="page-item @($"{(Model.PaginationResult.HasPrevious ? "" : "disabled")}")"
+	- value="@searchText"
+
+--------------------------------------------------------------------------------------------------------------------------------------------
+
+<< html element helpers >>
+
+<a asp-controller="Game" asp-action="AddGame">Add Page</a>
+<a asp-action="Details"  asp-controller="Employee" asp-route-id="@Model.Id"  asp-route-age="30">Details </a>
+<a href="/Employee/Details/2?age=30">details </a>
+
+
+
+<input asp-for="Address">     ==> id=Salary, name=Salary, type=number, value="@Model.Salary"
+
+<input class="form-control" type="text" asp-for="Supplier.UserName"> -> name="Supplier.UserName" id="Supplier_UserName"
+
+<input id="select-item-0" name="Project.items[0].Id">  // in case you want to bind list of items
+<input id="select-item-0" name="Project.items[0].Id">  // in case you want to bind list of items
+
+public async Task<IActionResult> IsUserNameUnique([FromQuery(Name = "Supplier.UserName")] string UserName, string? Id)
+
+
+
+- to redirect to action that has param: Login(string? returnUrl = null)
+	- return RedirectToAction("login", new { returnUrl = URL });
+
+
+- app.MapControllerRoute method configures how URLs should be routed to controllers and actions in your application.
+	- used define a route in the application that maps incoming HTTP requests to controller actions.
+	- app.MapControllerRoute(
+    		name: "default",  // name of the route
+    		pattern: "{controller=Home}/{action=Index}/{id?}");
+		
+
+
+-----------------------------------------------------------------------------------------------------------------------------
+
+<< model binding >>
+
+public class PageParam
+{
+    public string? SearchText {  get; set; }
+    public DateTime? FromDate { get; set; }
+    public DateTime? ToDate { get; set; }
+    public int? PageNumber { get; set; }
+}
+
+- public async Task<IActionResult> Delete(int id, PageParam? searchParam)
+	- href --> /Tag/Delete/2?pageNumber=4&SearchText=example
+	- asp-action="Delete" asp-route-Id="@tag.Id" asp-route-pageNumber="@Model.CurrentPage" asp-route-SearchText="@searchText">
+		- the element will take formation attribute: formaction="/tag/delete/2?pageNumber=1&SearchText="ss"
+
+----------------------------------------------------------------------------------------------------------------------------
+
+at script
+	location.reload();
+	var object = @Html.Raw(Json.Serialize(@Model)); // convert the @Model into js object
+		- Json.Serialize(@Model); // convert server-side object to json string
+		- @Html.Raw(): avoid HTML encoding which means Not converting the < to &ls; and so on,
+	- JSON.stringify(JS_Object): Use this on the client side to convert JS object to string 
+
+	- let items = @Html.Raw(Json.Serialize(Model.Items));
+
+jQuery
+	var inputValue = $('#myInput').val();
+	$('#myElement').text('Hello, World!'); // Changes the text of the selected element
+	
+
+
+----------------------------------------------------------------------------------------------------------------------------------------
+
+<< MVC validation >>
+
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+
+
+
+
+<input asp-for="Salary">    		==> id=Salary, name=Salary, type=number, value="@Model.Salary"
+
+<span asp-validation-for="PhoneNumber" class="text-danger"></span>
+
+<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+<div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+
+ModelState.AddModelError("", ex.Message); 
+ModelState.AddModelError(“”, ex.InnerException.Message);
+
+
+- remote validation
+
+	[Remote("Action", "Controller", ErrorMessage = "wrong pass", AdditionalFields="param1,param2")]
+	[Remote(action: "IsTagNameUnique", controller: "Validation", ErrorMessage = "Tag name must be unique.")]
+	
+	[Remote("IsTagNameUnique", "Validation", ErrorMessage = "Tag name must be unique.", AdditionalFields = "OtherField")]
+	public string TagName { get; set; }    
+	public string OtherField { get; set; }
+			
+	- the generated request 
+		- Validation/IsTagNameUnique?TagName=value&OtherField=value1  // note TagName is the name of field
+		- the remote validation uses the asp-for attribute of the input field 
+
+	- The AdditionalFields property specifies additional parameters to include in the request sent for remote validation. 
+	- These should be the property names of other fields in your model that you want to include in the query string.
+	
+	- the action IsTagNameUnique --> public async Task<IActionResult>  IsProjectNameUnique(string name)
+		- The parameter names in the action method must match the property names in the model (case-sensitive) 
+		  for the model binder to assign values correctly.
+
+- Important Note: keep in mind that validation using data annotations that are applied to class — 
+  the viewmodel of razor page needs to be the same class type to read these validations
+
+
+- unobtrusive validation manually
+   data-val="true"
+   data-val-required="name is required"
+   data-val-remote="Name must be unique"   
+   data-val-remote-url="/Tag/IsTagUnique"
+   data-val-remote-additionalfields="*.Id"
+	- It tells the unobtrusive validation system to include the value of the Id property from the viewModel of current razor page
+	- he asterisk * is a placeholder that refers to the current model (the form's view model)
+
+   at span
+	at input-> name="ProjectDTO.Name"
+	at span -> data-valmsg-for="ProjectDTO.Name" data-valmsg-replace="true"
+
+
+
+-   [Required(ErrorMessage = "password is required")]
+    [RegularExpression(@"(?=.*[A-Z]{1,})[A-Za-z\d_&*@!~]{8,}",
+    	ErrorMessage = "Password must be at least 8 \n characters long, include one uppercase letter, and allowed special characters (_&*@!)")]
+    public string Password { get; set; }
+
+    [Required(ErrorMessage = "confirm password is required")]
+    [Compare("Password", ErrorMessage = "Passwords do not match")]
+    public string ConfirmPassword { get; set; }
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+
+- create view at shared folder to use it as indicator error when executing opertations like add, delete, update
+
+<div class="alert alert-danger" role="alert">
+    <h4 class="alert-heading">Error</h4>
+    <hr />
+    <p>error during executing operation</p>
+</div>
+
+
+------------------------------------------------------------------------------------------------------------------------
+
+<< notes >>
+
+After a successful POST, you return a View, not a Redirect, so when user presses Ctrl+R, the browser tries to resubmit the POST
+
+return RedirectToAction("Register");   // ✔ Redirect instead of View
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+
+<< ViewData, TempData >>
+
+1. ViewData
+	- Pass data from Controller → View during a single request
+	- Lifetime: Only available for the current request. Once the view is rendered, it’s gone.
+	- Use case: When you want to pass small amounts of data like strings, numbers, or objects to the view.
+
+2. TempData
+	- Purpose: Pass data Controller → View, or Controller → Redirect → View.
+	- It survives one subsequent request—commonly used when you redirect from one action to another.
+	- once it’s read, it’s removed.
+-------------------------------------------------------------------------------------------------------------------------------------
+View codes
+
+ @if ((ViewData[PageConst.OperationStatus] as ErrorViewModel)?.IsErrorOccured ?? false) {}
+
+ @if ((ViewData[PageConst.OperationStatus] as bool?) ?? false) {}
+
+ <strong>@(string.Join('\n', (ViewData[PageConst.OperationStatus] as ErrorViewModel)!.Errors))</strong>
+
+
+@if ((ViewData[PageConst.OperationStatus] as ErrorViewModel)?.IsErrorOccured ?? false)
+{
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <strong>@(string.Join('\n', (ViewData[PageConst.OperationStatus] as ErrorViewModel)!.Errors))</strong>
+    </div>
+}
+
+ Scanned at : @(Model.ScannedAt?.ToLocalTime().ToString("yyyy-MM-dd hh:mm tt") ?? "Not scanned yet")
+ Scanned at : @(Model.ScannedAt != null ? Model.ScannedAt.Value.ToLocalTime().ToString("yyyy-MM-dd hh:mm tt") : "")
+
+---------------------------------------------------------------------------------------------------------------------------------------
+
+public class OperationViewModel
+{
+    public bool IsOperationDone { get; set; } = false;
+    public bool IsErrorOccured { get; set; } = false;
+    public List<string> Messages { get; set; } = new List<string>();
+}
+
+-----------------------------------------------------------------------------------------
+
+
+<< Login >>
+
+
+  [HttpGet]
+  public  IActionResult Login(string? returnUrl = null)
+  {
+     ViewData["ReturnUrl"] = returnUrl;
+     return View();
+  }
+
+	[HttpPost]
+  	public async Task<IActionResult> Login(LogInDTO logInDTO, string? returnUrl = null)
+  	{
+    	   if (!ModelState.IsValid)
+    	   {
+        	return View(logInDTO);
+    	   }
+    	   try
+    	   {
+        	var appUser = await _userManager.FindByNameAsync(logInDTO.UserName);
+        	if (appUser == null)
+        	{
+            	   ViewData[PageConst.OperationStatus] = new ErrorViewModel() { IsErrorOccured = true, Errors = new() { "wrong user name or password" } };
+            	   return View(logInDTO);
+        	}
+
+        	var res = await _userManager.CheckPasswordAsync(appUser, logInDTO.Password);
+        	if (!res)
+        	{
+            	   ViewData[PageConst.OperationStatus] = new ErrorViewModel() { IsErrorOccured = true, Errors = new() { "wrong user name or password" } };
+            	   return View(logInDTO);
+        	}
+
+        	await _signInManager.SignInAsync(appUser, true);
+       		var userRoles = (await _userManager.GetRolesAsync(appUser));
+
+       		if(userRoles!=null && userRoles.Contains(RolesConst.Usher))
+        	{
+            	   if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+            	   {
+                	return Redirect(returnUrl);
+            	   }
+            		return RedirectToAction("Scan", "Usher");
+        	}
+        	else if (userRoles != null && userRoles.Contains(RolesConst.Admin))
+        	{
+            	   if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+            	   {
+                	return Redirect(returnUrl);
+            	   }
+            		return RedirectToAction("index");
+           	}
+
+        	ViewData[PageConst.OperationStatus] = new ErrorViewModel() { IsErrorOccured = true, Errors = new() { "No Authorized yet" } };
+        	return View(logInDTO);
+    	    }
+            catch
+            { 
+        	ViewData[PageConst.OperationStatus] = new ErrorViewModel() { IsErrorOccured = true, Errors = new() { "operation failed" } };
+        	return View(logInDTO);
+    	    }
+      }
+
+
+- at view inside form
+	<input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]" />
+
+-------------------------------------------------------------------------------------------------------------------------------
+
+<< Globalization, Localization >>
+
+- Create Resources Folder at presentation Layer [MVC project]
+- for Register.cshtml View you need to make directory like the one that Register view existed on it
+  EX: if Register.cshtml existed at --> Views\User\Register.cshtml
+	- at Resources you need to place Regiser.en.resx, Regiser.ar.resx resource files at Resources\Views\User\
+		
+
+- configuation at program.cs
+	- builder.Services.AddLocalizationService(); // you have created it at ServicesConfiguration folder
+	- app.UseMiddleware<LocalizationMiddleware>();
+
+- to allow including of resource file
+	- go to its properties -> at Custom Tool -> write PublicResXFileCodeGenerator + rebuild you project
+
+- at HTML page
+	@using System.Globalization
+	<html lang="@CultureInfo.CurrentUICulture.TwoLetterISOLanguageName">
+
+- at site.css
+	html[lang="ar"] { direction: rtl; text-align: right; }
+	html[lang="en"] { direction: ltr;    text-align: left; }
+
+- to change lang  
+
+	public IActionResult SetLanguage([FromQuery]string culture)
+	{
+    		Response.Cookies.Append("lang", culture, new CookieOptions { Expires = DateTime.Now.AddYears(1)});
+    		var currentUrl = Request.Headers["Referer"].ToString(); // Get the current URL     
+    		return Redirect(currentUrl); // Redirect back to the same URL
+	}
+
+
+
+- at view -> to change the language
+
+	<select class="lang-select form-select position-absolute mt-1 pe-5 ms-3" onchange="switchLang(this.value)">
+    		<option value="/User/SetLanguage?culture=ar" selected="@(CultureInfo.CurrentCulture.Name == "ar")">Arabic</option>
+    		<option value="/User/SetLanguage?culture=en" selected="@(CultureInfo.CurrentCulture.Name == "en")">English</option>
+	</select>
+
+
+	@inject Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer Localizer
+	placeholder="@Localizer["EnterYourNameKey"].Value"
+
+	- to get the cuurent culuture like [en, ar, ..ETC.]
+		@using System.Globalization
+
+ 		@CultureInfo.CurrentCulture.Name
+		
+
+- at ViewModel
+	[Required(ErrorMessageResourceName= "RequiredError", ErrorMessageResourceType = typeof(Resources.Controllers.UserController))]
+
+
+
+----------------------------------------------------------------------------------------------------------------
+
+<< controller >>
+
+[HttpGet]
+public IActionResult Create()
+{
+    return View(new TagForCreationDTO());
+}
+
+
+ [HttpPost]
+ public async Task<IActionResult> Create(TagForCreationDTO tag)
+ {
+     if (!ModelState.IsValid)
+     {
+         return View(tag);
+     }
+     var tagForCreation = mapper.Map<Tag>(tag);
+     await tagRepository.AddAsync(tagForCreation);
+     return RedirectToAction("Index");
+ }
+
+
+------------------------------------------
+
+<< at the form of adding course with sessions or shipment with parcels >>
+
+-- in this example we are dealing with course with sesssions 
+-- we want buttons that add
+
+public class CourseDTO
+{
+    public string Title { get; set; } 
+    public DateTime StartDate { get; set; }  
+    public DateTime EndDate { get; set; }
+    public CourseStage Stage { get; set; }
+    public CourseStatus Status { get; set; } = CourseStatus.Active;
+    public List<CourseSessionDTO> Sessions { get; set; }
+}
+
+public class CourseSessionDTO
+{
+    public DayOfWeek Day { get; set; }
+    public TimeSpan FromHour { get; set; }
+    public TimeSpan ToHour { get; set; }
+}
+
+<table class="table table-bordered" id="sessionsTable">
+    <thead class="table-light">
+        <tr>
+            <th>Day</th>
+            <th>From</th>
+            <th>To</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+
+<button type="button" class="btn btn-primary mb-3" onclick="addSessionRow()">+ Add Session</button>
+
+<table class="d-none">
+    <tbody>
+        <tr id="sessionRowTemplate">
+            <td>
+                <select class="form-select session-day">
+                    @foreach (WeekDay day in Enum.GetValues(typeof(WeekDay)))
+                    {
+                        <option value="@((int)day)">@day</option>
+                    }
+                </select>
+            </td>
+
+            <td><input type="time" class="form-control session-from" /></td>
+
+            <td><input type="time" class="form-control session-to" /></td>
+
+            <td class="align-middle text-center"><button type="button" class="btn btn-danger btn-sm remove-row">Remove</button></td>
+        </tr>
+    </tbody>
+</table>
+
+
+  @@media (max-width: 660px) 
+  {
+      /* hide table header */
+      #sessionsTable thead
+      {
+          display: none;
+      }
+
+      #sessionsTable tr {
+          display: block;
+          margin-bottom: 1rem;
+          border: 1px solid #dee2e6;
+          border-radius: .5rem;
+          padding: .75rem;
+      }
+
+      #sessionsTable td {
+          display: block;
+          border: none;
+          padding: .5rem 0;
+      }
+
+      #sessionsTable td::before {
+          content: attr(data-label);
+          display: block;
+          font-weight: 600;
+          margin-bottom: .25rem;
+      }
+      .remove-row {
+          width: 100%;
+      }
+  }
+
+<script>
+
+    let sessionIndex = 0;
+
+    function addSessionRow() {
+
+        const template = document.getElementById("sessionRowTemplate").cloneNode(true);
+
+        template.removeAttribute("id");
+
+        template.querySelector(".session-day").setAttribute("name", `CourseDTO.Sessions[${sessionIndex}].Day`);
+
+        template.querySelector(".session-from").setAttribute("name", `CourseDTO.Sessions[${sessionIndex}].FromHour`);
+
+        template.querySelector(".session-to").setAttribute("name", `CourseDTO.Sessions[${sessionIndex}].ToHour`);
+
+        template.querySelector(".remove-row").addEventListener("click", () => template.remove()); // .remove-row button
+
+        document.querySelector("#sessionsTable tbody").appendChild(template);
+
+        sessionIndex++;
+    }
+</script>
+
+
+-- server validation
+
+ if (!ModelState.IsValid)
+ {
+     foreach (var key in ModelState.Keys.Where(k => k.StartsWith("CourseDTO.Sessions")))
+     {
+         ModelState.Remove(key);
+     }
+
+     if (CourseDTO.Sessions == null)
+         ModelState.AddModelError("Courses","Sessions is required");
+
+     if (CourseDTO.Sessions != null)
+     {
+         for (int i = 0; i < CourseDTO.Sessions.Count; i++)
+         {
+             var session = CourseDTO.Sessions[i];
+             var missingFields = new List<string>();
+
+             // Check Day
+             if (!Enum.IsDefined(typeof(WeekDay), session.Day) || (int)session.Day == 0)
+             {
+                 missingFields.Add("Day");
+             }
+
+             if (session.FromHour == default(TimeSpan))
+                 missingFields.Add("From hour");
+
+             if (session.ToHour == default(TimeSpan))
+                 missingFields.Add("To hour");
+
+             if (missingFields.Any())
+             {
+                 string message = $"Session {i + 1} is missing: {string.Join(", ", missingFields)}.";
+                 ModelState.AddModelError($"CourseDTO.Sessions[{i}]", message);
+             }
+         }
+     }
+
+     return Page();
+ }
+

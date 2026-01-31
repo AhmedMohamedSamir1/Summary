@@ -1,0 +1,122 @@
+public class Shipment : BaseEntity
+{
+    public DateOnly PickUpDate { get; set; }
+    public TimeOnly PickUpStartTime { get; set; }
+    public TimeOnly PickUpEndTime { get; set; }
+    public ShipmentType ShipmentType { get; set; }
+    public string ConsigneeName { get; set; }
+    public string ConsigneePhone { get; set; }
+    public decimal Price { get; set; }
+    public string TrackingNumber { get; set; }
+    public string? CourierTrackingNumber { get; set; }
+    public ShipmentStatus ShipmentStatus { get; set; }
+
+    public List<Parcel> Parcels { get; set; }
+}
+
+
+
+public class Parcel : BaseEntity
+{
+    public double LengthCm { get; set; }
+    public double WidthCm { get; set; }
+    public double WeightKg { get; set; }
+    public double HeightCm { get; set; }
+    public int Quantity { get; set; }
+    public string? Commodity { get; set; }
+
+    [ForeignKey("Shipment")]
+    public int? ShipmentId { get; set; }
+
+    public Shipment Shipment { get; set; } 
+}
+
+public class ParcelDTO
+{
+    public double LengthCm { get; set; }
+    public double WidthCm { get; set; }
+    public double HeightCm { get; set; }
+    public double WeightKg { get; set; }
+    public int Quantity { get; set; }
+    public string? Commodity { get; set; }
+}
+
+public class ShipmentDTO
+{
+    public DateOnly PickUpDate { get; set; }
+    public TimeOnly PickUpStartTime { get; set; }
+    public TimeOnly PickUpEndTime { get; set; }
+    public ShipmentType ShipmentType { get; set; }
+    public ShipmentStatus ShipmentStatus { get; set; } = ShipmentStatus.Created;
+    public string ConsigneeName { get; set; }
+    public string ConsigneePhone { get; set; }
+    public int? PickUpAddressId { get; set; }
+    public int? DestinationAddressId { get; set; }
+    public List<ParcelDTO> Parcels { get; set; }
+}
+
+
+
+--- add
+
+ public async Task<bool> Add(ShipmentDTO shipmentDTO)
+ {
+     try
+     {
+         var shipment = mapper.Map<Shipment>(shipmentDTO);
+
+         var appUserId = int.Parse(contextAccessor.HttpContext!.User.FindFirst(ClaimConst.Id)!.Value);
+         shipment.ApplicationUserId = appUserId;
+         shipment.TrackingNumber = Guid.NewGuid().ToString("N").Substring(0, 9);
+
+         int pickUpAddressId = (int)shipment.PickUpAddressId!;
+         int destinationAddressId = (int)shipment.DestinationAddressId!;
+         var weight = shipment.GetShipmentWeight();
+
+         shipment.Price = await GetShipmentPrice(appUserId, weight, pickUpAddressId, destinationAddressId);
+         await this.ShipmentRepo.AddAsync(shipment);
+         
+         return true;
+     }
+     catch
+     {
+         return false;
+     }
+ }
+
+
+--- Edit
+
+public async Task<bool> Edit(int id, ShipmentDTO shipmentDTO)
+{
+    var transaction = await ShipmentRepo.BeginTransactionAsync();
+    try
+    {
+        var existingShipment = await ShipmentRepo.GetByIdAsync(id, false, "Parcels");
+        if (existingShipment == null)
+            return false;
+
+        mapper.Map(shipmentDTO, existingShipment);
+
+        var appUserId = int.Parse(contextAccessor.HttpContext!.User.FindFirst(ClaimConst.Id)!.Value);
+        int pickUpAddressId = (int)existingShipment.PickUpAddressId!;
+        int destinationAddressId = (int)existingShipment.DestinationAddressId!;
+        var weight = existingShipment.GetShipmentWeight();
+
+        existingShipment.Price = await GetShipmentPrice(appUserId, weight, pickUpAddressId, destinationAddressId);
+
+        await  ShipmentRepo.SaveAsync();
+
+        await transaction.CommitAsync();
+        return true;
+
+    }
+    catch
+    {
+        await transaction.RollbackAsync();
+        return false;
+    }
+}
+
+
+

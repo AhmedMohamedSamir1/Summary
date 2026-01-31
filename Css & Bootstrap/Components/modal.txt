@@ -1,0 +1,118 @@
+<< model using bootstrap >>
+
+
+- data-bs-toggle 
+	- Applies to Button or link
+	- tells Bootstrap what kind of component to open or toggle.
+	- When clicked, Bootstrap should toggle (open)
+	- EX: <button data-bs-toggle="modal" data-bs-target="#myModal"></button>
+
+- data-bs-target
+	- Applies to Button or link
+	-  Specifies the target element to toggle or open
+	- EX: data-bs-target="#myModal"
+
+- data-bs-backdrop
+	- Applies on Modal element
+	- controls the behavior of the overlay behind the modal, which is the semi-transparent overlay that appears behind a modal dialog.
+        - It can take three possible values
+		- data-bs-backdrop="true"   // default, creates a backdrop that is visible and, when clicked, will close the modal.
+		- data-bs-backdrop="static" // creates a backdrop, but clicking on it will not close the modal.
+		- data-bs-backdrop="false"  // there will be no overlay behind the modal.
+
+- data-bs-dismiss
+	- Applies on Inside a component (element that lives inside the Bootstrap component that you want to close)
+	- Tells Bootstrap to close the component
+	- data-bs-dismiss="modal"
+	- 
+
+- data-bs-keyboard
+	- Applies on  Modal element
+	- Determines if ESC key can close the modal
+	- EX: data-bs-keyboard="false"
+
+<button id="submitDelete"
+    class="btn btn-outline-danger"
+    data-bs-target="#deletemodal"
+    data-bs-toggle="modal"
+    onclick="window.click(this)"
+    data-name="@tag.Name"
+    asp-action="Delete"
+    asp-route-pageNumber="@Model.CurrentPage"
+    asp-route-SearchText="@searchText"
+    asp-route-Id="@tag.Id">
+    Delete
+</button>
+
+- data-bs-toggle="modal"
+	- data-bs-toggle : Bootstrap-specific attributes
+	- It tells Bootstrap that this element will be used to toggle (show/hide) a modal element.
+	- 
+
+- data-bs-target="#deletemodal"
+	- the modal element
+
+-------------------------------------------------------------------------------------------------------------------------
+
+
+<div class="modal fade" tabindex="-1" role="dialog" id="deletemodal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h4 id="deletemodaltitle" class="modal-title text-left">Delete Tag</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+                <strong class="text-danger" id="deleteMessage">Are you sure you want to delete this Tag?</strong>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                <!-- Confirmation Button -->
+                <a id="deleteConfirmationSubmit" href="#" class="btn btn-outline-danger">Delete</a>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+- class="modal"
+	- A Bootstrap class that makes the element modal
+
+- class="fade"
+	- fade: Adds a fade-in and fade-out transition effect when the modal is opened or closed.
+
+- data-bs-dismiss="modal"
+	- When the element with this attribute is clicked, it triggers the modal to close (i.e., it hides the modal from view).
+
+- tabindex="-1"
+	- Prevents the modal itself from being focused via the Tab key.
+
+ 
+----------------------------------------------------------------------------------------------------------------------------------
+
+<<<< js code >>>>
+
+window.click = function(button) {
+
+    console.log(button); // Get the tag name and ID from the button
+
+    const tagName = button.getAttribute('data-name'); // Tag name
+    const link = button.getAttribute('formaction');   // /Tag/Delete/25?pageNumber=1
+    console.log(tagName);
+    console.log(link);
+
+    // Update the modal message with the tag name dynamically
+
+    const deleteMessage = document.getElementById('deleteMessage');
+    deleteMessage.innerHTML = `Are you sure you want to delete this Tag: <strong>${tagName}</strong>?`;
+
+    const deleteLink = document.getElementById('deleteConfirmationSubmit');
+    deleteLink.setAttribute('href', link);
+ };
+

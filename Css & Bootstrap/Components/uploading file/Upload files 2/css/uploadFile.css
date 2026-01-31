@@ -1,0 +1,34 @@
+.custom-file-area {
+  border: 2px dashed #ced4da;
+  border-radius: 6px;
+  padding: 15px;
+  background-color: #f8f9fa;
+  min-height: 100px;
+  transition: border-color 0.3s ease;
+}
+
+.media-item {
+  background: #ffffff;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 10px;
+  text-align: center;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.03);
+}
+
+.media-preview {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.file-name-size {
+  font-size: 13px;
+  word-break: break-word;
+}
+
+.remove-btn {
+  
+  font-size: 13px;
+}

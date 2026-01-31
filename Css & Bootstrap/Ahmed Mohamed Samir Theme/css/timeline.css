@@ -1,0 +1,123 @@
+
+.timeline-container {
+    --timeline-dot-bgcolor: #E85215;
+    --timeline-dot-border: #FFA37E;
+    --timeline-dot-outline: #F0BAA4;
+    --timeline-dot-width: 65px;
+    --timeline-dot-height: 65px;
+    --timeline-dot-border-width: 5px;
+    --timeline-dot-outline-width: 5px;
+    --timeline-line-width: 4px;
+
+    --timeline-dot-completed: #15D465;
+    --timeline-dot-completed-border: #3FEB87;
+    --timeline-dot-completed-outline: #A1FBC6;
+
+    --timeline-dot-inactive: #717171;
+    --timeline-dot-inactive-border: #9C9C9C;
+    --timeline-dot-inactive-outline: #D9D9D9;
+
+
+    background-color: #FFFFFF;
+    padding: 35px;
+    border-radius: 15px;
+    
+}
+
+.timeline {
+    position: relative;
+    /* padding: 20px 0; */
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: calc((var(--timeline-dot-width) - var(--timeline-line-width)) / 2);
+    height: 100%;
+    width: var(--timeline-line-width);
+    background: hsl(205, 38%, 89%);
+}
+
+.timeline-step {
+    display: flex;
+    position: relative;
+    z-index: 1;
+    margin-bottom: 55px;
+}
+
+.timeline-dot {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+    width: var(--timeline-dot-width);
+    height: var(--timeline-dot-height);
+    border-radius: 50%;
+    background-color: var(--timeline-dot-bgcolor);
+    border: var(--timeline-dot-border-width) solid var(--timeline-dot-border);
+    outline: var(--timeline-dot-outline-width) solid var(--timeline-dot-outline);
+    box-shadow: 0 0 15px rgba(255, 0, 0, 0.3), 0 0 30px rgba(255, 0, 0, 0.2);
+}
+
+.timeline-dot img {
+    width: 50px;
+}
+
+
+.timeline .timeline-content {
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    margin-inline-start: 20px;
+    background-color: aliceblue;
+    flex-grow: 1;
+    position: relative;
+    border-radius: 0.25em;
+    box-shadow: 0 3px 0 hsl(205, 38%, 89%);
+}
+
+.timeline .inactive-content {
+    opacity: 0.2
+}
+
+.timeline .timeline-content::before {
+    content: '';
+    position: absolute;
+    /* top: 16px; */
+    right: 100%;
+    width: 0;
+    height: 0;
+    border: 7px solid transparent;
+    border-right-color: #93979b;
+}
+
+.timeline .timeline-content h3 {
+    margin: 0;
+}
+
+
+
+
+
+.timeline-dot-completed {
+    background-color: var(--timeline-dot-completed);
+    border-color: var(--timeline-dot-completed-border);
+    outline-color: var(--timeline-dot-completed-outline);
+    box-shadow: 0 0 8px rgba(0, 255, 128, 0.3), 0 0 16px rgba(0, 255, 128, 0.2);
+}
+
+.timeline-dot-inactive {
+    background-color: var(--timeline-dot-inactive);
+    border-color: var(--timeline-dot-inactive-border);
+    outline-color: var(--timeline-dot-inactive-outline);
+    box-shadow: 0 0 8px rgba(113, 113, 113, 0.3), 0 0 16px rgba(113, 113, 113, 0.2);
+}
+
+
+.timeline-dot-current {
+    background-color: var(--timeline-dot-bgcolor);
+    border: var(--timeline-dot-border-width) solid var(--timeline-dot-border);
+    outline: var(--timeline-dot-outline-width) solid var(--timeline-dot-outline);
+    box-shadow: 0 0 15px rgba(255, 0, 0, 0.3), 0 0 30px rgba(255, 0, 0, 0.2);
+}

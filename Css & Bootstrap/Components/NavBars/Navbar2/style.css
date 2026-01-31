@@ -1,0 +1,135 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  min-height: 100vh;
+  font-family: 'Poppins', sans-serif;
+}
+
+nav {
+  background-color: white;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+nav ul.navbar li img {
+  height: 40px;
+}
+
+nav ul.navbar {
+  width: 100%;
+  list-style: none;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 10px 20px;
+  column-gap: 10px;
+}
+
+nav ul.navbar li {
+  height: 50px;
+  position: relative;
+}
+
+nav ul li a {
+  height: 100%;
+  padding: 0 20px;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  color: black;
+  font-weight: 600;
+  transition: all .2s ease-in-out;
+}
+
+/*start the line that appear at the bottom of navbar item*/
+
+nav ul.navbar li:not(:first-child):not(:last-child):after 
+/* you exclude the first li as it include img and last li as it include the menu that used to open the the sidebar*/
+{
+    content: "";
+    position: absolute;
+    height: 4px;
+    width: 0%;
+    background-color: red;
+    bottom:0;
+    left: 0;
+    transition: all 0.25s ease-in;
+    z-index: 1;
+}
+nav ul.navbar li:not(:first-child):not(:last-child):hover::after {
+  width: 100%;
+}
+
+/*End the line that appear at the bottom of navbar item*/
+
+
+/* Start the drop down menu of navbar item*/
+
+.nav-item-menu{
+    position: absolute;
+    width: 100%;
+    top: calc(100% + 10px);
+    left: 0;
+    background-color: rgb(255, 170, 31);
+    border-radius: 5px;
+    border-top-left-radius: 0;
+    font-size: 15px;
+    width: 150px;
+    visibility: hidden;
+    opacity: 0;
+    z-index: 1;
+    transition: all 0.25s ease-in-out;
+}
+
+nav ul.navbar li:hover .nav-item-menu{
+    opacity: 1;
+    visibility: visible;
+    top: 100%;
+}
+
+.nav-item-menu div{
+   padding: 10px;
+   transition: all 0.25s ease-in-out;
+   cursor: pointer;
+}
+.nav-item-menu div:not(:last-child){
+    border-bottom: 2px solid whitesmoke;
+ }
+
+ .nav-item-menu div:hover
+ {
+    background-color: cornflowerblue;
+    color: white;
+}
+
+/* End the drop down menu of navbar item*/
+
+
+ul.navbar li a:hover {
+  background-color: #f0f0f0;
+}
+
+nav ul li:first-child {
+  margin-right: 10px;
+}
+
+
+.menu-button {
+  display: none;
+  margin-left: auto;
+}
+
+/* ------------------------------------ */
+
+@media (max-width: 800px) {
+  .hideOnMobile {
+    display: none;
+  }
+
+  .menu-button {
+    display: block;
+  }
+}

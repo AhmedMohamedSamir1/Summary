@@ -1,0 +1,68 @@
+
+<<purpose of interceptor >>
+
+- allow you to modify the outgoing http request globally for example 
+	- gate between application and interceptor that helps you to hold the requests and responses
+	- Add Headers to Requests (like add the JWT Token stored in localStorage)
+		- Modify Requests or Responses
+
+
+
+---------------------------------------------------------------------------------------------------------
+
+create  Auth.Interceptor
+	- at app folder create Interceptors folder + create Auth.Interceptor.ts file
+	
+------------------------------------------------------------------------------------------------------
+
+<< code of interceptor that used to attach a JSON Web Token (JWT) to outgoing HTTP requests >>
+
+-- at interceptor.ts file
+
+import { HttpHeaders, HttpInterceptorFn } from '@angular/common/http';
+	// HttpHeaders: A class used to manipulate HTTP headers in requests.
+	// HttpInterceptorFn: A function type introduced in Angular 16+ to create interceptors using functional programming.
+
+export const authInterceptorService: HttpInterceptorFn = (req, next) => {
+	// req: Represents the outgoing HTTP request.
+	// next: A handler function that forwards the request to the next interceptor in the chain or the HTTP backend.
+  
+let token = localStorage.getItem('userToken');
+  if (token == null) {
+    return next(req);  // If no token is found, the request proceeds without modification by calling next(req).
+  }
+
+  let headers = req.headers || new HttpHeaders();   		 // Creates or uses existing headers for the outgoing request.
+  headers = headers.append('Authorization', `Bearer ${token}`);  // Appends the Authorization header in the format:
+
+  const modifiedReq = req.clone({  headers: headers,  });   
+  	// Since HTTP requests are immutable in Angular, the interceptor creates a clone of the request with the new headers.
+
+  //console.log(modifiedReq);
+  return next(modifiedReq);
+};
+
+
+
+-- at app.config.ts file
+	 - add -->  withInterceptors([authInterceptor])   to provideHttpClient()
+		the provideHttpClient() method will be
+		provideHttpClient(
+        		withFetch() ,// Enable fetch API
+        		withInterceptors([authInterceptor])
+      		)  
+
+-------------------------------------------------------------------------------------------------------------------
+
+<< to hold the response >>
+
+return next(modifiedReq).pipe(
+   tap( (event)=> {
+	if(event.type==HttpEventType.Response){
+	   if(event.status==200){}
+	   else if(event.status==500){}
+	}
+   })
+)
+
+	

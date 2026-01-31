@@ -1,0 +1,24 @@
+<footer data-aos="fade-up">
+    <div class="container">
+        <div class="row text-center text-md-start align-items-center">
+
+            <!-- Left: Logo -->
+            <div class="col-12 col-md-4 mb-3 mb-md-0 footer-logo d-flex justify-content-center justify-content-md-start">
+                <img src="~/assets/images/K_Logo1.png" style="width:80px" alt="Logo">
+            </div>
+
+            <!-- Center: Text -->
+            <div class="col-12 col-md-4 mb-3 mb-md-0">
+                <p class="text-dark text-center mb-0 fw-semibold">&copy; Copyright Khoury Stand</p>
+            </div>
+
+            <!-- Right: Facebook -->
+            <div class="col-12 col-md-4 footer-facebook d-flex justify-content-center justify-content-md-end">
+                <a href="https://www.facebook.com/khourystand/" target="_blank" class="text-decoration-none fs-1">
+                    <i class="bi bi-facebook"></i>
+                </a>
+            </div>
+
+        </div>
+    </div>
+</footer>

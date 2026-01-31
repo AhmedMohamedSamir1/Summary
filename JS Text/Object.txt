@@ -1,0 +1,193 @@
+Serialization: 
+	- is the process of converting an object into a format that can be stored or transmitted
+	- It’s like turning a complex object (with data, fields, structure) into a string or binary data
+          so you can save it, send it, or store it — and then deserialize it back later.
+
+- JSON.stringify(JS_Object)
+	- It serializes the object into a JSON string. 		
+	- This is useful when you need to send data over the network, store it in a file
+
+- JSON.parse(text) 
+	- takes a JSON string and transforms it into a JavaScript object.
+
+
+----- object declaration
+   - var person = {}; // empty object
+
+   let user = {
+       userName:"ahmed",
+       userAge:"23",
+       sayHello: function(){	
+           return `hello ${this.userName}`
+	   // return `hello ${user.userName}`
+	   // note: you can't access the property of object without using the name of object or this
+      }
+   };
+   
+   console.log(user.userName);      // ahmed
+   console.log(user.userAge);       // 23
+   console.log(user.sayHello());    // hello ahmed
+   console.log(user["sayHello"]()); // hello ahmed  
+
+
+
+----- syntax sugar in object declaration
+     EX1: 
+     	var fname = "ahmed";
+     	var obj = {
+       	   fname, // when value of the key is a variable with the same name  
+       	   display(){ }
+        }
+        obj.display(); // ahmed
+
+     EX2:
+	- var fname = "perons_name";
+    	  let person{
+      	     [fname]: "ali" // it means the key will be the value of variable fname; 
+    	  }
+         // person{person_name:ali};
+
+
+------- loop on an object
+   for(var i in user)
+     console.log(i);
+     // userName
+     // from where
+
+   for(var i in user)
+     console.log(user.i); // undefined -> there is no key i in object user
+     console.log(user[i]);
+     // ahmed
+     // egypt
+
+----- add or update properties to current object
+
+   let user = {};
+   user.age = 22;		     // added if not exist, updated if existed
+   user['userName'] = "ahmed"; // added if not exist, updated if existed
+   user.sayHello = function(){ return "hello"; }
+
+
+
+----- Object.defineProperties()
+		
+	- used to add properties to an object however it gives you fine-grained control over how the property behaves.
+
+	- Object.defineProperties(obj, props)
+		obj: The object you want to define new properties on.
+		props: An object containing one or more property descriptors.
+
+ 	- For example:
+	   let user = {
+  		userName: "ahmed",
+  		age: 22,
+  		doubleAge: function(){ return this.age * 2; }
+	   }	
+	   Object.defineProperty(user, "email", {
+  		value: "ahmed@gmail.com",
+  		writable: false,      // can't change it
+  		enumerable: true,     // will show in loops like for...in
+  		configurable: false   // can't delete or redefine
+	   });
+
+
+---- create object using new keyword
+
+   let user  = new Object({ userName = "ahmed", });
+
+
+---- object prototype.
+
+   - Every JavaScript object has an internal link to another object called its prototype.
+   - When you try to access a property or method on an object:
+	- JavaScript first looks at the object itself.
+	- If it doesn't find it, it looks at the object's prototype.
+	- This continues up the prototype chain until it either finds the property or reaches the end (null).
+	
+   - You can access an object's prototype using
+	- Object.getPrototypeOf(obj);
+	- console.log(obj.__proto__);
+
+   - You can set the prototype of objec
+   	- Object.setPrototypeOf(source, { sayHi: () => "Hi" });
+
+---- create object with create method --> Object.create()
+	- is a method in JavaScript used to create a new object, and it allows you to:
+ 		- Set a specific prototype for that object.
+		- Optionally define properties during creation.
+
+	  let user = {
+      	    userName: "ahmed",
+      	    age: 22,
+      	    doubleAge: function(){ return this.age*2; }
+   	  }
+
+	   let newObject = Object.create(user, { email: {value:"ahmed@gamil.com"}, pass:{value:"123"} });
+		newObject prototype will be the user 
+		newObject properies direct properies are email and password
+
+
+--- Object.assign()
+	- copies the values of all enumerable own properties from one or more source objects to a target object. It returns the target object.
+	- the prototype  is not copied , Only the enumerable properties  
+        - Object.assign(target, ...sources);
+		- target: the object to receive the properties.
+		- sources: one or more objects whose properties will be copied into the target.
+
+
+	let info1 = { name: "ahmed", age: 22 }
+   	let info2 = { email: "ahmed@gmail.com" }
+	
+	Object.assign(info2,  info1);
+	console.log(info2); // {email: 'ahmed@gmail.com', name: 'ahmed', age: 22}
+
+--- Object.keys() , Object.values(), Object.entries()
+	- Object.keys(Person);    // returns the keys of object in the form of array
+	- Object.values(Person)  // returns the values of object in the form of array
+	- Object.entries(Person)  // returns the array of array each array consist of key,value of the object
+
+
+--- Object Destructuring in JavaScript
+      
+      ---  Ex1
+	 const user = {
+  	   name: "Ahmed",
+  	   age: 25,
+  	   email: "ahmed@example.com"
+	 };
+
+	 // Destructuring
+	 const { name, age } = user;
+
+	 console.log(name); // "Ahmed"
+	 console.log(age);  // 25
+
+
+    --- You can rename the extracted variables:
+	  const { name: userName, age: userAge } = user;
+	  console.log(userName); // "Ahmed"
+	  console.log(userAge);  // 25
+
+     --- If the property doesn’t exist in the object, you can assign a default value:
+	 const { city = "Cairo" } = user;
+	 console.log(city); // "Cairo" (default)
+
+     --- You can also destructure nested objects:
+	 const person = {
+  	   name: "Ahmed",
+  	   address: {
+    		city: "Giza",
+    		zip: "12345"
+  	  }
+	 };
+
+	const { address: { city } } = person;
+	console.log(city); // "Giza"
+
+
+   --- Using in Function Parameters
+	function printUser({ name, age }) {
+  		console.log(`Name: ${name}, Age: ${age}`);
+	}
+	printUser(user); // "Name: Ahmed, Age: 25"
+

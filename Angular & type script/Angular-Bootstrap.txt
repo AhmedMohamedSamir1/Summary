@@ -1,0 +1,47 @@
+
+- installation
+	npm i @ng-bootstrap/ng-bootstrap  // recommended, to use the component that need the js code
+
+
+
+- let-modal
+	- Context Variable (NOT a reference) representing the opened modal instance
+	- Produced from NgbModalService.open(). When you open the modal, ng-bootstrap injects a context object into your template
+	- receive it in ts in the form of NgbModalRef
+	- it allow you to call
+		(click)="modal.close()"
+		(click)="modal.open()"
+	- let-modal is NgModalRef
+
+- NgbModalRef
+	- close()
+	- closed
+	- opened
+
+this.modalService.open(content, { centered: false, keyboard: true, backdrop:'static' });
+----- Usage
+
+  import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+  constructor(private modalService: NgbModal){}
+
+  openEditModal(content: TemplateRef<any>){
+     this.modalService.open(content, { centered: false, keyboard: true, backdrop:'static' });
+  }
+
+
+<ng-template #editModal let-modal>
+  <div class="modal-header">
+    <h2 class="modal-title">Edit Job</h2>
+    <button class="btn-close" (click)="modal.dismiss()"></button>
+  </div>
+
+  <div class="modal-body">
+      .....
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-dark"    (click)="modal.dismiss()">Close</button>
+    <button class="btn btn-success" (click)="saveEdit(modal)">Ok</button>
+  </div>
+
+</ng-template>

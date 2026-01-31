@@ -1,0 +1,41 @@
+.custom-file-area {
+      border: 2px dashed #ced4da;
+      border-radius: 6px;
+      padding: 15px;
+      background-color: #f8f9fa;
+      min-height: 100px;
+      transition: border-color 0.3s ease;
+    }
+
+    .file-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #e9ecef;
+      padding: 6px 10px;
+      border-radius: 4px;
+      margin-top: 6px;
+    }
+
+    .file-name-size {
+      font-weight: 500;
+      font-size: 14px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      min-width:100px
+    }
+
+    .remove-btn {
+      background-color: crimson;
+      color: white;
+      border: none;
+      padding: 4px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    #fileInput {
+      display: none;
+    }

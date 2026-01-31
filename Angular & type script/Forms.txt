@@ -1,0 +1,264 @@
+<< Template Driven Forms  >>
+
+- import { FormsModule } from '@angular/forms';
+
+@Component({
+  ......
+  imports: [FormsModule ]
+  .......
+})
+
+
+Example 1:
+
+ export interface IProduct {
+   Name:string,
+   description:string,
+ }
+
+---- html code
+
+<div class="form-container bg-info rounded-3 mt-5 pt-1 position-relative">
+    <form #addProdForm="ngForm" (submit)="addProd()">
+        <div class="row mt-5 p-2 mx-2">
+            <div class="form-group col-12 mb-2">
+                <label class="ms-1">Name</label>
+
+                <input class="form-control"
+                 type="text" 
+                 [(ngModel)]="AddProduct.Name"
+                 name="name"
+                 pattern="^[a-zA-Z]{3,14}"
+                 required
+                 #productName="ngModel"
+                 placeholder="Enter product name">
+
+                 <ng-container *ngIf="productName.touched && productName.invalid">
+                    @if (productName.hasError('required')) {
+                        <span class="text-danger ms-1">name is required</span>
+                    }
+                    @if (productName.hasError('pattern')) {
+                        <span class="text-danger ms-1">name must be at least 5 charachters</span>
+                    }
+                 </ng-container>
+            </div>
+    
+            <div class="form-group col-12 mb-2">
+                <label class="ms-1">Description</label>
+                <input class="form-control"
+                type="text" 
+                [(ngModel)]="AddProduct.description"
+                name="description"
+                pattern="^[a-zA-Z]{3,14}"
+                required
+                #productDesc="ngModel"
+                placeholder="Enter product name">
+                
+                <ng-container *ngIf="productDesc.invalid && productDesc.touched">
+                    @if (productDesc.hasError('required')) {
+                        <span class="text-danger ms-1">name is required</span>
+                    }
+                    @if (productDesc.hasError('pattern')) {
+                        <span class="text-danger ms-1">name must be at least 5 charachters</span>
+                    }
+
+                </ng-container>
+            </div>
+
+            <button type="submit" [disabled]="!addProdForm.valid" class="btn btn-success col-6 col-md-4 m-auto fs-5">Submit</button>
+        </div>
+    </form>
+</div>
+
+
+-- ts code
+	AddProduct:IProduct={} as IProduct;
+	addProd(){ console.log(this.AddProduct); }
+-----------------------------------------------------------------------------------------------------------
+
+
+<< ReactiveFormsModule  (model driven forms)>>
+
+
+---- at typescript file ------
+
+import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+
+
+@Component({
+  ......
+  imports: [ ReactiveFormsModule , CommonModule],
+  .......
+})
+
+productForm = new FormGroup({
+
+    email : new FormControl('', [Validators.required], [this.emailUniqueValidator()]),
+    name   : new FormControl('init name'), 
+    price: new FormControl(0),
+    quantity: new FormControl(null),
+    name : new FormControl('init name',[Validators.required, Validators.minLength(3), Validators.pattern(/^[0](10|11|12|15)[0-9]{8}$/),]  // validation
+
+    password: new FormControl('', [Validators.required, Validators.pattern(/^(?=.*[A-Z])(?=.*[\dA-Za-z]{4,})(?=.*[_$@|/\\.&])[A-Za-z\d_$@|/\\.&]{8,}$/)]),
+
+});	
+
+- create get methods for form controls
+	get getName(){return this.productForm.controls.name;}
+	get getPrice(){ return this.productForm.controls.price;}
+	get getquantity(){ return this.productForm.controls.quantity;}
+
+
+--- custom emailUnique
+
+  emailUniqueValidator(): AsyncValidatorFn {
+    	return (control: AbstractControl): Observable<{ emailTaken: boolean } | null> => {
+      		if (!control.value) 
+        		return of(null); // If no value is provided, skip validation
+      	
+      		return this.userService.isEmailUnique(control.value).pipe(
+        		map(isUnique => (isUnique.success ? null : { emailTaken: true })),   // 'emailTaken' is used in --> hasError('emailTaken')
+        		catchError(() => of(null)) // In case of an error, skip validation
+      		);
+    	};
+  }
+
+-- ValidatorFn
+
+  matchPasswordValidator(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const parent = control.parent; // Access the parent form group
+      if (!parent) {
+        return null; // Parent not yet initialized
+      }
+      const newPassword = parent.get('newPassword')?.value;
+      const confirmPassword = control.value;
+      return newPassword === confirmPassword ? null : { notIdentical: true };
+    };
+  }
+
+- upon submitting form
+
+ registerUser(){
+
+    if (this.userForm.status=="VALID") {
+
+    }else{
+      this.userForm.markAllAsTouched();
+    }
+  }
+
+
+--- info about FormGroup object
+		- this.productForm.Value;
+		- this.productForm.controls;
+		- this.productForm.controls.price.value;   //value is a read-only
+		- this.productForm.controls.price.touched;
+    		- this.productForm.controls.price.errors;
+		- this.productForm.controls.price.hasError('required')  // 'required', 'pattern'
+		- this.editGovernmentForm.controls.isActive.setValue(true)
+		- this.productForm.status =='VALID'
+			- status : carry form validation status "VALID" | "INVALID" need all validation to be true to status be valid
+		- this.userForm.markAllAsTouched(); 
+		- this.userForm.reset()
+		- this.userForm.patchValue({name: 'Mona', email: 'ahmed@yahoo.com'})
+		- this.userForm.setValue({name: 'Mona', email: 'ahmed@yahoo.com'}) // must include all form Keys [email, pass, ETC, ]
+
+- touched: The form control has been blurred (focused and then left).
+- pristine: The value has not changed from the initial value.
+- dirty: The value has changed from the initial value.
+
+
+------ at HTML file --------
+
+<form [formGroup]="userForm" (submit)="registerUser()">
+<input class="form-control" placeholder="Enter your name" formControlName="name" type="text">
+
+
+<ng-container *ngIf="getName.touched">
+	<div *ngIf="getName.hasError('required')" class="text-danger form-text">name is required</div>
+</ng-container> 
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<< Example 2 on reactive form>>
+
+--- Ts Code 
+
+  UserRegisterationForm: FormGroup;
+  constructor(){
+    this.UserRegisterationForm = new FormGroup({
+      email: new FormControl('',[Validators.required, Validators.min(3)],),
+      password: new FormControl(''),
+      address: new FormGroup({
+        city: new FormControl(''),
+        street: new FormControl(''),
+      }),
+      phoneNums: new FormArray([new FormControl('')]),
+    })
+  }
+
+  get getPhones(){ return this.UserRegisterationForm.get('phoneNums') as FormArray;}
+
+
+  addNewPhone(){ this.getPhones.push(new FormControl(''));}
+
+
+
+--- html code
+
+<form [formGroup]="UserRegisterationForm" class="m-5" >
+    
+    <div>{{UserRegisterationForm.value| json}} </div>
+  
+   <input class="form-control mb-2" placeholder="Enter your name" formControlName="email" type="text"> 
+    <input class="form-control mb-2" placeholder="Enter your password" formControlName="password" type="password">
+    <div formGroupName = "address" >
+        <input class="form-control mb-2" placeholder="Enter your city" formControlName="city" type="text">
+        <input class="form-control mb-2" placeholder="Enter your street" formControlName="street" type="text">
+    </div>
+
+    <div formArrayName="phoneNums" *ngFor="let p of getPhones.controls; let i = index">
+        <input class="form-control mb-2" placeholder="address" [formControlName]="i" type="text">
+
+    </div>
+    <button  class="btn btn-danger d-block mb-2" (click)="addNewPhone()">+</button>
+
+    <button  class="btn btn-danger" [disabled]="UserRegisterationForm.invalid">Submit</button>
+</form>
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+<< ValidatorFn >>
+
+- is a type of function used to implement custom validation logic for form controls in reactive forms
+- It is a function that takes a FormControl as input and returns an object representing validation errors (if any), or null if the control is valid.
+- its return type --> (control: AbstractControl) => ValidationErrors | null
+
+- Definition
+	- export type ValidatorFn = (control: AbstractControl) => ValidationErrors | null;
+		- control: The form control (of type AbstractControl) that you want to validate.
+		- ValidationErrors: An object where the key is the error name and the value provides details about the error (e.g., { required: true }).
+			- export declare type ValidationErrors = { [key: string]: any; };
+				- it means the function returns an object that can have any number of properties where: Each key is a string.
+		- null: Indicates that the control has no validation errors.
+		
+
+- example
+
+ matchPasswordValidator(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const parent = control.parent; // Access the parent form group
+      if (!parent) {
+        return null; // Parent not yet initialized
+      }
+      const newPassword = parent.get('newPassword')?.value;
+      const confirmPassword = control.value;
+      return newPassword === confirmPassword ? null : { notIdentical: true };
+    };
+  }
+
+
+
+-------------------------------------------------------------------------------------------------------------

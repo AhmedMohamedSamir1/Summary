@@ -1,0 +1,369 @@
+<< ModelState >>
+
+if (ModelState.IsValid)
+{
+    return Ok("ss");
+}
+var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
+return BadRequest(new ApiValidation() { Errors = errors });
+
+
+
+- ModelState.AddModelError("projectFile", "Please upload a valid Excel file.");
+
+----------------------------------------------------------------------------------------------------------------------------------------
+
+
+- it's prefered for you to disable ModelStateInvalidFilter to use your custom response when validation errors is occured
+
+	public static IServiceCollection DisableModelStateInvalidFilter(this IServiceCollection services)
+	{
+    	    services.Configure<ApiBehaviorOptions>(options =>{
+             
+	    	// Disable automatic 400 Bad Request when ModelState is invalid
+             	options.SuppressModelStateInvalidFilter = true;
+    	    });
+    	    return services;
+	}
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+<< fluent Validation >>
+
+- Install-Package FluentValidation.AspNetCore
+
+- inherit from AbstractValidator<T> is an abstract class that implements the IValidator<T> interface.
+
+- Registration      
+	- builder.Services.AddScoped<IValidator<TagDTO>, TagValidator>(); // the easy one for me
+	- builder.Services.AddScoped<TagValidator>();  
+	- builder.Services.AddValidatorsFromAssembly(typeof(TagValidator).Assembly);
+		- Scans the specified assembly for all classes that implement IValidator<T> and registers them with the DI container.
+
+
+- constructor is where you configure the validator.
+
+
+---- Info in general
+
+   - AbstractValidator class members
+	- RuleFor()
+	   - return IRuleBuilderInitial which implements IRuleBuilder
+
+   - IRuleBuilder members
+	- NotEmpty() , Matches(), ETC .
+	   - return IRuleBuilderOptions
+ 	
+   - IRuleBuilderOptions members
+	- WithMessage()    // return IRuleBuilderOptions
+	- DependentRules() // return IRuleBuilderOptions
+	- When()           // Runs the rule only if the condition is true.
+
+
+---- IRuleBuilder extension methods
+
+- NotEmpty()
+	- Validation will fail if the property is null, an empty string, whitespace, an empty collection or the default value for the type 
+          (for example, 0 for integers but null for nullable integers)
+
+- NotNull()
+	- Ensures the property is not null (but empty string is allowed).
+
+- Length()
+	- there is exact length
+
+- MinimumLength() / MaximumLength()
+
+- Matches(regex)
+
+- EmailAddress()
+
+- InclusiveBetween(min, max) / ExclusiveBetween(min, max)
+
+- .GreaterThan(value) / .LessThan(value)
+
+- Equal()  ,  NotEqual()
+
+- Must(predicate)
+
+- DependentRules(...) block → defines extra rules that only run if the parent rule(s) passed.
+
+- Matches
+
+
+----- Examples
+
+    -- When Example 1
+
+	 RuleFor(tagDTO => tagDTO.Name).NotEmpty().WithMessage("validation error")
+	.When(tagDTO => tagDTO.IsCompitible);  // Validate that Name is not empty, but only if IsCompitible is true
+
+   -- When Example 2
+
+	When(x => Id == 0, () =>
+	{
+    	   RuleFor(p => p.Image).NotEmpty().WithMessage("image is required").DependentRules(() =>
+    	   {
+           	RuleFor(x => x.Image).Must((img) => isImgValid(img)).WithMessage("only image files are allowed (jpeg, png, gif, bmp, webp)");
+           	RuleFor(x => x.Image).Must((img) => isImgSizeValid(img)).WithMessage("image size must not exceed 6 MB");
+           });
+      	});
+
+
+   - DependentRules Example
+	 RuleFor(user => user.Email).NotEmpty().WithMessage("email is required.")
+     	.EmailAddress().WithMessage("Enter a valid email")
+     	.DependentRules(() =>
+     	{
+           RuleFor(user => user.Email).MustAsync((userEmail, cancellationToken) => UniqueUserEmail(userEmail, id, cancellationToken))
+             .WithMessage("email must be unique.");
+     	});
+	
+		
+
+---- If you know ahead of time you’ll sometimes skip certain rules, you can put them in a RuleSet
+
+	RuleSet("SkipNameCheck", () =>
+        {
+            RuleFor(x => x.Id).GreaterThan(0);
+        });
+
+	// usage
+	var result = await validator.ValidateAsync(company, options =>
+	{
+    		options.IncludeRuleSets("SkipNameCheck"); // only validate rules in this set
+	});
+
+
+
+----------------------------------------------------------------------------------------------------------------------------------------
+
+<< Full class Example >>
+
+public class TagValidator : AbstractValidator<TagDTO>
+{
+    private readonly TagValidationService tagValidationService;
+    private int? id;
+
+    public TagValidator(TagValidationService tagValidationService)
+    {
+        this.tagValidationService = tagValidationService;
+  	id = null;
+
+        RuleFor(tag => tag.Name).NotEmpty().WithMessage("Tag name is required.");
+        RuleFor(tag => tag.Name).MustAsync((tagName, cancellationToken) => UniqueTagName(tagName, id, cancellationToken))
+	.WithMessage("Tag name must be unique.");
+
+	RuleFor(user => user.PhoneNumber)
+    		.Matches(@"^[0](10|11|12|15)[0-9]{8}$")
+    		.When(user => !string.IsNullOrEmpty(user.PhoneNumber)) // in case of PhoneNumber is provided
+    		.WithMessage("Phone number must be valid (Egyptian format).");
+
+	RuleFor(resetPass => resetPass.ConfirmPassword)
+            .NotEmpty().WithMessage("Confirmation password is required.")
+            .Equal(resetPass => resetPass.NewPassword).WithMessage("Passwords must match.");
+
+	RuleFor(PL => PL.File)
+    		.Must(file => file != null && file.Length > 0).WithMessage("No file uploaded");
+    }
+
+    public void SetId(int? id)
+    {
+        this.id = id;
+    }
+
+     private async Task<bool> UniqueProjectName(string projectName, int? id, CancellationToken cancellationToken)
+     {
+       return await projectService.isProjectNameUnique(projectName, id);
+     }
+
+}
+
+
+
+[HttpPost]
+public async Task<IActionResult> Add(TagDTO tagDTO)
+{
+    var ValidatorResult = await tagValidator.ValidateAsync(tagDTO);
+    if (ValidatorResult.IsValid){
+
+    }
+}
+
+
+[HttpPut("{id}")]
+public async Task<IActionResult> edit(int id,  TagDTO tagDTO)
+{
+    tagValidator.SetId(id);
+    var validatorResult = await tagValidator.ValidateAsync(tagDTO);
+    if (ValidatorResult.IsValid){
+
+    }else{
+	var errors = ValidatorResult.Errors.Select(e => e.ErrorMessage);
+	return BadRequest(new ApiValidation() { Errors = errors });
+     }
+}
+
+-------------------------------------------------------------------------------------------------------------------------------------
+
+<< Data Annotation Validation >>
+
+- [RegularExpression("pattern")] Works with string
+
+- [Required] 	      --> Ensure property is not null , is not empty value, Work With all DTs
+
+- [StringLength(max)] -> Limits the string length (min and/or max)
+
+- [MaxLength] 	      -> Restricts the maximum length for arrays, strings, or collections, Works with string, array, ICollection
+
+- [MinLength]         -> Specifies the minimum length for strings, arrays, or collections, Works with string, array, ICollection
+
+- [Range(min, max)]   -> Specifies inclusive numeric or date range, works with int, double, decimal, Datetime
+
+- [EmailAddress]      -> Checks if value is a valid email address
+
+- [Phone]	      -> [Checks for valid phone number
+
+- [Url] 	     -> Validates if value is a valid URL, Works with string
+
+- [CreditCard]	     -> Checks for valid credit card format, Works with string
+
+- [Compare("OtherProperty")] -> Compares two property values for equality, works Any comparable types (usually string, int, DateTime)
+
+- [NotMapped] --> Excludes a property from database mapping , Works with Any property
+
+- [Column("ColumnName")]  -> Sets DB column name
+
+
+--- MVC Data Annotation
+	- [ValidateNever] Skips validation for a property
+	- [RemoteValidation]
+
+
+------- CustomValidation
+   public class ValidateNotPastDate
+   {
+      public static ValidationResult? ValidateDate(object? value, ValidationContext context)
+      {
+         if (value is DateTime date)
+         {
+             if (date < DateTime.Today)
+                 return new ValidationResult("Date cannot be in the past.");
+
+             return ValidationResult.Success;
+         }
+         return new ValidationResult("Invalid date value.");
+ 
+     }
+  }
+
+
+--- Usage
+ [CustomValidation(typeof(ValidateNotPastDate), "ValidateDate")]
+
+-----------------------------------------------------------------------------------
+
+<< ValidationContext >>
+
+-- ValidationContext lives in the System.ComponentModel.DataAnnotations namespace.
+
+-- ValidationContext — Key Properties & Features
+
+  - ObjectInstance: object, used to access object being validated and its properties
+	- context.ObjectInstance as MyModel
+
+  - ObjectType: Type, used to access property value EX ->  context.ObjectType.GetProperty("PropertyName"); // return PropertyInfo			
+							   (context.ObjectType.GetProperty("PropertyName")).GetValue(context.ObjectInstance) // return
+
+  - MemberName   The name of the property currently being validated
+
+  - GetService   retrieve a service instance from the associated DI container
+		 var emailService = (IEmailService)validationContext.GetService(typeof(IEmailService));
+
+  - GetRequiredService<T> ,  to retrieve a service from the IServiceProvider
+   			     MyService myService = validationContext.GetService<IMyService>(); 
+
+
+---------------------------------------------------------------------------------------------------------------
+
+<< ValidationAttribute >>
+
+    public class BetweenAttribute : ValidationAttribute
+    {
+        private readonly string _lowerPropertyName;
+        private readonly string _upperPropertyName;
+
+        public BetweenAttribute(string lowerPropertyName, string upperPropertyName)
+        {
+            _lowerPropertyName = lowerPropertyName;
+            _upperPropertyName = upperPropertyName;
+        }
+
+        protected override ValidationResult? IsValid(object? value, ValidationContext validationContext) {
+		return new ValidationResult("Error MSG")
+		return return ValidationResult.Success;
+	}
+    }
+
+---- Custom Validation Attribute: DateOnly Not in Past
+
+ public class NotInPastAttribute : ValidationAttribute
+ {
+     protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
+     {
+         if (value == null)
+             return ValidationResult.Success;
+
+         if (value is not DateOnly date)
+             return new ValidationResult("invalid date value");
+
+         if (date < DateOnly.FromDateTime(DateTime.Now))
+             return new ValidationResult(ErrorMessage ?? "date can not be in the past");
+
+         return ValidationResult.Success;
+     }
+ }
+
+[NotInPast]
+public DateOnly StartDate { get; set; }
+
+
+---- Gap Between Two Dates
+
+public class MinGapBetweenDatesAttribute : ValidationAttribute
+{
+    private readonly string _startDateProperty;
+    private readonly int _minDays;
+
+    public MinGapBetweenDatesAttribute(string startDateProperty, int minDays)
+    {
+        _startDateProperty = startDateProperty;
+        _minDays = minDays;
+    }
+
+    protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
+    {
+        if (value is not DateOnly endDate)
+            return new ValidationResult("Invalid date value");
+
+        var startProp = validationContext.ObjectType.GetProperty(_startDateProperty);
+
+        if (startProp == null)
+            return new ValidationResult($"Property '{_startDateProperty}' not found");
+
+        var startDate = startProp.GetValue(validationContext.ObjectInstance) as DateOnly?;
+
+        if (!startDate.HasValue)
+            return ValidationResult.Success;
+
+        if (endDate < startDate.Value.AddDays(_minDays))
+            return new ValidationResult(
+                ErrorMessage ?? $"End date must be at least {_minDays} days after start date");
+
+        return ValidationResult.Success;
+    }
+}
+
+ [MinGapBetweenDates(nameof(StartDate), 20)]
+ public DateOnly EndDate { get; set; }

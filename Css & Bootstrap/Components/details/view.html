@@ -1,0 +1,33 @@
+<h1>Project Details</h1>
+
+<div class="row p-details-con">
+
+    <!-- Left: Thumbnail -->
+    <div class="col-md-8 mb-3 mb-md-0 img-desc-con">
+        @if (!string.IsNullOrEmpty(Model.Thumbnail))
+        {
+            <img src="@Url.Content($"~/MediaFiles/{Model.Id}_{Model.Name}/{Model.Thumbnail}")" class="p-img"/>
+        }
+
+        <!-- Description -->
+        <div class="p-desc">
+            <h5 class="mb-2">Description</h5>
+            <p class="fs-5">@Model.Description</p>
+        </div>
+    </div>
+
+    <!-- Right: Title & Category -->
+    <div class="col-md-4 p-t-cat-con">
+        <!-- Project Name -->
+        <div class="p-icon-t-con">
+            <span class="p-t">@Model.Name</span>
+        </div>
+        <!-- Category Badge -->
+        @if (!string.IsNullOrEmpty(Model.CategoryName))
+        {
+            <span class="p-cat">
+                <i class="bi bi-bookmark-heart-fill me-1 text-info"></i> @Model.CategoryName
+            </span>
+        }
+    </div>
+</div>

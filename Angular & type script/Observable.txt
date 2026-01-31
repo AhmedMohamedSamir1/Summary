@@ -1,0 +1,334 @@
+
+<< Observable >>
+
+- it is used to handle asynchronous operations
+- Emits multiple values over time (better for data streaming) (data prodcuer)
+- Lazy (executes when subscribed).
+- Can be canceled (by unsubscribing).
+- Included in ReactiveX Libraary
+
+
+- Observable Signature
+	- new Observable<string>( 
+		subscribe?: ( (this: Observable<string>, subscriber: Subscriber<string>) => TeardownLogic) | undefined): Observable<string>
+
+	      - new Observable<string> : the type of data the observable will emit is string
+	      
+	      - subscribe?: (this: Observable<string>, subscriber: Subscriber<string>) => TeardownLogic) | undefined)
+                   - subscribe?: it's an optional parameter that can be undefined or a function that used to handle the logic of how the observable should
+	             emit values, handle errors, and signal completion.
+
+	          - (this: Observable<string>, subscriber: Subscriber<string>) => TeardownLogic)
+			- this: Observable<string>--> Refers to the Observable instance itself you’re creating.
+
+			- subscriber: Subscriber<string>
+			      - observer handler object.
+			      - the object that will emit the values, errors, and completion signals from the observable. 
+                              - It is typed as Subscriber<string>, meaning it expects the values to be of type string.
+			      - subscriber object has these key methods:
+				   - next(value): emit (send) a value to the observer.
+				   - error(err) : Sends an error notification and stops the Observable, After calling error(), no more values will be emitted.
+				   - complete() : Signals that the observable has finished emitting values, Once called, the Observable will not emit any more values.
+				   - unsubscribe(): // this method is called on the subscription (not directly on on the subscriber)
+						- const subscription = myObservable.subscribe({next: (value) => console.log(value),});
+						- setTimeout(() => {subscription.unsubscribe(); }, 3000);
+			
+			- TeardownLogic is a type alias in RxJS — it represents:
+				- A void or A function or  a Subscription That gets called when the subscriber unsubscribes or the observable completes.
+
+		
+- Observer
+    - Data Consumer
+    - An Observer is an object that knows how to handle values emitted by an Observable. It defines callback functions to handle the values emitted by an Observable
+    	- next(value) – Receives and processes values emitted by the Observable.
+	- error(error) – Handles any error that occurs.
+	- complete() – Called when the Observable has finished emitting values.
+
+   - An Observer is passed to an Observable when we subscribe to it.
+   - Example
+	const myObserver = {
+  	   next: (value) => console.log('Received:', value), 
+  	   error: (err)  => console.error('Error:', err),
+  	   complete: ()  => console.log('Observable complete'),
+	};
+
+
+
+-- any observable we subscribe on it need to be unsubsribe at ngOnDestroy
+  - example
+	subscribtion!: Subscribtion
+	this.subscribtion = this.getNotification().subscribe({....});
+	ngOnDestroy: void{
+   	   this.subscribtion.unsubscribe();
+	}
+   
+
+-- A Pipeable Operator is a function that takes an Observable as its input and returns another Observable. It is a pure operation: the previous Observable stays unmodified.
+	https://rxjs.dev/guide/operators
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<< Example >>
+
+
+------------ Example 1
+
+  Observable1(): Observable<string>{
+    return new Observable<string>((subscriber) => {
+      subscriber.next("hello");
+      subscriber.next("world");
+      subscriber.complete();
+    });
+  }
+
+  const Observable1$ = this.Observable1();
+    Observable1$.subscribe({
+      next:(value)=>{ console.log(value)},
+      error:(error)=>{console.log(error)},
+      complete:()=>{console.log("completed")},
+    });
+
+output
+Hello
+World
+Completed!
+
+
+------------ Example 2
+
+<button id="myButton">Click Here man</button>
+
+Observable2(): Observable<Event>{
+    const button = document.getElementById('myButton')!;
+    return fromEvent(button, 'click'); // fromEvent turns a DOM event into an observable.
+  }
+
+const observable$ = this.Observable2();
+    observable$.subscribe({
+      next:(eventData)=>{console.log(eventData.target)}
+    })
+
+output
+<button _ngcontent-ng-c2927024362 id="myButton">Click Here man</button>	
+
+
+------------ Example 3
+	
+    const interval$ = interval(1000); // Creates an Observable that emits sequential numbers every specified interval of time 
+    const subscription = interval$.subscribe((val) => {
+      console.log('Value:', val);
+    });
+
+    setTimeout(() => {
+      subscription.unsubscribe();
+      console.log('Stopped!');
+    }, 5000);
+
+output
+Value: 0
+Value: 1
+Value: 2
+Value: 3
+Value: 4
+Stopped!
+
+------------ Example 4
+
+let numbers$  = of(1, 2, 3, 4, 5); // numbers is Observable<number>
+    numbers$.pipe(
+      filter((num) => num % 2 === 0), // only even numbers
+      map((num) => num * 10)          // multiply each by 10
+    ).subscribe({
+      next: (result)=>console.log(result)
+    })
+
+
+output
+20
+40
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------- 
+
+<< pipe with Observable >>
+
+- It allows you to transform, filter, or manipulate the data emitted by an observable before it reaches its final subscribing
+- Returns a New Observable: When you use the pipe method, it doesn't modify the original observable. Instead, it returns a new observable that applies the defined transformations.
+
+
+import { Observable } from 'rxjs';
+import { filter, map } from 'rxjs/operators';
+
+const obs = new Observable((observer) => {
+  observer.next(1);
+  observer.next(2);
+  observer.next(3);
+  observer.next(4);
+  observer.next(5);
+  observer.complete();  // Signals that no more values will be emitted
+}).pipe(
+  filter((data) => data > 2),                // Filters out values less than or equal to 2
+  map((val) => val * 2)                      // Transforms remaining values by multiplying by 2
+);
+
+obs.subscribe({
+  next: (val) => console.log(val),  		// This will log: 6, 8, 10
+  complete: () => console.log('Completed!'), 	// Called when the observable completes
+});
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------- 
+
+<< All RxJS Observable Creation Functions >>
+
+---- of()
+
+   import { of } from 'rxjs';
+   of(1, 2, 3).subscribe(console.log);
+
+
+
+---- from()
+   Converts an array, promise, string, or iterable into an Observable.
+   import { from } from 'rxjs';
+   from([10, 20, 30]).subscribe(console.log);
+
+   
+
+---- fromEvent()
+   - Creates an Observable from DOM events.
+   - fromEvent(document, 'click').subscribe(() => console.log('Clicked!'));
+
+---- interval()
+   - Emits an incremental number every specified milliseconds (like a timer).
+   - interval(1000).subscribe(console.log);
+   
+---- timer()
+   - Emits a number once after a delay
+   - timer(2000).subscribe(() => console.log('After 2 seconds'));
+
+---- range()
+   - range(1, 5).subscribe(console.log);
+
+---- throwError()
+   - throwError(() => new Error('Something went wrong!')).subscribe({
+      error: (err) => console.error(err.message)
+    });
+
+---- defer()
+   - const deferredObs = defer(() => of(Math.random()));
+   - deferredObs.subscribe(console.log);
+   - deferredObs.subscribe(console.log);
+   - (different numbers each time you subscribe)
+
+    output
+    0.1234
+    0.5678
+
+
+---- iif()
+   - Creates an Observable based on a condition.
+   - iif(
+  	() => loggedIn,
+  	of('Welcome!'),
+  	EMPTY
+	).subscribe(console.log);
+
+---- generate()
+    Creates an Observable that generates values by iterating a function.
+    import { generate } from 'rxjs';
+
+generate({
+  initialState: 0,
+  condition: (x) => x < 5,
+  iterate: (x) => x + 1
+}).subscribe(console.log);
+
+
+
+---- ajax()
+ajax('https://jsonplaceholder.typicode.com/posts/1')
+  .subscribe(response => console.log(response.response));
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------- 
+
+
+
+<< Subject >>
+
+- A Subject is a special type of Observable that allows values to be multicasted to multiple Observers.
+- It acts both as an Observable and an Observer at the same time.
+	You can emit values into a Subject (like an Observer: subject.next()).
+	You can subscribe to it (like an Observable: subject.subscribe()).
+
+1- Plain Subject 
+      — starts empty, emits values to subscribers after subscription.
+      const subject = new Subject<number>();
+      subject.subscribe(value => console.log('Observer 1: ' + value));
+      subject.next(1); // all observers get this
+      subject.next(2); // all observers get this
+      subject.subscribe(value => console.log('Observer 2: ' + value));
+      subject.next(3); // all observers get this
+      subject.next(4); // both observers get this
+
+      // output
+      // Observer 1: 1
+      // Observer 1: 2
+      // Observer 1: 3
+      // Observer 2: 3
+      // Observer 1: 4
+      // Observer 2: 4
+
+
+2- BehaviorSubject
+    -- It requires an initial value.
+    -- It always returns the current value to new subscribers immediately, then continues emitting.
+
+    const behaviorSubject = new BehaviorSubject<number>(0); // initial value is 0
+    behaviorSubject.subscribe(value => console.log('Observer A: ' + value));
+    behaviorSubject.next(1);
+    behaviorSubject.next(2);
+    behaviorSubject.subscribe(value => console.log('Observer B: ' + value));
+    behaviorSubject.next(3);
+
+    Observer A: 0
+    Observer A: 1
+    Observer A: 2
+    Observer B: 2
+    Observer A: 3
+    Observer B: 3
+
+3- ReplaySubject
+    - Keeps a buffer of emitted values (you can specify how many).
+    - New subscribers immediately get the buffered values.
+
+	const replaySubject = new ReplaySubject<number>(2); // buffer last 2 values
+	replaySubject.next(1);
+	replaySubject.next(2);
+	replaySubject.next(3);
+
+	replaySubject.subscribe(value => console.log('Observer X: ' + value));
+
+	replaySubject.next(4);
+
+	output:
+	Observer X: 2
+	Observer X: 3
+	Observer X: 4
+	
+-------------------------------------------------------------------------------------------------------------------------------------------------------- 
+
+<< Observable Operators >>
+
+- Operators By Category
+	- Creating Observables
+	- Transforming Observables
+	- Filtering Observables
+	- Combining Observables
+
+
+- Creating Observables
+	- from(this.notifications); // it will emit all notifications array as one value
+	- of(1, 2, 3, 4, 5);	    // creates an observable that emits these values	
+	- interval
+
+
+

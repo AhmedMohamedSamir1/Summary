@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="css/css-extension.css">
+</head>
+
+<style>
+    canvas{
+        border: 5px saddlebrown solid;
+    }
+</style>
+<body>
+
+    <!-- rules
+     1. i think
+    -->
+    <button id="addTextBtn">Add Text</button>
+    <button id="addImageBtn">Add Image</button>
+    <input type="file" id="imageUploader" style="display:none">
+    <button id="saveBtn" class="btn btn-primary">Save</button>
+    <button id="loadDesignBtn" class="btn btn-success">Add Saved Design</button>
+
+
+    <div>
+        <canvas id="my-canvas" height="580" width="700" class="mx-auto"></canvas>
+    </div>
+    
+    <!-- // import { fabric } from "fabric"; -->
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
+
+   <script>
+    // Fix warning for TextBaseline
+    fabric.Text.prototype._setTextStyles = function(ctx, style, fontSize) {
+        ctx.textBaseline = "alphabetic";
+        if (this.path) {
+            switch (this.pathAlign) {
+                case "center": ctx.textBaseline = "middle"; break;
+                case "ascender": ctx.textBaseline = "top"; break;
+                case "descender": ctx.textBaseline = "bottom"; break;
+            }
+        }
+        ctx.font = this._getFontDeclaration(style, fontSize);
+    };
+
+    const canvas = new fabric.Canvas('my-canvas');
+
+    // Product image
+    fabric.Image.fromURL('/designy-images/T-shirt.PNG', function(img) {
+        img.set({
+            left: canvas.width / 2,
+            top: canvas.height / 2,
+            originX: 'center',
+            originY: 'center',
+            selectable: false,
+            hasControls: false,
+            scaleX: 0.4,
+            scaleY: 0.4
+        });
+        canvas.add(img);
+        canvas.sendToBack(img);
+    });
+
+    // Print area (visual guide)
+    const printArea = new fabric.Rect({
+        left: canvas.width / 2 + 6,
+        top: canvas.height / 2 - 25,
+        originX: 'center',
+        originY: 'center',
+        width: 250,
+        height: 320,
+        fill: 'rgba(0,0,0,0)',
+        stroke: '#00aaff',
+        strokeDashArray: [6, 4],
+        selectable: false,
+        evented: false,
+        visible: false
+    });
+    canvas.add(printArea);
+
+    // Clip rectangle for text/images
+    const clipRect = new fabric.Rect({
+        left: printArea.left,
+        top: printArea.top,
+        originX: 'center',
+        originY: 'center',
+        width: printArea.width,
+        height: printArea.height,
+        absolutePositioned: true,
+        selectable: false,
+    });
+
+    // Add text button
+    document.getElementById('addTextBtn').addEventListener('click', () => {
+        const text = new fabric.IText('New Text', {
+            left: printArea.left,
+            top: printArea.top,
+            originX: 'center',
+            originY: 'center',
+            fontSize: 32,
+            fill: '#000',
+            fontWeight: 'bold',
+            textBaseline: 'alphabetic',
+            clipPath: clipRect,
+            lockScalingFlip: true
+        });
+        canvas.add(text);
+        canvas.setActiveObject(text);
+    });
+
+    // Show / hide print area
+    function showPrintArea() {
+        printArea.visible = true;
+        canvas.requestRenderAll();
+    }
+    function hidePrintArea() {
+        printArea.visible = false;
+        canvas.requestRenderAll();
+    }
+    canvas.on('selection:created', showPrintArea);
+    canvas.on('selection:updated', showPrintArea);
+    canvas.on('selection:cleared', hidePrintArea);
+
+    // Restrict moving (works for single & group)
+canvas.on('object:moving', function(e) {
+        const obj = e.target;
+        const rect = obj.getBoundingRect(true, true);
+
+        const areaLeft   = printArea.left - printArea.width / 2;
+        const areaTop    = printArea.top  - printArea.height / 2;
+        const areaRight  = areaLeft + printArea.width;
+        const areaBottom = areaTop  + printArea.height;
+
+        let dx = 0;
+        let dy = 0;
+
+        if (rect.left < areaLeft) dx = areaLeft - rect.left;
+        if (rect.left + rect.width > areaRight) dx = areaRight - (rect.left + rect.width);
+        if (rect.top < areaTop) dy = areaTop - rect.top;
+        if (rect.top + rect.height > areaBottom) dy = areaBottom - (rect.top + rect.height);
+
+        obj.left += dx;
+        obj.top  += dy;
+    });
+
+    // Restrict scaling for IText inside printArea
+canvas.on('before:transform', function(e) {
+    const t = e.transform;
+    const obj = t.target;
+    
+    // فقط للتحقق من Scaling
+    if (t.action !== 'scale') return;
+    
+    console.log(e);
+    // الحجم المتوقع بعد الـ scale
+    const nextWidth  = obj.width  * obj.scaleX * t.scaleX;
+    const nextHeight = obj.height * obj.scaleY * t.scaleY;
+
+    // إذا أي بعد هيعدي حدود printArea → إلغاء التوسيع
+    if (nextWidth > printArea.width || nextHeight > printArea.height) {
+        return false; // cancel scaling
+    }
+});
+
+
+// عند الضغط على زر إضافة صورة من ملف
+document.getElementById('addImageBtn').addEventListener('click', () => {
+    document.getElementById('imageUploader').click();
+});
+
+document.getElementById('imageUploader').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(f) {
+        fabric.Image.fromURL(f.target.result, function(img) {
+            img.set({
+                left: printArea.left,
+                top: printArea.top,
+                originX: 'center',
+                originY: 'center',
+                scaleX: 0.3,
+                scaleY: 0.3,
+                clipPath: clipRect,
+                lockScalingFlip: true
+            });
+            canvas.add(img);
+            canvas.setActiveObject(img);
+        });
+    };
+    reader.readAsDataURL(file);
+});
+
+
+
+const deleteIcon = new Image();
+let deleteIconLoaded = false;
+
+deleteIcon.onload = () => {
+    deleteIconLoaded = true;
+};
+
+deleteIcon.src =
+'data:image/svg+xml;utf8,' +
+'<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 16 16">' +
+'<circle cx="8" cy="8" r="8" fill="%23ff3b3b"/>' +
+'<path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708" fill="white"/>' +
+'</svg>';
+
+
+
+function deleteObject(eventData, transform) {
+    const target = transform.target;
+    const canvas = target.canvas;
+
+    if (target.type === 'activeSelection') {
+        // حذف كل العناصر داخل الجروب
+        target.forEachObject(obj => {
+            canvas.remove(obj);
+        });
+    } else {
+        // حذف عنصر واحد
+        canvas.remove(target);
+    }
+
+    canvas.discardActiveObject();
+    canvas.requestRenderAll();
+}
+
+
+
+function renderDeleteIcon(ctx, left, top, styleOverride, fabricObject) {
+    const size = 24;
+
+    ctx.save();
+    ctx.translate(left, top);
+    ctx.rotate(fabric.util.degreesToRadians(fabricObject.angle));
+    ctx.drawImage(deleteIcon, -size / 2, -size / 2, size, size);
+    ctx.restore();
+}
+
+
+fabric.Object.prototype.controls.deleteControl = new fabric.Control({
+    x: 0.5,
+    y: -0.5,
+    offsetX: 16,
+    offsetY: -16,
+    cursorStyle: 'pointer',
+    mouseUpHandler: deleteObject,
+    render: renderDeleteIcon,
+    cornerSize: 24
+});
+
+
+document.addEventListener('keydown', function (e) {
+    // تجاهل الحذف أثناء الكتابة داخل IText
+    const activeObj = canvas.getActiveObject();
+    if (!activeObj) return;
+
+    // لو المستخدم بيكتب جوه Text
+    if (activeObj.type === 'i-text' && activeObj.isEditing) return;
+
+    if (e.key === 'Delete' || e.key === 'Backspace') {
+        if (activeObj.type === 'activeSelection') {
+            activeObj.forEachObject(obj => canvas.remove(obj));
+        } else {
+            canvas.remove(activeObj);
+        }
+
+        canvas.discardActiveObject();
+        canvas.requestRenderAll();
+    }
+});
+
+
+document.getElementById('saveBtn').addEventListener('click', () => {
+
+    const designObjects = canvas.getObjects().filter(obj => obj.selectable !== false);
+
+    const simpleData = designObjects.map(obj => {
+        if (obj.type === 'i-text') {
+            return {
+                type: 'i-text',
+                text: obj.text,
+                left: obj.left,
+                top: obj.top,
+                fontSize: obj.fontSize,
+                fontFamily: obj.fontFamily,
+                fontWeight: obj.fontWeight,
+                fill: obj.fill,
+                angle: obj.angle
+            };
+        }
+        if (obj.type === 'image') {
+            return {
+                type: 'image',
+                left: obj.left,
+                top: obj.top,
+                scaleX: obj.scaleX,
+                scaleY: obj.scaleY,
+                angle: obj.angle,
+                src: obj.getSrc()
+            };
+        }
+        if (obj.type === 'rect' || obj.type === 'circle') {
+            return {
+                type: obj.type,
+                left: obj.left,
+                top: obj.top,
+                width: obj.width,
+                height: obj.height,
+                fill: obj.fill,
+                angle: obj.angle
+            };
+        }
+    });
+
+    const designJSON = JSON.stringify(simpleData);
+    console.log("Saved Design JSON:");
+    console.log(designJSON);
+
+    // يمكن هنا تبعته للـ backend
+    // fetch('/api/save-design', { method: 'POST', body: designJSON })
+});
+
+
+document.getElementById('loadDesignBtn').addEventListener('click', () => {
+    // مثال: load من JSON محفوظ
+    const jsonFromDB = prompt("Paste saved JSON here"); // أو fetch من الـ backend
+    if (!jsonFromDB) return;
+
+    const savedData = JSON.parse(jsonFromDB);
+
+    savedData.forEach(item => {
+        if (item.type === 'i-text') {
+            const text = new fabric.IText(item.text, {
+                left: item.left,
+                top: item.top,
+                fontSize: item.fontSize,
+                fontFamily: item.fontFamily,
+                fontWeight: item.fontWeight,
+                fill: item.fill,
+                angle: item.angle
+            });
+            canvas.add(text);
+        }
+        if (item.type === 'image') {
+            fabric.Image.fromURL(item.src, img => {
+                img.set({
+                    left: item.left,
+                    top: item.top,
+                    scaleX: item.scaleX,
+                    scaleY: item.scaleY,
+                    angle: item.angle
+                });
+                canvas.add(img);
+            });
+        }
+        if (item.type === 'rect' || item.type === 'circle') {
+            const shape = item.type === 'rect'
+                ? new fabric.Rect({ left: item.left, top: item.top, width: item.width, height: item.height, fill: item.fill, angle: item.angle })
+                : new fabric.Circle({ left: item.left, top: item.top, radius: item.width / 2, fill: item.fill, angle: item.angle });
+            canvas.add(shape);
+        }
+    });
+});
+
+
+   </script>
+
+
+</body>
+</html>

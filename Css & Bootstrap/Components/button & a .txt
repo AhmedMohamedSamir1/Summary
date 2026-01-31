@@ -1,0 +1,25 @@
+- classes that can be used with <button>, <a> , <input>
+	btn btn-danger	
+	btn btn-outline-warning
+	btn-lg
+	
+
+- disabled attribute Make <button> element inactive
+- <a> don't support the disabled attribute, so you must add the .disabled class to make it visually appear disabled.
+
+<< anchor tag >>
+	<a class="btn btn-outline-danger btn-sm" onclick="">Delete</a>
+	
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+<< button >>
+
+<div class="col-sm-6 mx-sm-auto mb-2">
+    <button type="submit" class="btn btn-info w-100 btn-register">Register</button>
+</div>
+
+- button width is 100% of div due to        --> w-100
+- div in the center of its parent	    --> mx-sm-auto
+- div  will take the half of parent(row)    --> col-sm-6
+--------------------------------------------------------------------------------------------------------------------------------

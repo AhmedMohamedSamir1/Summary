@@ -1,0 +1,58 @@
+<< if your links or buttons one of them should have a specific class let's say "active" and other not when click on one of them class "active" added to it and removed from the others>>
+
+        <div class="btn-group">
+             <button type="button" class="btn btn-outline-primary">Left</button>
+             <button type="button" class="btn btn-outline-primary">Middle</button>
+             <button type="button" class="btn btn-outline-primary">Right</button>
+        </div>
+
+	<script>
+            btn = document.querySelectorAll('div div button');
+            btn.forEach(element => {
+                console.log(element);
+                element.addEventListener("click",()=>{
+                    btn.forEach(element2 => {
+                        element2.classList.remove('active');                          
+                    });
+                    element.classList.add('active');
+                });
+            });
+        </script>
+-------------------------------------------------------------------------------------------------------------------
+
+<< Object.values()
+
+this.options = {
+    "1": { value: "1", text: "Item 1" },
+    "2": { value: "2", text: "Item 2" },
+};
+
+let arrOptions = Object.values(this.options)  // Convert the object to an array of values
+
+[
+    { value: "1", text: "Item 1" },
+    { value: "2", text: "Item 2" }
+]
+
+
+----------------------------------------------------------------------------------------------------------------------
+
+<< dom tricks part >>
+
+- event
+	- <button class="btn btn-warning col-3 mb-3" onclick="addItem(event)">Add Item</button>
+	- function deleteRow(event) { 
+		event.preventDefault()
+		event.target;     // the element that call the event
+	}
+	
+	deleteButton.addEventListener("click", function (event) {
+        	deleteRow(event);      
+    	});
+ 
+- to get the parent element to delete
+	- Element.closest("selector")  //This method traverses up the DOM tree, starting from the current element itself, until it finds a matching element, or null 
+	- 
+
+- 
+

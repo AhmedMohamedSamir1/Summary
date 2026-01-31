@@ -1,0 +1,29 @@
+/* animations.css */
+@keyframes pulseZoom {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 0.9;
+    }
+
+    50% {
+        transform: scale(1.09);
+        opacity: 1;
+    }
+}
+ 
+/* background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);*/
+/*  background-size: 200% 200%; */
+/* animation: animatedGradient 2s ease-in-out infinite; */
+
+@keyframes animatedGradient 
+ {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}

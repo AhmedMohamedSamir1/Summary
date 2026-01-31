@@ -1,0 +1,1069 @@
+
+CSS: stands for cascading style sheet
+
+-----------------------------------------------------------------------
+
+ <<< to invoke the css file >>>
+
+First way (inline style): inside the tag -> example <p style="style=color: red"> Ahmed</p>
+Second way (Internal style): inside the head -> example
+
+<style>
+ selector 
+ {
+	property: value;
+ }
+  </style>
+
+
+Third way  (external style): <link rel="stylesheet" href="style.css"type="text/css"> -> inside the head
+---------------------------------------------------------------------------------------------------------------------------
+
+<< to put a logo to be the icon image in browser tabs >>
+
+<link rel="icon" href="/your_path_to_image/favicon.jpg">
+
+---------------------------------------------------------------------------------------------------------------------------
+
+-- import css file into another
+	@import url(/css/animation.css);
+
+---------------------------------------------------------------------------------------------------------------------------
+<<<<<<<<     Access Selector In CSS      >>>>>>>>>>
+
+-- *{}  // global (universal) selector 
+-- <div class="myDiv"></div> --> div.myDiv { properties }
+
+- To access all (specific) elements like paragraph that inside another element like div
+  <div class="myDiv">                                          
+        <p>html</p>
+        <p>css</p>
+        <p>java script</p>
+  </div>
+  div.myDiv p { properties }
+
+- specificty
+	element        Specificity
+	inline-style : 1000
+	id           : 100
+	class        : 10
+	tagName      : 1
+	p.class      : 11
+        p#id         : 101
+	p.class#id   : 111
+
+
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+
+- To access all elements that inside container
+	<div class="myDiv">
+        	<p>html</p>
+        	<p>css</p>
+        	<p>java script</p>
+        	<div> Ahmed </div>
+	</div>
+
+	div.myDiv* = { properties }
+
+
+<< Grouping >>
+
+-- Element1, Element2,…… { properties}
+
+-- Element1+Element2 {properties} //(sibling) the first next direct Element2 after Element1 [element2, element1 at the same level]
+
+Element1~Element2 { properties } -> each Element2 that next of element1 , [element2, element1 at the same level]
+~ -> called telda
+
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+
+#idP{}  // select byId
+
+.class-one.class-two {}    // the element that has these two classes --> class="class-one class-two"
+
+.parent > .child-2 // the direct child with class="child-2" of parent with class="parent" 
+
+Element :first-child { properties } // any first child inside Element , Ex: div :first-child {} any first child inside div
+	div.container div :first-child { properties }
+
+Element :last-child { properties } // any last child element inside Element
+
+p:only-child { properties }        // any p that’s only child in any parent
+p:only-of-type { properties }      // p that’s only of its type in any parent
+div:first-of-type { properties }   // any div that first of its type in any parent 
+div:nth-of-type(2) { properties }  // any div that's second of its type in any parent
+div:last-of-type { properties }    // any div that's last of its type in any parent	
+
+table tr:nth-child(odd) 
+table tr:nth-child(even) 
+
+
+
+
+div p:not(:last-child){}  // any child p inside parent div and not the last child  
+.container .links ul li:not(:last-child) a {}
+.collapse:not(.show){}  // elements with class collapse and without class show
+
+.element:hover p {} // when hover occured on element with class element p will be ....
+
+[attribute]{}
+[attribute=value]
+element[attribute]
+element[attribute=value]
+
+[attribute^="AH" ]  { properties }  -> any element its attribute(like class as example) start with "AH"
+[attribute$= "AH" ] { properties }  -> any element its attribute ends with "AH"
+[attribute*= "AH" ] { properties }  -> any element its attribute contains "AH"
+[attribute~= "AH" ] { properties }  -> any element its attribute contains a word "AH"
+
+-------------------------------------------------------------------------------------------------------------------------------
+
+kebab case is the best practice to css --> user-test{}
+
+-------------------------------------------------------------------------------------------------------
+
+ << background property >>
+
+background-color: red
+background-color: rgb(255, 0, 255)
+background-color: rgba(255, 0, 255, 0.5) alpha from 0:1 -> transparency
+background-color: #RRGGBB  -> (hex code)
+background-color: #FF0000
+
+
+<< background Image >>
+background-image: url("./images/image.png")
+
+background-repeat: repeat --> default 
+background-repeat: no-repeat
+background-repeat: repeat-x
+background-repeat: repeat-y
+
+background-attachment: scoll; --> default
+background-attachment: fixed;
+
+background-position: center center;
+background-position:  center;
+background-position: bottom center;
+
+background-position: left-value top-value;
+background-position: 100px 70px
+background-position: 50% 50%;
+
+background-size: atuo (default)
+background-size: cover -->  stretch the width and height of image by equal ratio to fill entire area 
+background-size: contain;
+	- the image will scale to fit within the dimensions of the element, and ensuring that the entire image is visible without being cropped.
+	- the ratio of its width to its height is maintained. This means that when the image is resized, it will not be stretched or distorted.
+
+background-size: 100% 100% --> the width and height of image will be stretched to fill the container
+
+background-size: 100%;
+	- The background image will be scaled so that its width exactly matches the width of the element it is applied to.
+	- the height of the background image is automatically scaled to maintain its original aspect ratio
+	- If the aspect ratio of the image does not match the aspect ratio of the container, empty space will be left
+
+The background image will be scaled so that its width exactly matches the width of the element it is applied to.
+
+object-fit: fill;
+object-fit: cover;
+---------------------------------------------------------------------------------------------
+
+
+
+<< padding >>
+padding: top right bottom left
+padding: 10px 10px 10px 10px
+
+
+padding:  top down right left
+padding:    10         10 
+
+padding: 10
+
+------------------------------------------------------------------------------------------------
+
+<< margin >>
+
+margin: auto  --> the browser make the element at the center of its container as it divides the empty width
+		  space between margin-right and margin-left
+
+- only vertical margin collapse
+- collapsing occur when there is no element between 
+- bigger margin wins
+- very important note : if a parent (e.g div) with its direct child and you want to make a top margin to child the margin will applied to parent cause collapse margin
+	                the solution is to make  overflow: hidden; to the parent or make padding top to the parent
+
+margin: auto;  works with block, flex, and grid
+
+--------------------------------------------------------------------------------------------------------------------------
+<< border >>
+border-width: 10px   20px   10px   20px;
+border-width: 15px 30px
+border-style: solid;
+border-color: red;
+border: 20px 	solid 	#148;
+
+,,,,,,,,,,,,,
+
+
+<< border radius
+
+border-radius:	18px		60px		40px		20px;
+		top-left	top-right	down-right	down-left
+
+border-top-left-radius:
+
+
+---------------------------------------------------------------------------------------------------------------------------------
+
+<< all-elements >>
+
+- block elements
+	- <h1> to <h6>
+	- <p>
+	     - it has by default top and bottom margin: 16px
+ 
+	- <form>	--> Contains interactive controls for submitting data.
+	- <aside>
+	- <div>
+	- <nav>
+	- <table>
+	- <main>    	– Represents the main content of the document.
+	- <header> 	– Represents the header of a section.
+	- <footer>  	– Represents the footer of a section.
+	- <section> 	– A generic section of content.
+	
+	- <ul> – An unordered list.
+	- <ol> – An ordered list.
+	- <li> A list item in <ul>, <ol>
+
+- inline element
+	- span
+	- label
+---------------------------------------------------------------------------------------------------------------------------------
+
+<<< display >>>
+
+display:Block:
+	- add line break before and after
+	- take full width 100% of its container (unless a specific width is set)
+	- margin auto works in case there is specified width for the element
+	- block does not support vertical-align.
+
+
+display:inline;
+	- don't add line break
+	- allows elements before and after it
+	- don't respect width, height [ size is determined by content.]
+	- respect padding, margin [just left and right], margin auto does not work
+	- support vertical-align
+
+display:inline-block
+	- allows elements before and after it 
+	- respect padding, margin, width, height
+	- margin auto does not work
+	- support vertical-align
+
+display:none
+	- the element removed from page (workflow)
+
+
+-----------------------------------------------------------------------------------------------
+
+<< width , height >>
+height: auto // default
+
+min-width:
+max-width:
+width: fit-content   // the element still block but its width will fit the content not 100% of container
+
+min-height:
+max-height:
+
+height: 80vh; // the element will take 80% of view screen height
+
+------------------------------------------------------------------------------------
+<< visibility >>
+
+visibility: visible --> default
+visibility: hidden --> element place at the page still reserved in the page
+-----------------------------------------------------------------------------------------------
+
+<< overflow >>
+
+overflow: visible; // default
+overflow: hidden
+overflow: scroll;
+overflow: auto;   	// if the content is larger than the area of container scroll is enabled
+overflow-y: hidden      // it hide the the vertical content, and scroll the horizontal	 content
+overflow-x: hidden	//it hide the the horizontal content, and scroll the vertical content
+text-overflow: elipsis  // add ... to indicate that text is hidden
+-------------------------------------------------------------------------------------------------------
+
+<< text >>
+
+color: red;
+text-shadow: H-shadow V-shadow blur color
+text-shadow: 1px 2px 2px red
+
+text-align: center;
+direction:ltr;
+direction: rtl
+
+text-decoration: line-through;
+text-decoration: underline;
+text-decoration: overline;
+text-decoration: none;
+
+text-transform: capitalize;
+text-transform: uppercase;
+text-transform: lowercase;
+
+letter-spacing: 2px;
+word-spacing: 4px;
+line-height: 33px;
+text-indent: 120px; 
+
+
+white-space: normal;
+white-space: nowrap;
+text-overflow: ellipsis;
+
+word-break: normal;
+word-break: break-word;
+
+font-style: normal
+font-style: italic
+font-weight: bold
+font-weight: normal
+-----------------------------------------------------------------------------------------
+<< scroll bar >>
+
+<< add scroll bar to element and add styling to it >>
+
+element{
+	overflow-y: auto;
+}
+
+
+
+nav::-webkit-scrollbar{
+    width: 5px;
+}
+
+/*background of scroll bar*/
+nav::-webkit-scrollbar-track{
+    background-color: black;
+}
+
+/*color of scroll bar*/
+nav::-webkit-scrollbar-thumb{
+    background-color: var(--arrow-color);
+}
+
+nav::-webkit-scrollbar-thumb:hover { }
+------------------------------------------------------------------------------------------
+<< Box Shadow >>
+box-shadow: horizontal shadow[req] | vertical shadow [req] | Blur | spread | color | inset, outset[default, not written]
+box-shadow: none;   ->  the default value (no shadow)
+
+horizontal shadow | vertical shadow  can take negative values
+Examples:
+
+box-shadow: 3px 3px 7px;
+
+box-shadow: 10px 10px 10px #546;
+box-shadow:10px 10px 10px #546,
+	-10px -10px 10px #546;	
+
+box-shadow: 2px 2px 10px #546, -2px -2px 10px #546
+
+box-shadow: 2px 2px 2px 2px #3333;
+
+---------------------------------------------------------------------------------------------
+<< inherit >>
+
+inherit property from parent
+example:
+
+padding:inherit
+--------------------------------------------------------------------------------------------------
+
+<< font-size,  Units>>
+
+- the font size of an HTML page 16px by default
+
+- css uints
+   - px
+   - em: refer to font-size, if a property value is 2em this means two times of element font-size ot its parent 
+   - rem -> ex: font-size: 2rem; -> it means element font-size will be 2 times of root-element (html page) 2*16 = 32 
+   - precentage  -> ex: font-size: 100% -> it means element font-size will be 100% of parent font-size
+   - vw (Viewport Width):
+	- For example, if the browser window is 1000px wide: 1vw = 1% of 1000px = 10px
+   
+   - vh (Viewport Height):
+	- For example, if the browser window is 800px tall-> 1vh = 1% of 800px = 8px
+
+   - vw -> view port width -> 1 vw means 1% of screen width so we can get a dynamic font according to screen width
+		 ex: font-size:4vw , screen width = 600 so font-size will be 0.04 * 600 = 24px
+
+--------------------------------------------------------------------------------------------------------------------------
+
+<<< cursor >>>
+
+cursor: pointer
+cursor: grab
+
+role='button' to any HTML tag would add cursor: "pointer"
+
+--------------------------------------------------------------------------------------------------------
+
+<< float , clear >>
+
+float: left  // in the child
+overflow: hidden
+
+// this is fail when a parent has pop up menu as it will hide it
+
+float: left // in the child
+width: calc(100%/4);
+clear:both  // in one of different child if all children is divs this child will be a paragraph 
+
+width: calc((100% - 60px)/4);
+
+-----------------------------------------------------------------------------------------------------------------------
+
+<< opacity >>
+from [0 : 1]
+opacity: 0.8;
+
+----------------------------------------------------------------------------------------------------------------------------
+
+<< position >>>
+
+- used in complex layouts
+
+- position: static; // the default
+
+- position: relative
+	the element is moving based on itself
+	the element workflow still reserved even the element is moved
+	it consider the parent of absolute
+
+- position: absolute
+	the element will not relate to workflow 
+	the element is moving based on the relative parent
+
+- position: fixed
+	the element will not relate to workflow 
+	the element will be fixed in its place in the page
+
+-position: sticky
+ top: 10px;
+
+
+- note: top, bottom, right and left properties can used with position property 
+- top:100%
+-----------------------------------------------------------------------------------------------------------------------
+
+<< z-index >>
+
+-  This property must be work with position property
+-  z-index: auto; // default
+-  z-index: 0; 
+----------------------------------------------------------------------------------------------------------------------------------
+
+<< list >>
+
+list-style-type:
+list-style-position: inside
+list-style-position: outside // default
+list-style-image: url()
+
+list-style: none;
+
+----------------------------------------------------------------------------------------------------------------------------------------
+
+<< table style >>
+
+border-spacing: 1px;
+
+-----------------------------------------------------------------------------------------------------------------------------------
+
+<< pseudo classes >>
+
+a:hover   { property}
+a:visited { property }
+
+
+.ch:checked { property}
+.input:focus { property }
+
+------------------------------------------------------------------------------------------------------------------
+<< pseudo elements >>
+
+div.one::first-letter{}, 
+div.one::first-line{},
+.four::selection{}
+.four::place-holder{}
+
+
+---- ::before, ::after 
+.one::after {
+   content: ""; // mendatory
+   property;
+}
+
+.one::after {
+   content: ""; // mendatory
+   property;
+}
+
+.one::after {
+   content: attr(data-label); // It tells CSS to display the value of an HTML attribute
+   properties;
+}
+
+example
+
+div.menu-toggle:hover span::before,
+
+----------------------------------------------------------------------------------------------------------
+
+<< counter -increment >>
+counter-increment: member-count; // its a variable name it whatever you want
+content: counter(member-count);
+content: attr(attribute_name)
+
+---------------------------------------------------------------------------------------------------------
+<<< box sizing >>>
+
+box-sizing: content-box // [default] the padding and border added to element width
+box-sizing: border-box  // the width of element including padding, border
+
+*{
+	box-sizing: border-box
+ }
+
+
+
+-------------------------------------------------------------------------------------
+
+
+<< important >>
+
+// it makes the property ovveride even if the property in inline style
+ background-color: blue !important;
+
+---------------------------------------------------------------------------------------
+<< variable in css >>
+
+the global variable exist in root element
+the local at the element
+
+to define variable: --myVariable
+to use the variable in another element we will use:  var(variablename, fallback value)
+fallback value used when the variable has a mistake
+
+:root{
+	--mainColor: blue;
+}
+
+div.parent{
+	backgound-color: var(--mainColor, red)	
+}
+
+
+div.local{
+
+	--mainColor: blue;
+	backgound-color: var(--mainColor, red)		
+}
+
+-------------------------------------------------------------------------------------------------
+
+ <<< flex Box >>>
+
+<< -- parent properties -- >>
+
+display: flex;         	 // the elements will be palced next to each others and its height equal to parent and its width equal to content
+display: inline-flex;  	 // to allow elements to be next to flex parent
+
+flex-wrap: nowrap;       	// default value
+flex-wrap: wrap;         	// very important as without it the children will be placed next to each other until going out from parent space
+flex-wrap: wrap-reverse;
+
+flex-direction: row;	        //default,  elements are placed to cope with the page direction the page is ltr or rtl
+flex-direction: row-reverse;    // Items are start placed from opposite side the text direction. [items aligned from right to left]
+flex-direction: column; 	// the elements will be placed in the form of column under each others
+flex-direction: column-reverse;
+
+flex-flow: flex-direction flex-wrap  // short-hand of flex-direction flex-wrap
+
+justify-content --> aligns items [ horizontally or vertically ] based on flex-direction and accepts the following values:
+
+
+justify-content: flex-start;     // the default, align Items to the left side of the container, 
+justify-content: flex-end;       // align Items to the right side of the container.	
+justify-content: center;         // align Items to the center of the container.
+justify-content: space-between;  // the best, items display with equal spacing between them.
+justify-content: space-around;   //Items display with equal spacing around them.
+
+
+
+align-items --> aligns items vertically and accepts the following values:
+align-items: stretch  // default value, this property makes each item height stretched to fit the container but first it respects the width of the element 
+align-items: flex-start;  // it make the children elements at the top of container ,   child element height will be its content only
+align-items: flex-end;    // it make the children elements at the bottom of container, child element height will be its content only
+align-items: center;      // it make the children elements at the center of container, child element height will be its content only
+
+
+
+ <<  align-content property >> 
+first of all it needs the existence of the flex-wrap property -> flex-wrap: wrap , It organize the element in form of column
+
+align-content: stretch;      // default value
+align-content: center;       // the elements will be placed in the center of the height, child element height will be its content only
+align-content: flex-start;   // child element height will be its content only
+align-content: flex-end;     // child element height will be its content only
+align-content: space-between; // child element height will be its content only
+align-content: space-around;  // child element height will be its content only
+
+	
+ << child property >>
+
+// align-self --> apply to individual item , manipulate the place of item vertically 
+align-self:  stretch;    
+align-self:  auto;
+align-self: flex-start  // child element height will be its content only
+align-self: flex-end    // child element height will be its content only
+align-self: center 	// child element height will be its content only
+
+note: align-content is stronger than align-self
+
+order: 1;
+order:-1;
+
+
+flex-grow:0; 
+	- the default value
+	- The item will not grow even if there’s extra space in the container.
+
+flex-grow:1;  
+	- the element will take width space that fit its content first, then the element will grow in the empty space in the parent,
+	- flex-grow:1; to more than one element, the empty space will be divided equally to them
+ 	- respect max-width
+
+flex-shrink:1
+	- default 
+	- respect min-width
+	- if the flex container width is 400px, there are two items with width: 200px each, the total width needed would be 400px, which exactly fits the container.
+	  But, if there are three items of 200px each (600px total), the container is only 400px width.
+	  Because flex-shrink: 1 is the default, each item will shrink proportionally to fit within the 400px container.
+	
+	- the element will take width space that fit its content first, is forced child to wrap its contents to a new line if there is no spaces
+		   “shrinking” to allow more space for the item with flex-grow:1
+
+flex-shrink:0  
+	- it will keep the assigned width it needs, and not wrap its content  [will not reduce its size to fit.] 
+	- will not reduce its size to fit
+
+flex-basis:  
+	- overrules any css width property but it respect the max-width	
+	- to control the starting size of a flex item before any growing or shrinking
+
+flex-basis: auto 
+	- default
+	- it means the initial starting width of child will be as specified [width value], 
+	  if width doesn't specified it will make the initial strating width according to content
+	-  	
+
+flex-basis: 200px;
+	- This explicitly sets the initial size of the flex item to 200px. 
+	  The item will start at 200px wide, and then flex-grow or flex-shrink will take over if necessary, based on the available space.
+	- Use this when you want the flex item to have a specific starting size, but allow it to grow or shrink as needed.
+
+
+flex-basis:0; 
+	- The item starts with a size of 0. It will grow to fill the space based on the flex-grow value. This forces the item to rely entirely on flex-grow to determine its size.
+
+flex-basis:0; flex-grow:1; are commonly used together
+
+
+flex is the short hand of -> flex-grow, flex-shrink, flex-basis
+flex:1 	-> // flex-grow : 1; flex-shrink:1; flex-basis : 0
+
+- if you have a flex parent [without flex-wrap:wrap] with 2 childs the first with width:200px and second with width:100%  
+  The second child will attempt to take 100% of the parent's width, ignoring the width of the first child.
+  This will cause the second child to potentially overflow the parent container, instead of taking just the remaining space.
+
+
+----------------------------------------------------------------------------------------------------------------------------------
+
+
+
+<< filters >>
+img{
+	filter: grayscale(100%);
+}
+
+img{
+	filter: blur(3px);
+}
+
+-------------------------------------------------------------------------------------------------------------
+
+ <<linear-gradient>>
+
+linear-gradient(direction, angle[optional], color stop1, color stop2, .... )
+
+background-image: linear-gradient(to right, red, green);  // to right  like 90deg
+background-image: linear-gradient(to left, red, green);   // to left   like 270deg
+background-image: linear-gradient(to top, red, green);    // to top    like 0deg
+background-image: linear-gradient(to bottom, red, green);  //to borrom like 180deg
+
+
+-----------------------------------------------------------------------------------------------------------------
+
+<< caret-color >>
+caret-color: red // text editble cursor will be red
+
+---------------------------------------------------------------
+
+ << pointer event >>
+
+pointer-event: auto; // default
+pointer-event: none;
+--------------------------------------------------------------------------------------------
+
+<< grid >>
+
+---- parent properties
+
+display: grid // it's alone make the elements take the full width and height of parent
+display: inline-grid;
+
+grid-template-columns: 100px 100px 100px 200px; // you will have 4 columns 3 with width 100px and 1 with width 200px
+grid-template-columns: 25% 25% 20% 30%;		// 
+grid-template-columns: auto auto auto auto ;    // you will have 4 columns with the same width
+grid-template-columns: repeat(5, auto)		// you will have 5 columns with the same width
+grid-template-columns: 100px 100px auto         // the third column will take the rest of parent width
+grid-template-columns: 100px 100px 1fr          // the third column will take the rest of parent width
+grid-template-columns: auto 1fr               // the first column will take width that accomodate its conetnt,the second column will take the rest of parent width
+
+grid-template-columns: minmax(200px, 400px) repeat(2, 1fr); // the first column take 200px at least
+grid-template-columns: repeat(auto-fill, 200px) 	    // it will fill the parent width with columns of width 200px
+
+grid-template-columns: repeat(auto-fill, minmax(200px, 1fr) ) // it will make columns with width 200px to fill the parent width, 
+								and if there is a rest width it will be taken by columns
+
+fixed width > fr > auto
+grid-template-rows: 100px 100px 200px // you will have 2 rows with height 100px and 1 with width 200px
+grid-template-rows: 100px 100px auto  // the third rows will take the rest of parent width
+
+row-gap: 10px;
+column-gap: 10px;
+gap: column-gap row-gap;
+
+justify-content: flex-start; 
+justify-content: flex-end;
+justify-content: center;
+justify-content: space-between;
+justify-content: space-around;
+justify-content: space-evenly;
+
+//note: justify-content make the auto took width that accomodate its conetnt
+
+align-content: stretch;  // default value
+align-content: center;   the elements will be placed in the center of the height
+align-content: flex-start;
+align-content: flex-end;
+align-content: space-between;
+align-content: space-around; 
+
+
+assume 
+grid-template-columns: repeat(10, 1fr); 
+grid-template-rows: 50px auto 50px; 
+grid-template-areas: 
+	"logo logo logo nav nav nav nav nav nav nav"   // if you don't specify the grid-template-columns: , it will make 10 column automatically.
+	"cont cont cont cont cont cont cont side side side side"
+	"foot foot foot foot foot foot foot foot foot foot"
+
+-- child properties
+
+h2{
+	grid-area: logo
+}
+nav{
+	grid-area: nav;
+}
+
+    grid-column: 1/4;       // make child take 3 column to its width start from column 1 to column 3
+    grid-column-start: 1;   // details of the above grid-column short hand
+    grid-column-end: 4;     // details of the above grid-column short hand 
+    grid-column: span 3;    // make child take 3 column staring from its place
+    grid-column: 2 /span 3; // make child take 3 column staring from column 2
+
+    grid-row: 1/4;       // make child take 3 row to its height start from row 1 to row 3
+    grid-row-start: 1;   // details of the above grid-row short hand
+    grid-row-end: 4;     // details of the above grid-row short hand 
+    grid-row: span 3;    // make child take 3 row staring from its place
+    grid-row: 2 /span 3; // make child take 3 row staring from row 2
+     
+
+    grid-area: [grid row start] [grid column start] [grid row end (not including end)] [grid column end (not including end)]
+    grid row start:2; 
+    grid column start:2;
+    grid row end:5;
+    grid column end:6;
+    
+    grid-area: 2 /2 /5 /6 
+
+
+
+// read --> auto fit, ch unit
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<< transform >>
+
+- 2d transform
+	transform: scaleX(2)    // element will scale to double of its width
+	transform: scaleY(2)    // element will scale to double of its height
+	transform: scale(2, 2)  // element will scale to double of its width and heigth
+	transform: scale(2) 	// element will scale to double of its width and heigth
+	transform: scaleX(-1)   // element will flip horizontally
+	transform: scaleY(-1)   // element will flip vertically
+	transform: scale(-1)    // element will scale will flip horizontally and vertically
+
+	transform: rotate(45deg);   // 45 degree with inclockwise
+	transform: rotate(-45deg);  // 45 degree with inclockwise
+	transform: rotate(360deg);
+	transform: rotate(1turn);   // 1turn == 360deg
+	transform: rotateX(45deg);
+	transform: rotateY(45deg);
+	
+	transform: scale(1.3) rotate(5deg)  // it's common used 
+	
+	transform: translate(100px, 100px); // the element move from left 100px and from top 100px
+	transform: translate(100%, 50%);    // the element move from left space 100% of its width and move from height space 50% of its height
+	transform: translateX(45px); == transform: translate(45px);
+	transform: translateY(50px);
+
+
+	transform: skewX(20deg);
+	transform: skewX(20deg);
+	transform: skewX(20deg, 20deg);
+
+	 /* matrix(scaleX,skewY,skewX,ScaleY,translateX,translateY) */
+    	/* transform: matrix(1,1.1,0,1,50,50); */
+
+
+	perspective: 1000px  // given to parent and it activates 3d 
+	transform: translateY(100px);	
+
+note translate is used to center the element horizontally using position and left and top like this 
+position: absolute;
+top:50%
+left:50%
+transform:translate(-50%, -50%)
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+<< transition >>
+
+transition-property: all;  // default value
+transition-duration: 0s;   // default value
+
+transition-property: width, background-color;
+
+transition-duration: 1s, 2s; // duration of width is 1s and background-color is 2s
+transition-duration: 2s;    // duration of width, background-color are 2s
+
+
+transition-timing-function: ease; // the default
+transition-timing-function: linear;
+transition-timing-function: ease-in;
+transition-timing-function: ease-out;
+transition-timing-function: steps(2, start), transition-timing-function: steps(2, end)
+
+transition-timing-function: steps(2, start); 	// step with change
+transition-timing-function: steps(2, end) ;	// step then change
+ 
+transition-delay: 3s // the element will wait 3s before starting transition
+
+- transition: property[req] | duration[req] | delay[opt]   |timing function //  short hand of transition
+- property, duration are mandatory to make  short hand of transition work
+
+transition: width 1s;
+transition: width 1s, background-color 1s;
+transition: 1s
+
+transition: transform .5s ease-in-out;
+
+transform: perspective(1000px) translateZ(200px);
+
+-------------------------------------------------------------------------------------------------------------------------------------
+
+<< vertical align >>
+
+- The vertical-align property in CSS is used to specify the vertical alignment of inline element. 
+- it's commonly used when we align checkbox with label text
+- also used to align images to it’s corresponding text.
+
+vertical-align: baseline; // default  Align the alphabetic baseline of the element with the 'alphabetic' baseline of the parent element , baseline -> حدود
+vertical-align:sub  	  // It aligns the element baseline corresponding to the subscript-baseline of its parent.
+
+
+---------------------------------------------------------------------------------------------------------------------------------------
+
+<< Animation >>
+
+--- You define the animation with @keyframes
+
+@keyframes colorFade {
+  0%   { background-color: red; }
+  50%  { background-color: yellow; }
+  100% { background-color: green; }
+}
+
+animation-name: colorFade;
+animation-duration: 4s;
+animation-timing-function: linear;
+animation-iteration-count: infinite; 
+animation-direction: alternate; It makes the animation run forward, then backward in each cycle.
+
+
+animation-play-state: paused;
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+
+<< will-change >>
+
+- informs the browser ahead of time that a specific CSS property will change soon,
+- when you have nested hover
+	- apply it to the animate element
+
+--------------------------------------------------------------------------------------------------------------------------------------------
+
+
+<< media query >>
+
+@media condition{
+ 
+}
+
+
+@media print{
+ 
+	
+}
+
+@media (max-width: 1000px) {
+ 
+	
+}
+
+@media (max-width: 1000px) and (min-width:400px){
+ 
+	
+}
+
+we can make css file for each media as example
+<link rel="stylesheet" href="style.css"type="text/css" media="print">
+<link rel="stylesheet" href="style.css"type="text/css" media="(max-width: 1000px) and (min-width:400px)">
+
+
+
+Media Queries for Standard Devices 
+
+
+
+// X-Small devices (portrait phones, less than 576px)
+@media (max-width: 576px){ ... }
+
+// Small devices (landscape phones, 576px and up)
+@media (min-width: 576px) { ... }
+
+// Medium devices (tablets, 768px and up)
+@media (min-width: 768px) { ... }
+
+// Large devices (desktops, 992px and up)
+@media (min-width: 992px) { ... }
+
+// X-Large devices (large desktops, 1200px and up)
+@media (min-width: 1200px) { ... }
+
+// XX-Large devices (larger desktops, 1400px and up)
+@media (min-width: 1400px) { ... }
+
+note : overriding property can be occured at mediaQuery
+
+
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+<< elements >>
+
+
+- body   -> block , margin 8px
+- h      -> block , margin-top: 19.920px , margin-bottom:19.920px
+- aside  -> block ,
+- main   -> block , 
+- nav    -> block , hold a group of links
+- header -> block	
+- footer -> block
+- section-> block
+- article-> block
+- p	 -> block
+- ol, ul, li --> block
+
+
+span  -> inline
+label -> inline
+input -> inline
+img   -> inline
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+<< font awsome library >>
+
+- allow you to use font icons
+- go to fontawsome folder =>   and copy webfonts folder and paste it with html page directory (same level)
+- go to fontawsome folder/css/ and copy all.min.css file and paste it into your css folder
+- add this line --> <link rel="stylesheet" href="css/all.min.css">
+
+- OR you can use the cdn --> <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css"rel="stylesheet"/>
+ 
+- ex: <i class="fas fa-globe-asia fa-3x"></i> 
+      <i class="fas fa-bars"></i>
+
+
+
+
+limit #lines 
+    display: -webkit-box;
+    -webkit-line-clamp: 3; /* Number of lines to display */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+
+sol2
+    overflow: hidden;
+    line-height: 1.2;
+    max-height: 3.6em
+
+
+--------------------------------------------------------------------------------------------------------------------------
+
+<< my naming to classes>>
+
+- con --> refer to container
+- p   --> refer to product or project
+- cat   --> refer to category
+- t   --> refer to title
+- n   --> refer to name
+- desc --> description
+- name --> name

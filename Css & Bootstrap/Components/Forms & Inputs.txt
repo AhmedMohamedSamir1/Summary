@@ -1,0 +1,903 @@
+<< bootstrap styles>>
+
+class="form-group" 		--> .form-group label display: block; , .form-group input{display: block; width: 100%;}
+
+class="form-select" 		--> display: block; width: 100%; font-size: 1rem;
+
+class="form-control" 		--> display: block; font-size: 1rem; width: 100%; styled-border
+
+class="form-label"   		--> inline block; margin-bottom: .5rem;	
+
+class="input-group"
+		--> Adds elements to inputs [ when you need to enhance an input with extra content]
+		--> position: relative; display: flex; flex-wrap: wrap; align-items: stretch;  width: 100%;
+
+class="input-group-prepend"
+		--> When adding content before the input.
+		--> 
+class="input-group-prepend"
+		--> When adding content after the input.
+
+
+class="row"			--> display:flex; flex-wrap:wrap; // row>* {width:100%, max-width:100%}
+  - row childs takes by default --> flex-shrink: 0; width: 100%; max-width: 100%;
+
+
+- very important note when using form with elelemnt has class row
+	the elelemnt with class row must be inside the form not the vice versa , why ? because it make conflict and affect the alignmment of elements
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+< events >>
+
+- input
+	- Detect changes to input value.
+	- Triggered After the value changes.
+	- Doesn't detect keys explicitly.	
+
+- keydown
+	- Detect any key press.
+	- Triggered When the key is pressed down.
+	- Detects all keys, including non-character keys.
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<< input attribute >>
+
+- readonly : bool
+	- Makes an input field uneditable, but its value can still be submitted with the form
+	- The user can see and interact with the field (e.g., copy the value), The user cannot modify the value.
+
+- disabled : bool
+	- Makes an input, button, or other form element uninteractive and prevents it from being submitted with the form.
+	- Applicable To: Any form element (e.g., <input>, <button>, <select>).
+	- The user cannot edit, copy, or interact with the username
+
+- required : bool
+	- Marks a field as mandatory; the form cannot be submitted unless the field is filled.
+	
+- hidden: bool
+	- Hides an element from the user entirely.
+	- Applicable To: Any HTML element (e.g., <div>, <input>)Behavior:
+	- For inputs, the value is still submitted with the form (unless the input is also disabled).
+
+
+- input.hasAttribute('readonly', 'true');
+- button.removeAttribute('disabled');
+- button.setAttribute('disabled', 'true');
+- input.disabled = true;
+- button by default submit the form so if you want it unless 
+	type="button"
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+- If Grammarly is interfering with your input fields, you can disable it on specific elements by adding 
+	data-gramm="false":
+
+----------------------------------------------------------------------------------------------
+
+<< to make the file input accept only image >>
+
+<input class="form-control" type="file" accept="image/*"  placeholder="upload your receipt" asp-for="UserDTO.ReceiptImg">
+
+
+--------------------------------------------------------------------------------------------------------------------------------
+<< event info >>
+
+- when event is fired it sends an event object as a parameter to the function that will be executed,  this object represent info about element that fire the event 
+- console.log(e.target);     // <p id = 'mainP'>hello from p</p>
+
+- onclick="addItem(event)"
+- deleteButton.addEventListener("click", function (event) { deleteRow(event); });'
+
+- onsubmit="addAttempt(event)"
+	- event.preventDefault();
+	- const form = event.target;  // event.target --> the form with its children
+		- form.elements.length
+		- form.elements[i].tagName === 'INPUT'	
+		- form.elements[i].value 
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<< text input and label above it >>
+
+
+   <div class="form-group mb-3">
+       <label class="form-label">Name</label>
+       <input class="form-control" placeholder="Enter game name">
+   </div>
+
+
+----------------------------------------------------------------------------------------------
+
+<< password input with eye >>
+
+  <div class="form-group">
+     <label class="ms-1">Password</label>
+
+     <div class="input-group">
+     	<input [type]="showPassword ? 'text' : 'password'" class="form-control" placeholder="Enter your password"/>
+        <span class="input-group-text" role="button" (click)="togglePassword()">
+          <i class="bi" [ngClass]="showPassword ? 'bi-eye-slash' : 'bi-eye'"></i>
+        </span>
+     </div>
+  </div>
+
+----------------------------------------------------------------------------------------------
+
+<< checkbox input and text next to it >>
+
+<div class="form-group col-12 col-sm-12 mb-3 p-0">
+	<div class="d-flex align-items-center pb-1">
+		<input class="form-check-input m-0 me-2 flex-shrink-0 fs-5" type="checkbox"@bind="individualUserDTO.PolicyAgreement">
+		<label>I agree to the terms of use and the private policy <span class="text-danger">*</span></label>
+	</div>
+	<!-- Validation message in its own line -->
+	<ValidationMessage For="()=>individualUserDTO.PolicyAgreement" />
+</div>
+
+
+-----------------------------------------------------------------------------------------------------------------------------------
+
+<< text area and text above it >>
+
+<div class="mb-3 form-group">
+   <label class="ms-2 form-label">Instructions [required]</label>
+   <textarea class="form-control" rows="2" style="resize: none;" placeholder="Enter instructions" formControlName="projectInstructions"></textarea>
+</div>
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<< input enhanced with extra content like select before it >>
+
+        <div class="input-group my-3">
+            <div class="input-group-prepend">
+              <select class="form-select">
+                <option>Tag</option>
+                <option>Technology</option>
+                <option>Dependency</option>
+              </select>
+            </div>
+            <input type="text" class="form-control" placeholder="enter keyword">
+          </div>
+
+        </div>
+
+
+<div class="col-12 col-sm-12 col-md-8 col-lg-6 p-0">
+   <form action="/project/index">
+      <div class="input-group div-search">
+
+         <select class="form-select select-category" style="flex: 0 1 155px;" onchange="filterByCategory(this.value)">
+            <option value="" selected="@(string.IsNullOrEmpty(CategoryId) ? "selected" : null)">All</option>
+            @foreach (var category in Model.Categories)
+            {
+              <option value="@category.Id" selected="@(category.Id.ToString() == CategoryId ? "selected" : null)">@category.Name</option>
+            }
+         </select>
+
+         <input type="text" class="form-control input-search" placeholder="Search" name="SearchText" value="@searchText">
+         <input type="text" hidden placeholder="Search" name="CategoryId" value="@CategoryId">
+         <button class="btn btn-info text-white btn-search"><i class="bi bi-search"></i></button>
+      </div>
+    </form>
+</div>
+
+---------------------------------------------------------------------------------------------------------------------------------------
+
+<< Input with button over it on the right >>
+
+<div class="row m-0 p-0">
+	<div class="input-btn-container m-0 mx-auto col-11 col-sm-6 col-md-6 col-lg-5">
+		<input type="text" placeholder="Type your tracking number" />
+		<button type="button">Track</button>
+	</div>
+</div>
+
+
+.input-btn-container {
+    position: relative;
+    display: flex; align-items: center;
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+    overflow: hidden;
+}
+
+.input-btn-container input {
+    flex: 1;
+    border: none; 
+    outline: none;
+    padding: 18px 15px;
+    font-size: 15px;
+}
+
+.input-btn-container button {
+    position:absolute;
+    right:10px;
+    z-index: 1;
+    width:100px;
+    background: #E85215;
+    border: none;
+    color: white;
+    padding: 10px;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 15px;
+}
+
+@media(max-width: 576px){
+    .input-btn-container button{
+        width:70px;
+    }
+}
+
+.input-btn-container button:hover {
+    background: #c63e10;
+}
+
+
+---------------------------------------------------------------------------------------------------------------------------------------
+
+
+<< form example 1 using bootstrap >>
+
+    <div class="form-container bg-info rounded-3 mt-5 pt-1 position-relative">
+        
+        <h2 class="form-header position-absolute top-0 start-50 translate-middle">Registration</h2>
+
+        <form>
+
+            <div class="row mt-5 p-2 mx-2">
+
+                <div class="form-group col-12 col-sm-6 mb-3">
+                    <label class="ms-1">First Name</label>
+                    <input class="form-control" type="text" placeholder="Enter the first name">
+                    <span class="text-danger ms-1">First name is required</span>
+                </div>
+        
+                <div class="form-group col-12 col-sm-6 mb-3">
+                    <label class="ms-1">Last Name</label>
+                    <input class="form-control" type="text" placeholder="Enter the last name">
+                    <span class="text-danger ms-1">Last name is required</span>
+                </div>
+              
+                <div class="form-group mb-3 col-12">
+                    <label class="ms-1">Nationality</label>
+                    <input class="form-control" type="text" placeholder="Enter the last name">
+                    <span class="text-danger ms-1">Last name is required</span>
+                </div>
+
+                <div class="form-group mb-3 col-12 col-sm-6 col-lg-4">
+                    <label class="ms-1">fir</label>
+                    <input class="form-control" type="text" placeholder="Enter the last name">
+                    <span class="text-danger ms-1">Last name is required</span>
+                </div>
+                
+
+                <div class="form-group mb-3 col-12 col-sm-6 col-lg-4">
+                    <label class="ms-1">fir</label>
+                    <input class="form-control" type="text" placeholder="Enter the last name">
+                    <span class="text-danger ms-1">Last name is required</span>
+                </div>
+
+                <div class="form-group mb-3 col-12 col-sm-12 col-lg-4">
+                    <label class="ms-1">fir</label>
+                    <input class="form-control" type="text" placeholder="Enter the last name">
+                    <span class="text-danger ms-1">Last name is required</span>
+                </div>
+
+                <button type="submit" class="btn btn-success col-6 col-md-4 m-auto fs-5">Submit</button>
+
+            </div>
+        </form>
+        
+    </div>
+
+
+<style>
+
+    .form-container{
+        max-width: 700px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+
+    @media (max-width: 576px){ /* extra small screen */
+            .form-container{
+                width: 96%;
+            }
+    }
+
+    @media (min-width: 576px){ /* small screen */
+            .form-container{
+                width: 90%;
+            }
+    }
+
+    @media (min-width: 768px){ /* Medium  screen */
+            .form-container{
+                width: 70%;
+            }
+    }
+
+    .form-header{
+        font-family: monospace;
+        font-size: 32px;
+        color: white; 
+        text-align: center; 
+        background-color: black;
+        padding: 10px 35px; 
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
+        width: fit-content;
+        position: absolute;
+        font-weight: 700;   
+    }
+
+    @media (max-width: 576px){ /* small screen */
+            .form-header{
+                font-size: 24px;
+            }
+    }
+
+
+</style>
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<< example 2 login form using bootstrap >>
+
+
+<div class="form-container row">
+
+        <div class="card shadow m-auto d-flex mt-4 px-0 col-12 col-sm-8">
+
+            <div class="card-header">
+                <h1 class="text-center">Log in</h1>
+            </div>
+
+            <div class="card-body">
+
+                <form  method="post">
+
+                    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                        <strong> invalid email or password </strong>  
+                    </div>
+
+                    <div class="form-floating my-3">
+                        <input class="form-control" autocomplete="username" aria-required="true" />
+                        <label class="form-label">Email</label>
+                        <span class="text-danger">Email is required</span>
+                    </div>
+
+                    <div class="form-floating my-3">
+                        <input class="form-control" autocomplete="current-password" aria-required="true" />
+                        <label class="form-label">Password</label>
+                        <span class="text-danger">Password is required</span>
+                    </div>
+
+                    <div class="form-group mb-2 col-12 col-sm-8 div-terms-conditions">
+                        <input class="form-check-input" type="checkbox" id="input-remember-me">
+                        <label for="input-remember-me">Remember me?</label>
+                    </div>
+
+                    <div>
+                        <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-primary">Log in</button>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <p class="mb-2"><a class="text-decoration-underline" style="cursor: pointer;">Forgot your password?</a></p>
+                        <p class="mb-2"><a class="text-decoration-underline" style="cursor: pointer;">Resend email confirmation</a></p>
+                    </div>
+
+                </form>
+            </div>
+
+        </div>
+    
+    </div>
+
+
+
+<style>
+   .form-container{
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+   }
+
+
+    @media (max-width: 576px){ /* extra small screen */
+            .form-container{
+                width: 96%;
+            }
+    }
+
+    @media (min-width: 576px){ /* small screen */
+            .form-container{
+                width: 90%;
+            }
+    }
+
+    @media (min-width: 768px){ /* Medium  screen */
+            .form-container{
+                width: 70%;
+            }
+    }
+</style>
+
+----------------------------------------------------------------------------------------------------------------------------------
+
+<< example 3: form using card ommer offbeat >>
+
+<div class="form-container">
+       
+        <div class="card shadow mt-5 px-0">
+
+            <h2 class="card-header">Create Product</h2>
+            
+            <form>
+                <div class="card-body row">
+
+                    <div class="form-group my-3 col-6">
+                        <label class="ms-1">Email</label>
+                        <input class="form-control" />
+                        <span class="ms-1 text-danger">Email is required</span>
+                    </div>
+    
+                    <div class="form-group my-3 col-6">
+                        <label class="ms-1">Email</label>
+                        <input class="form-control" />
+                        <span class="ms-1 text-danger">Email is required</span>
+                    </div>
+                    
+                    
+                </div>
+
+                <div class="card-footer">
+                    <a class="btn btn-outline-secondary">Cancel</a>
+                    <button class="btn btn-outline-primary" type="submit">Submit</button>
+                </div>
+
+            </form>
+            
+        </div>
+    
+    </div>
+
+
+<style>
+   .form-container{
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+   }
+
+
+    @media (max-width: 576px){ /* extra small screen */
+            .form-container{
+                width: 96%;
+            }
+    }
+
+    @media (min-width: 576px){ /* small screen */
+            .form-container{
+                width: 90%;
+            }
+    }
+
+    @media (min-width: 768px){ /* Medium  screen */
+            .form-container{
+                width: 70%;
+            }
+    }
+</style>
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+<<<<<<<<<<<< Select input >>>>>>>>>>>>>>>>>>>>>>>
+
+
+<< select input and label above it>>
+
+<div class="form-group">
+    <label class="form-label">Location Name</label>
+    <select class="form-select form-select-md mb-3">
+        <option selected disabled>Open this select menu</option>
+        <option value="1">One</option>
+        <option value="2">Two</option>
+        <option value="3">Three</option>
+    </select>
+</div>
+
+-----------------------------------------------------------------
+
+- properties i can use in select input
+	- to contrl the size of input
+		form-select-md
+		form-select-sm
+		form-select-lg
+
+- to send the selected value 
+	at select tag -> onchange="gameSelected(this.value)
+
+- to get the index of the selected option
+	element.selectedIndex
+
+- to get the selected text
+	element.options[element.selectedIndex].text;
+
+- to get the selected value 
+	element.value;
+
+- set the selected index of select input
+	selectElement.selectedIndex = 0;
+
+- to make option selected
+	locationOption.selected = true;
+
+------------------------------------------------------------------------------------------------
+
+<< Tom Select >>
+
+--- installation ----
+
+npm install tom-select
+
+"node_modules/tom-select/dist/css/tom-select.css"
+
+- use bootstrap
+<!-- Tom Select CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tom-select/2.0.2/css/tom-select.bootstrap4.min.css" rel="stylesheet" />
+<!-- Tom Select JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tom-select/2.0.2/js/tom-select.complete.min.js"></script>
+
+
+
+<select id="programming-select" class="form-control" onchange="test(this.value)" multiple>
+        <option value="0" disabled selected hidden>Select a programming language</option>
+        <option value="1">PHP</option>
+        <option value="2">C#</option>
+        <option value="7">java</option>
+</select>
+
+
+
+document.addEventListener('DOMContentLoaded', function() {
+            new TomSelect('#programming-select', {
+                placeholder: 'Select a programming language'
+            });
+
+		
+        });
+
+
+◘ TomSelect options 
+
+  - placeholder: "select item" 	=> This text appears when no item is selected
+  - maxItems: 1   	       	=> maximum number of items that can be selected in the dropdown
+  - create: true		=> Allows the user to create new options that aren't in the list.
+  - hideSelected: true,	      	=> Hides the already selected options from the dropdown list to prevent them from being selected again.
+  - openOnFocus: true,	      	=> Determines whether the dropdown should automatically open when the control (select input) is focused.
+  - onChange:  function(val){}	=> called when the selection changes
+  - onItemAdd: function(val){}  => called when an item is added (either via typing and pressing Enter or selecting from the list)
+  - onType: function(input) {}  => listen for the current value at every single type
+  - createFilter: function(input){}  => listen for each press to filter the new created option 
+	ex: createFilter: function(input){ return input.length>5 }
+  - create: function(optionText) {}  => to custom the creation of new option, it calls createFilter() method at first implicitly
+
+
+  - plugins: array of strings
+      	- 'dropdown_input'  	// drop down input is appeared below the select input
+	- 'caret_position'  	// allow you to multi-select 
+	- 'no_backspace_delete'	// 
+	- 'remove_button'	// provide x button next to each selected option 
+
+
+- inside any method you can access the options
+
+	 - this.options  --> 
+	      EX:   this.options = { 
+			   "1": { value: "1", text: "Item 1" }, 
+			   "2": { value: "2", text: "Item 2" }
+		    }
+
+
+	 - each option object has properties for example --> id, text, disabled: bool, order
+	 - this.setTextboxValue('');
+
+	- this.addOption({ value: item.id, text: item.name });  // add option inside any method
+	- this.addItem(item.id);				// select item
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+<< to add options to tom select >>
+
+let tomGameSelect
+document.addEventListener('DOMContentLoaded', function () {
+
+     tomGameSelect = new TomSelect('#game-select', {
+        placeholder: 'Select game',
+        plugins: ['dropdown_input'],
+    });
+
+});
+	
+tomGameSelect.clear();
+tomGameSelect.clearOptions();
+tomGameSelect.addOption({ value: '0', text: 'Select Game' });
+tomGameSelect.addItem(2); // mark the option with value as selected
+control.setValue([2, 3]); // mark the options with values 2,3 as selected
+
+
+let optionData = tagsSelect.options[oldOptionVal];  --> // get option with value=oldOptionVal in the form of object
+	optionData.value="labla";
+tagsSelect.updateOption(oldOptionVal, optionData); // // update the option with value oldOptionVal to optionData to reflect changes
+
+to get all selected options --> tomGameSelect.getValue()
+
+------------------------------------------------------------------------------------------------------------------------------------------------
+
+<< add tag to DB >>
+
+
+create: true,
+createFilter: function(optionTxt) {        
+    const options = Object.values(this.options);   // Convert the object to an array of values
+   
+    for (let option of options) {
+        if (option.text.toLowerCase() === optionTxt.toLowerCase()) {
+            return false;
+        }
+    }
+    return true;
+},
+
+create: function(optionText) {
+       // it trigger the createFilter method at first
+    const inputElement = document.querySelector("input[type='select-multiple']");
+    inputElement.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter') {
+            event.preventDefault(); // Prevent form submission
+        }
+    });
+    CreateTag(optionText);
+    this.setTextboxValue('');
+},
+
+
+
+function CreateTag(value){
+     
+    fetch(`/tag/addTagViaAPI`, {
+        method: 'POST',
+        headers:{'Content-Type': 'application/json',},
+        body: JSON.stringify({'Name': value}),
+
+    }).then(response=>{
+        if(response.ok)
+            return response.json();
+
+     }).then(data=>{ console.log(data);  addTagOption(data.name, data.id); })
+    .catch(error=>{ console.log(error); })
+}
+
+    function addTagOption(optionName ,optionVal){
+            tagsSelect.addOption({ text: optionName , value: optionVal });
+            console.log(tagsSelect.options)
+            tagsSelect.addItem(optionVal);
+}
+
+
+------------------------------------------------------------------------------------------------------------------------
+
+<< to Prevent form submission >>
+
+document.addEventListener('DOMContentLoaded', function () {
+
+     	const inputElement = document.getElementById("tag-select-ts-control");
+	inputElement.addEventListener('keydown', function(event) {
+    		if (event.key === 'Enter') {
+        		event.preventDefault(); 
+    		}
+	});
+});
+
+
+--- if you have more than one select
+   const inputElements = document.querySelectorAll("input[type='select-multiple']");
+       inputElements.forEach(inputElement => {
+           inputElement.addEventListener('keydown', function (event) {
+               if (event.key === 'Enter') {
+                   event.preventDefault(); // Prevent form submission
+               }
+           });
+    });
+
+- note the created input is -->  input[type='select-multiple']
+
+-------------------------------------------------------------------------------------------------------------------
+
+<< JS code to create TOM Select manually  and allow creation during selecting >>
+
+<button class="btn btn-warning col-3" onclick="addItem(event)">Add Item</button>
+<table class="table table-striped table-bordered  mt-4 text-center" id="table-added-items">
+    <thead class="bg-light">
+        <tr>
+            <th scope="col" class="col-7">Item Name</th>
+            <th scope="col" class="col-3">Quantity</th>
+            <th scope="col" class="col-2">Delete</th>
+        </tr>
+    </thead>
+    
+    <tbody>
+       
+       @* // body items will added dynamically *@
+    </tbody>
+        
+</table>
+            
+
+
+<script>
+
+
+ function addItem(event) {
+
+    event.preventDefault();
+   
+
+    const tbody = document.querySelector("#table-added-items tbody");
+    const newRow = document.createElement("tr");
+    const index = tbody.rows.length;
+
+    // Create a new <td> for the select input
+    const tdSelect = document.createElement("td");
+    const select = document.createElement("select");
+    select.id = `select-item-${index}`; // Unique ID for the select input
+    select.name = `Project.items[${index}].Id`; // Name attribute for proper form binding
+    // select.multiple = true;
+    select.classList.add("form-control");
+
+    // Creating options with items
+    items.forEach(item => {
+        const option = document.createElement("option");
+        option.value = item.id;
+        option.innerHTML = item.name;
+        select.append(option);
+    });
+
+    
+
+    tdSelect.appendChild(select);
+
+    // Create a new <td> for the quantity input
+    const tdQuantity = document.createElement("td");
+    const quantityInput = document.createElement("input");
+    quantityInput.type = "number";
+    quantityInput.min = "1"; // Minimum quantity
+    quantityInput.value = "1"; // Default quantity
+    quantityInput.name = `Project.items[${index}].Quantity`; // Name attribute for proper form binding
+    quantityInput.classList.add("form-control"); // Add Bootstrap styling if needed
+    quantityInput.addEventListener("keydown", function(event){
+        if (event.key === 'Enter') {
+               event.preventDefault(); // Prevent form submission
+        }
+    })
+    tdQuantity.append(quantityInput);
+
+    // Create a delete button for the row
+    const deleteButton = document.createElement("button");
+    deleteButton.textContent = "Delete";
+    deleteButton.classList.add("btn", "btn-danger");
+    deleteButton.addEventListener("click", function (event) {
+        deleteRow(event);
+    });
+
+    // Append delete button to the row
+    const tdDelete = document.createElement("td");
+    tdDelete.appendChild(deleteButton);
+
+    // Append the <td> elements to the new row
+    newRow.appendChild(tdSelect);
+    newRow.appendChild(tdQuantity);
+    newRow.appendChild(tdDelete);
+
+    // Append the row to the tbody
+    tbody.appendChild(newRow);
+
+
+    new TomSelect(`#select-item-${index}`, {
+        placeholder: 'Select item',
+        plugins: ['dropdown_input', 'no_backspace_delete',],
+        create: true,
+        maxItems: 1,
+
+        createFilter: function(optionTxt) {
+            const options = Object.values(this.options);   // Convert the object to an array of values
+            for (let option of options) {
+                if (option.text.toLowerCase() === optionTxt.toLowerCase()) {
+                    return false;
+                }
+            }
+            return true;
+        },
+
+        create: function(optionText) {
+  
+           console.log("create method is called, text: "+optionText);
+
+           let newItem
+           CreateItem(optionText)
+           .then(item => {
+                console.log(item); // Logs the created item
+                this.addOption({ value: item.id, text: item.name });
+                this.addItem(item.id);
+                 
+            });
+        },
+    });
+}
+
+
+
+function deleteRow(event) {
+
+    event.preventDefault();
+    const row = event.target.closest("tr");
+    row.remove();
+
+
+    // reindex rows
+
+    const tableBodyRows = document.querySelectorAll("#table-added-items tbody tr");
+    
+    tableBodyRows.forEach((row, index) => {
+        // Update select element
+        const select = row.querySelector("select");
+        if (select) {
+            select.id = `select-item-${index}`;
+            select.name = `Project.items[${index}].Id`;
+        }
+
+        // Update quantity input element
+        const quantityInput = row.querySelector("input[type='number']");
+        if (quantityInput) {
+            quantityInput.name = `Project.items[${index}].Quantity`;
+        }
+    });
+}
+
+
+function CreateItem(value) {
+
+    return fetch(`/Item/AddItemViaAPI`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 'Name': value }),
+    })
+    .then(response => {
+        if (response.ok) 
+            return response.json();
+    })
+    .then(data => {
+        let newItem = { id: data.id, name: data.name };
+        UpdateItems(items, newItem);
+        return newItem; 
+    })
+    .catch(error => {
+        console.error(error);
+    });
+}
+
+
+function UpdateItems(items, newItem){
+    items.push(newItem);
+}
+
+
+
+
+

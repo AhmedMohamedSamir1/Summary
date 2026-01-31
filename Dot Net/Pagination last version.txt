@@ -1,0 +1,350 @@
+	- create Pagination Folder 
+	- create PagedList<T> class that inherit from List<T>
+	- create BaseResourceParameters<T>
+	- create PageParam class
+	- PaginationResult class [for API ]
+
+--------------------------------------------------------------------------------------------------------------
+
+public class PagedList<T> : List<T>
+{
+    public int CurrentPage { get; set; }
+    public int TotalPages { get; set; }
+    public int PageSize { get; set; }
+    public int TotalCount { get; set; }
+    public bool HasPrevious => CurrentPage > 1;
+    public bool HasNext => CurrentPage < TotalPages;
+    public PagedList() { }
+    public PagedList(List<T> collection) : base(collection) { }
+    public PagedList(List<T> items, int count, int pageNumber, int pageSize) : base(items)
+    {
+        TotalCount = count;
+        PageSize = pageSize;
+        TotalPages = (int)Math.Ceiling(count / (double)pageSize);
+        CurrentPage = pageNumber;
+    }
+
+    public static async Task<PagedList<T>> Create(IQueryable<T> itemsQuery, int count, int? pageNmber, int? pageSize)
+    {
+        if (pageSize is null || pageNmber is null)
+        {
+            pageSize = count;
+            pageNmber = 1;
+        }
+        return new PagedList<T>(itemsQuery.ToList(), count, pageNmber.Value, pageSize.Value);
+    }
+}
+--------------------------------------------------------------------------------------------------------
+
+public class BaseResourceParameters<T> where T : class
+{
+    const int maxPageSize = 20;
+    private int? _pageSize = 2;
+
+    public int? PageNumber { get; set; } = 1;
+
+    public int? PageSize
+    {
+        get => _pageSize;
+        set => _pageSize = value > maxPageSize ? maxPageSize : value;
+    }
+
+    public Func<IQueryable<T>, IOrderedQueryable<T>>? OrderBy { get; set; } = null;
+    public Expression<Func<T, bool>>? Filter { get; set; } = null;
+    public string[] Includes { get; set; } = Array.Empty<string>();
+}
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+public class PageParam
+{
+    public string? SearchText {  get; set; }
+    public DateTime? FromDate { get; set; }
+    public DateTime? ToDate { get; set; }
+    public int? PageNumber { get; set; }
+}
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+public class PaginationResult<T>
+{
+    public required IEnumerable<T> Items { get; set; }
+    public int CurrentPage { get; set; }
+    public int TotalPages { get; set; }
+    public int PageSize { get; set; }
+    public int TotalCount { get; set; }
+    public bool HasNext { get; set; }
+    public bool HasPrevious { get; set; }
+}
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+at Generic Repository
+
+public Task<(IQueryable<TEntity> Collection, int EntityTotalCount)> GetPagedListAsync(BaseResourceParameters<TEntity> resourceParameters)
+{
+    if (resourceParameters == null)
+        throw new ArgumentNullException(nameof(resourceParameters));
+
+    var entityCollection = context.Set<TEntity>().AsQueryable().AsNoTracking();
+
+    if (resourceParameters.Includes.Length > 0)
+        entityCollection = entityCollection.IncludeExpression(resourceParameters.Includes);
+
+    if (resourceParameters.Filter is not null)
+    {
+        entityCollection = entityCollection.Where(resourceParameters.Filter);
+    }
+    if (resourceParameters.OrderBy is not null)
+    {
+        entityCollection = resourceParameters.OrderBy(entityCollection);
+    }
+    int collectionCount = entityCollection.Count();
+
+    int totalPages = (int)Math.Ceiling(collectionCount / (double)resourceParameters.PageSize!.Value);
+
+    if (resourceParameters.PageNumber > totalPages)
+        resourceParameters.PageNumber = totalPages > 0 ? totalPages : 1;
+
+    var collection = entityCollection
+        .Skip((resourceParameters.PageNumber!.Value - 1) * resourceParameters.PageSize!.Value)
+        .Take(resourceParameters.PageSize.Value);
+
+    return Task.FromResult((collection, collectionCount));
+}
+----------------------------------------------------------------------
+
+at AutoMapper folder
+
+- at MappingProfile class
+	CreateMap( typeof(PagedList<>), typeof(PagedList<>) )
+   		.ConvertUsing(typeof(PagedListConverter<,>));
+
+- create PagedListConverter class
+	
+public class PagedListConverter<Src, Dst> : ITypeConverter<PagedList<Src>, PaginationResult<Dst>>
+{
+    public PaginationResult<Dst> Convert(PagedList<Src> source, PaginationResult<Dst> destination, ResolutionContext context)
+    {
+        var destList = context.Mapper.Map<List<Dst>>(source); // this to convert from tag to tagGetDTO
+        var convertedList = new PaginationResult<Dst>() { Items = destList };
+
+        convertedList.Items = destList;
+        convertedList.TotalPages = source.TotalPages;
+        convertedList.CurrentPage = source.CurrentPage;
+        convertedList.PageSize = source.PageSize;
+        convertedList.TotalCount = source.TotalCount;
+        convertedList.HasPrevious = source.HasPrevious;
+        convertedList.HasNext = source.HasNext;
+        return convertedList;
+    }
+}
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<< at service >>
+
+
+
+- previously -->  Filter = q => string.IsNullOrEmpty(pageParam!.SearchText) || q.Name.Contains(pageParam.SearchText),
+
+- install-package LinqKit.core
+- install-package LinqKit.core -Version 1.2.8  // the one who used before At EMS
+
+
+ public override async Task<PaginationResult<ProductInstanceGetDTO>?> GetPagedListAsync(IPageParam? pageParam)
+ {
+     try
+     {
+         var ProductInstanceParam = pageParam as ProductInstanceParam;
+         BaseResourceParameters<ProductInstance> paginationParam = new()
+         {
+             PageNumber = (ProductInstanceParam.PageNumber == null || ProductInstanceParam.PageNumber <= 0) ? 1 : ProductInstanceParam.PageNumber,
+             Includes = ["ProductType"],
+             OrderBy = PI => PI.OrderByDescending(x => x.CreatedAt),
+             Filter = GetProductInstanceFilter(ProductInstanceParam),
+         };
+         var result = await Repository.GetPagedListAsync(paginationParam);
+         var pagedZones = await PagedList<ProductInstance>.Create(result.Collection, result.EntityTotalCount, paginationParam.PageNumber, paginationParam.PageSize);
+         return mapper.Map<PaginationResult<ProductInstanceGetDTO>>(pagedZones);
+     }
+     catch
+     {
+         return null;
+     }
+ }
+
+ private Expression<Func<ProductInstance, bool>> GetProductInstanceFilter(ProductInstanceParam pageParam)
+ {
+     if (string.IsNullOrEmpty(pageParam.SearchText))
+         return p => !pageParam.Status.HasValue || p.Status == pageParam.Status.Value;
+     switch (pageParam.SearchType)
+     {
+         case (ProductInstanceSearchType.NickName):
+             return p =>  (p.NickName.ToLower().Contains(pageParam.SearchText.ToLower()) 
+                 && (!pageParam.Status.HasValue || pageParam.Status.Equals(p.Status)) );
+         case (ProductInstanceSearchType.SerialNumber):
+             return p => ( p.SerialNumber.ToLower().Contains(pageParam.SearchText.ToLower())
+                 && (!pageParam.Status.HasValue || pageParam.Status.Equals(p.Status)) );
+         default:
+             return p => !pageParam.Status.HasValue || p.Status == pageParam.Status;
+     }
+ }
+
+private Expression<Func<ProductInstance, bool>> GetProductInstanceFilter(ProductInstanceParam pageParam)
+{
+    var predicate = PredicateBuilder.New<ProductInstance>(true); 
+    if(pageParam.Status != null && pageParam.Status.Length > 0)
+    {
+        predicate = predicate.And(PI => pageParam.Status.Contains(PI.Status));
+    }
+    if (!string.IsNullOrEmpty(pageParam.SearchText))
+    {
+        switch (pageParam.SearchType)
+        {
+            case (ProductInstanceSearchType.NickName):
+                predicate = predicate.And(PI => PI.NickName.ToLower().Contains(pageParam.SearchText.ToLower()));
+                break;
+            case (ProductInstanceSearchType.SerialNumber):
+                predicate = predicate.And(PI => PI.SerialNumber.ToLower().Contains(pageParam.SearchText.ToLower()));
+                break;
+            default:
+                return predicate;
+        }
+    }
+    return predicate;
+}
+
+
+public class ProductInstanceParam: PageParam, IPageParam
+{
+    public ProductInstanceSearchType SearchType { get; set; } = ProductInstanceSearchType.NickName;
+    public ProdcutInstanceStatus? Status { get; set; }
+}
+
+public enum ProductInstanceSearchType
+{
+    NickName=1,
+    SerialNumber,
+}
+
+
+---------------- at Service 2
+
+public virtual async Task<PaginationResult<TGetDTO>?> GetPagedListAsync(IPageParam? pageParam)
+{
+    var paginationParam = CreatePaginationParams(pageParam);
+    return await GetPagedListInternalAsync(paginationParam);
+}
+
+public virtual BaseResourceParameters<TEntity> CreatePaginationParams(IPageParam? pageParam)
+{
+    var paginationParam = new BaseResourceParameters<TEntity>
+    {
+        PageNumber = (pageParam!.PageNumber == null || pageParam.PageNumber <= 0) ? 1 : pageParam!.PageNumber,
+        OrderBy = q => q.OrderByDescending(x => x.CreatedAt)
+    };
+    return paginationParam;
+}
+
+private async Task<PaginationResult<TGetDTO>?> GetPagedListInternalAsync(BaseResourceParameters<TEntity> paginationParam)
+{
+    var result = await genericRepository.GetPagedListAsync(paginationParam);
+    var pagedResult = await PagedList<TEntity>.Create(result.Collection, result.EntityTotalCount, paginationParam.PageNumber, paginationParam.PageSize);
+    return mapper.Map<PaginationResult<TGetDTO>>(pagedResult);
+}
+
+
+-- override the CreatePaginationParams as you like
+	
+-----------------------------------------------------------------------------------------------------------
+
+at controller
+
+public async Task<IActionResult> Index(PageParam? searchParam)
+{
+    var res = await tagService.GetPagedListAsync( searchParam);
+    return View(res);
+}
+
+
+
+ public async Task<IActionResult> Delete(int id, PageParam? searchParam)
+ {
+     var res = await tagService.Delete(id);
+     if (res) 
+         return RedirectToAction("Index", new { pageNumber = searchParam!.pageNumber, SearchText = searchParam.SearchText });
+     return Content("error");
+ }
+
+
+
+---------------------------------------------------------------------------------------------------------------------------------------
+ at view
+
+ <form action="/Tag/Index">
+     <div class="row">
+         <div class="col-12 col-sm-6 col-md-4">
+             <div class="input-group div-search">
+                 <input type="text" class="form-control input-search" placeholder="Search" name="SearchText" value="@ViewContext.HttpContext.Request.Query["SearchText"]">
+                 <span class="input-group-text"><i class="bi bi-search"></i></span>
+             </div>
+         </div>
+     </div>
+
+ </form>
+
+
+
+@if (Model.Count != 0){
+    <nav>
+        <ul class="pagination justify-content-start flex-wrap">
+            <!-- Previous Button -->
+            <li class="page-item @($"{(Model.HasPrevious ? "" : "disabled")}")">
+                <a class="page-link" asp-action="Index" asp-route-pageNumber="@(Model.CurrentPage - 1)" asp-route-SearchText="@ViewContext.HttpContext.Request.Query["SearchText"]">Previous</a>
+            </li>
+
+            <!-- First Page with Ellipsis -->
+            @if (Model.CurrentPage > 3)
+            {
+                <li class="page-item">
+                    <a class="page-link" asp-action="Index" asp-route-pageNumber="1" asp-route-SearchText="@ViewContext.HttpContext.Request.Query["SearchText"]">1</a>
+                </li>
+
+                @if (Model.CurrentPage > 4)
+                {
+                    <li class="page-item disabled">
+                        <span class="page-link">...</span>
+                    </li>
+                }
+            }
+
+            <!-- Page Numbers -->
+            @for (int i = Math.Max(1, Model.CurrentPage - 2); i <= Math.Min(Model.TotalPages, Model.CurrentPage + 2); i++)
+            {
+                <li class="page-item @($"{(i == Model.CurrentPage ? "active" : "")}")">
+                    <a class="page-link" asp-action="Index" asp-route-pageNumber="@(i)" asp-route-SearchText="@ViewContext.HttpContext.Request.Query["SearchText"]">@i</a>
+                </li>
+            }
+
+            <!-- Last Page with Ellipsis -->
+            @if (Model.CurrentPage < Model.TotalPages - 2)
+            {
+                @if (Model.CurrentPage < Model.TotalPages - 3)
+                {
+                    <li class="page-item disabled">
+                        <span class="page-link">...</span>
+                    </li>
+                }
+                <li class="page-item">
+                    <a class="page-link" asp-action="Index" asp-route-pageNumber="@(Model.TotalPages)" asp-route-SearchText="@ViewContext.HttpContext.Request.Query["SearchText"]">@Model.TotalPages</a>
+                </li>
+            }
+
+            <!-- Next Button -->
+            <li class="page-item @($"{(Model.HasNext ? "" : "disabled")}")">
+                <a class="page-link" asp-action="Index" asp-route-pageNumber="@(Model.CurrentPage + 1)" asp-route-SearchText="@ViewContext.HttpContext.Request.Query["SearchText"]">Next</a>
+            </li>
+        </ul>
+    </nav>
+}

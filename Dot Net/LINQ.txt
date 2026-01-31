@@ -1,0 +1,497 @@
+ORM : stands for object relational mapper 
+LINQ : Language Integrated Query
+
+ORM : tool that get data in the form of objects then you can do your changes on the objects , 
+	then it will detect your changes and convert them into queries
+
+- the target of ORM is to make the developer focus more on the application not on problems of DB (tables and Columns names)
+
+- but you will need to query from object
+
+- LINQ : give us an expressions that help developer to query from object
+
+- ORM like EF retrieve data from DB in the form of objects and with LINQ we can query from the object
+
+-------------------------------------------------------------------------------------------------------------------
+
+<< review delegate >>
+
+        Func<int, int, int> d1 = new Func<int, int, int>(sum);
+        Func<int, int, int> d2 = sum;
+        Func<int, int, int> d3 = delegate (int x, int y) { return x + y; };
+        Func<int, int, int> d4 = (int x, int y) => x + y;
+        Func<int, int, int> d5 = ( x,  y) => x + y;
+
+
+-------------------------------------------------------------------------------------------------------------------
+
+- IEnumerable
+	- Parent is the base interface for all non-generic and generic collections in .NET.
+	- Provides iteration over a collection of objects.
+	- Fetches all data, then filters it
+
+- IQueryable 
+	- Inherits from IEnumerable
+	- filtering happens at the database level (server-side).
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<< Query Execution >>
+
+- The query variable Itself only stores the query commands. 
+- The actual execution of the query is deferred until you iterate over the query variable in a foreach statement.
+- To force immediate execution of any query and cache its results, you can call the ToList or ToArray methods.
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<< Rules >>
+
+- object that you query from should of type IEnumerable 
+
+- Enumerable static class exist at system.linq namespace
+
+------------------------------------------------------------------------------------------------------------------
+
+<< projection operators >>
+
+--- Select
+	public static IEnumerable<TResult> Select<TSource, TResult>( this IEnumerable<TSource> source, Func<TSource, TResult> selector )
+        public static IEnumerable<TResult> Select<TSource, TResult>(this IEnumerable<TSource> source, Func<TSource, int, TResult> selector)
+		- the int refers to the index
+		- 
+
+	public class Student
+	{
+    		public int Id { get; set; }
+    		public string FirstName { get; set; }
+    		public string LastName { get; set; }
+	}
+	
+	IEnumerable<int> Ids = StdList.select(x=>x.Id);	
+	IEnumerable<string> Fnames =  students.Select(x => x.FirstName);
+	IEnumerable<int> Indices = Arr.Select((name, index) => index+1);
+	
+
+SelectMany :
+	- It's used when you have a collection of collections (like a list of lists), and you want to flatten the result into a single sequence.
+	- is used to flatten nested collections-> suppose you have a collection of objects, and each object contains a nested collection. 
+          and you want to flatten the result into a single sequence.
+	- used when Item contains collection like -> if I have list of students and each student have a list of subjects  [collection of collection ]
+	- SelectMany flattens collections: it turns a sequence of sequences into a single flat sequence.
+		but determine the Where is the inner sequence is essential
+
+	- IEnumerable<TResult> IEnumerable<Source>.SelectMany<Source, TResult>(Func<Source, IEnumerable<TResult>>)
+	- IEnumerable<TResult> IEnumerable<Source>.SelectMany(Func<TSource, IEnumerable<TCollection>> collectionSelector, Func<TSource, TCollection, TResult> resultSelector)
+
+	- class Student
+	  {
+    		public string Name { get; set; }
+    		public List<string> Subjects { get; set; }
+	  }
+
+	 var students = new List<Student>
+	 {
+    		new Student { Name = "Alice", Subjects = new List<string> { "Math", "English" } },
+    		new Student { Name = "Bob", Subjects = new List<string> { "Science", "History" } }
+	 };
+
+	var allSubjects = students.SelectMany(s => s.Subjects);
+	      //Math
+	      //English
+	      //Science 
+	      //History
+
+	var result = students.SelectMany(student => student.Subjects, (student, subject) => $"{student.Name} studies {subject}" );
+		Alice studies Math
+		Alice studies English
+		Bob studies Science
+		Bob studies History
+
+---------------------------------------------------------------------------------------------------------
+
+<< filteration operators >>
+
+Where()
+
+OfType() : 
+	- filter elements of a collection based on their type. It returns only elements that can be cast to the specified type T
+
+	var list = new ArrayList { "ahmed", 24, "mohamed", 25, "samir", 55 };
+ 	var res =  list.OfType<string>();
+  	foreach(var x in res) { Console.WriteLine(x); };
+
+	class Animal { }
+	class Dog : Animal { }
+	class Cat : Animal { }
+
+	List<Animal> animals = new List<Animal>
+	{
+    	   new Dog(),
+    	   new Cat(),
+    	   new Dog()
+	};
+
+var dogs = animals.OfType<Dog>(); // 
+
+
+
+
+----------------------------------------------------------------------------------
+
+<< partitioning operators >>
+
+- Take()  --> names.Take(4);
+
+- TakeWhile(x=>x.age>10); --> take as long as the condition is valid
+
+- Skip(2) 	  --> skip first 2 
+
+- SkipWhile()	  --> skip as long as the condition is valid
+
+
+----------------------------------------------------------------------------------------
+
+<< ordering operators >>
+
+
+- OrderByDescending()
+- orderBy  & thenBy
+	stdLst.OrderBy(n => n.Fname).ThenBy(s => s.age);
+
+- to get 5 rondom record
+	OrderBy(S=> EF.Functions.Rondom());  // unfortunately does not working with SQL Server
+	Sol1 : context.Questions.FromSqlRaw("SELECT TOP 5 * FROM Questions ORDER BY NEWID()")
+	Sol2:  var randomIds = await context.Questions.Select(q => q.Id).OrderBy(q => Guid.NewGuid()).Take(5).ToListAsync();
+	       var randomQuestions = await context.Questions.Where(q => randomIds.Contains(q.Id)).Include(q => q.Choices).AsNoTracking().ToListAsync();
+
+- reverse()
+
+- Example 1 order list of string by length
+	string[] names = { "Tom", "Dick", "Harry", "MARY", "Jay" };
+	var Q5 = names.OrderBy(x => x.Length);
+
+
+------------------------------------------------------------------------------------------------------------------
+
+<< grouping opertors >>
+
+GroupBy : 
+
+<< example 1 >>
+	var orders = new List<Order>
+	{
+    		new Order { CustomerName = "Alice", Product = "Book", Price = 12 },
+    		new Order { CustomerName = "Bob", Product = "Pen", Price = 2 },
+    		new Order { CustomerName = "Alice", Product = "Notebook", Price = 5 },
+	};
+
+	var groupedOrders = orders.GroupBy(o => o.CustomerName);
+
+	foreach (var group in groupedOrders)
+	{
+    	   Console.WriteLine($"Customer: {group.Key}");
+    	   foreach (var order in group)
+    	   {
+        	Console.WriteLine($"  Product: {order.Product}, Price: {order.Price}");
+    	   }
+	}
+
+output
+
+Customer: Alice
+Product: Book, Price: 12
+Product: Notebook, Price: 5
+
+Customer: Bob
+Product: Pen, Price: 2
+
+
+
+----------------------------------------------------------------------------------------------------------------------
+
+<< set operators >>
+
+- Distinct() : 
+	- return a distinct elements
+	- The Distinct() method in LINQ uses Equals() and GetHashCode() to determine whether two items are equal.
+
+	---- with value DT (
+		- like int, double, char, and structs) values are compared based on their actual values.
+		- In .NET, value types (like int, double, char, and struct) implement the IEquatable<T> interface. which provide Equals(T other) method
+		
+		- you can customize the equality logic for struct by overriding the equal 
+			struct Point {
+    			   public int X { get; set; }
+    			   public int Y { get; set; }
+
+    			  // Override Equals() to compare X and Y values
+    			  public override bool Equals(object obj)
+    			  {
+        		     if (obj is Point other)
+            			return this.X == other.X && this.Y == other.Y;
+        		     return false;
+    			  }
+
+    			  // Override GetHashCode() to generate hash based on X and Y
+    			  public override int GetHashCode(){ return HashCode.Combine(X, Y); }
+			}
+
+	------ with Reference Types
+		- Reference types (like string, custom classes, and objects) are compared based on reference equality, unless you override equality logic.
+		- by default, Distinct() will check whether two objects refer to the same memory location, not whether their properties are equal.
+		- To make Distinct() compare the contents of reference types rather than their memory references
+			- Option 1: Override Equals() and GetHashCode()
+			- Option 2: Use IEqualityComparer<T>
+
+	 		public class Person
+	 		{
+    	     			public string Name { get; set; }
+    	     			public int Age { get; set; }
+	 		}
+
+	 		public class PersonComparer : IEqualityComparer<Person>
+	 		{
+    	    			public bool Equals(Person x, Person y)
+    	    			{
+        				return x.Name == y.Name && x.Age == y.Age;
+    	    			}
+
+    	    			public int GetHashCode(Person obj)
+    	    			{
+        			   return HashCode.Combine(obj.Name, obj.Age);
+    	    			}
+	 		}
+			var people = new List<Person>
+			{
+    				new Person { Name = "Alice", Age = 30 },
+    				new Person { Name = "Alice", Age = 30 },
+    				new Person { Name = "Bob", Age = 25 }
+			};
+			var distinctPeople = people.Distinct(new PersonComparer());
+			Output:
+			   Alice, 30  
+			   Bob, 25
+
+
+
+- Union():
+	- union the results between collections without repetition
+	- L1.Union(L2);
+	- L1.Union(L2,IEqualityComparer<T>)
+
+- Concat() :union the results between collections with repetition
+	
+- Intersect(): 
+	
+- Except() : exist in first and don't in second
+
+
+-----------------------------------------------------------------------------------------------------------
+
+<< Join Operators >>
+- Join()
+- GroupJoin()
+
+            List<student> stdLst = new List<student>()
+            {
+                new student() { id = 1, Fname = "mohamed", Lname = "mostafa", age = 22 , depId = 1},
+                new student() { id = 1, Fname = "ali", Lname = "mostafa", age = 22 , depId = 1, },
+                new student() { id = 3, Fname = "mona", Lname = "ahmed", age = 20 ,  depId = 2},
+            };
+
+            List<department> departments = new List<department>()
+            {
+                new department(){id=1 , name="SD"},
+                new department(){id=2 , name="os"},
+                new department(){id=3 , name="El"},
+            };
+
+        public static IEnumerable<TResult> Join<TOuter, TInner, TKey, TResult>
+	(
+	  this IEnumerable<TOuter> outer, 
+	  IEnumerable<TInner> inner,
+	  Func<TOuter, TKey> outerKeySelector,
+	  Func<TInner, TKey> innerKeySelector,
+	  Func<TOuter, TInner, TResult> resultSelector
+	)
+	// TKey: type of key -> 
+	 var res22 =  stdLst.Join(
+              departments, 
+	      std => std.depId,
+              dep => dep.id,
+              (std, dep) => new { std_name = std.Lname, dep_name = dep.name }
+         );
+
+	mostafa SD
+	mostafa SD
+	ahmed os
+
+-----------------------------------------------------------------------------------------------------------------------
+
+<< Element Operators >>
+
+   - Single()
+	- TSource Single<TSource>(this IEnumerable<TSource> source)
+	- Returns the only element of a sequence and throws an exception if thereis not exactly one element in the sequence.
+
+   - SingleOrDefault()
+   - FirstOrDefault():
+	IEnumerable<TSource>.FirstOrDefault();
+		// Returns the first element of a sequence, or a default value if the sequence contains no elements
+
+	var res = stdLst.FirstOrDefault(new student() { id = 5, age = 12 });
+		// Returns the first element of a sequence, or a specified default value if the sequence contains no elements
+	 
+	var res = stdLst.FirstOrDefault(student => student.id == 0);
+		// return the first element that satisfy the condition or default value
+
+	var group = stdLst.FirstOrDefault(student=>student.id == 0,new student { id=55, Fname = "fathy"});
+		// return the first element that satisfy the condition or specified default value if the sequence contains no elements
+
+   - LastOrDefault()
+   - Last: Returns the last element of a sequence.
+   - ElementAt: Returns the element at a specified index in a sequence.
+   - ElementAtOrDefault: Returns the element at a specified index in a sequence or a default value if the index is out of range.
+
+--------------------------------------------------------------------
+
+<< Quantifier Operators >>
+
+	- Any()   : Determines whether any element of a sequence satisfies a condition.
+	- All()   : Determines whether all elements of a sequence satisfy acondition()
+	- Contains() : Determines whether a sequence contains a specifiedelement.
+
+------------------------------------------------------------------------------------------
+
+<< Aggregate Operators >>
+	• Count: Counts the elements in a sequence.
+		int IEnumerable<TSource>().Count();
+		int IEnumerable<TSource>().Count(Func<TSource, bool> predicate);
+
+	• LongCount: Counts the elements in a sequence, returning thecount as a long.
+	• Sum: Computes the sum of a sequence of numeric values.
+		int[] Arr2 = { 5, 4, 1, 3, 9, 8, 6, 7, 2, 0 };
+		Arr2.Sum();
+		string[] arr44 = { "apple", "banana", "kiwi" };
+		var ress = arr44.Sum(x => x.Length); // sums up the lengths of all strings
+
+	• Min: Returns the minimum value in a sequence.
+		var ress = arr44.Min(x=>x.Length);
+		
+	• Max: Returns the maximum value in a sequence.
+		var ress = arr44.Max(x=>x.Length);
+
+	• Average: Computes the average of a sequence of numericvalues.
+	• Aggregate: Applies an accumulator function over a sequence
+
+---------------------------------------------------------------------------------------
+
+<< Equality Operators >>
+
+- SequenceEqual()
+
+-----------------------------------------------------------------------------------------
+
+<< Generation Operators >>
+
+	• Empty: Returns an empty IEnumerable<T> with the specifiedtype argument.
+	• Repeat: Generates a sequence that contains one repeated value.
+	• Range: Generates a sequence of integral numbers within aspecified range.
+
+-------------------------------------------------------------------------------------
+
+<< Special Operators >>
+
+DefaultIfEmpty()
+	- This operator returns the elements of the specified sequence
+	- operator will return a singleton collection containing the default value for the type of elements in the sequence.
+	ex:
+	var q10 = sts.Where(n => n.age >21).DefaultIfEmpty<Student>(new Student() { id = 0, name = "nostudent" }); ;
+
+----------------------------------------------------------------------------------------------------------------------------
+
+<< tricks >>
+
+public class ItemForQuotationDetailsDTO
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public int Quantity { get; set; }
+    public decimal Price { get; set; }
+}
+
+var items = new List<ItemForQuotationDetailsDTO>
+{
+    new ItemForQuotationDetailsDTO { Id = 1, Name = "Item1", Quantity = 10, Price = 0 },
+    new ItemForQuotationDetailsDTO { Id = 2, Name = "Item2", Quantity = 5, Price = 100 },
+    new ItemForQuotationDetailsDTO { Id = 3, Name = "Item3", Quantity = 8, Price = 0 }
+};
+
+
+-- Assign new value to Price for items with Price == 0
+ foreach (var item in items.Where(i => i.Price == 0))
+ {
+            item.Price = 50; // Assign the desired value
+ }
+ - the Where method only filters once when the loop starts
+
+- to make the quantity of each item to 55
+    items.Select(item =>
+    {
+        item.Quantity = 55;
+        return item;
+    }).toList();
+    
+    - toList(): to force enumeration of the LINQ query to ensure the modifications take effect
+    - Select method creates an IEnumerable that transforms the objects, but it does not execute the transformation until you enumerate the result
+
+
+- var errors = validatorResult.Errors.Select(e => e.ErrorMessage);  // IEnumerable<string>
+
+-----------------------------------------------------------------------------------------------------------------------------------------------
+
+<< Enumerable class >>
+
+
+public static partial class Enumerable {
+
+   public static TSource FirstOrDefault<TSource>(this IEnumerable<TSource> source, Func<TSource, bool> predicate, TSource defaultValue)
+   {
+      TSource? first = source.TryGetFirst(predicate, out bool found);
+      return found ? first! : defaultValue;
+   }
+   
+   
+  
+}
+
+
+-- var property = properties.FirstOrDefault( p => p.Name.Equals(_include, StringComparison.OrdinalIgnoreCase) ,defaultValue: null);
+        
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------
+
+<< LinqKit.Core >>
+
+
+- Install-Package LinqKit.Core
+
+private Expression<Func<Deployment, bool>> GetDeploymentFilter(DeploymentParam param)
+{
+    var predicate = PredicateBuilder.New<Deployment>(true);
+
+    if (param.Status != null && param.Status.Length > 0)
+    {
+        predicate = predicate.And(d => param.Status.Contains(d.Status));
+    }
+
+    if (param.EventIds != null && param.EventIds.Length > 0)
+    {
+        predicate = predicate.And(d => param.EventIds.Contains(d.Location.EventId));
+    }
+
+    return predicate;
+}
+

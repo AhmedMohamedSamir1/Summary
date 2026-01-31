@@ -1,0 +1,144 @@
+-- app.config.ts
+	import { provideHttpClient, withFetch } from '@angular/common/http';
+	at provider array --> provideHttpClient(withFetch()) 
+		- (configure angular httpClient Service to be available for injection)
+		-  withFetch() to make HttpClient use fetch instead of XMLHttpRequest (Default)
+
+- to create service using command
+	ng g s product --skip-tests
+
+
+
+- @Injectable(): This decorator is used to makes a class injectable and specifies that Angular should provide it as a singleton in the root injector.
+	- root injector: is the main dependency injection container
+
+@Injectable({
+  providedIn: 'root' // can be injected at any component, Angular automatically registers that service with the root injector
+})
+ 
+
+- to provide the service instance as Transient 
+	- at @Component decorator function you'll need the providers 
+
+@Component({
+  selector: 'app-example',
+  templateUrl: './example.component.html',
+  providers: [MyService] // New instance for each component instance
+})
+export class ExampleComponent {
+  constructor(private myService: MyService) { }
+}
+
+------------------------------------------------------------------------------------------------------------------
+
+
+
+- Service full example
+
+import { TagDTO } from './../DTOs/Tag/TagDTO';
+import { Injectable } from "@angular/core";
+import { HttpClient } from '@angular/common/http';
+import { environment } from "../../Environments/environment.development";
+import { IApiResponse } from "../Interfaces/IApiResponse";
+import { catchError, Observable, of } from "rxjs";
+import { TagGetDTO } from '../DTOs/Tag/TagGetDTO';
+
+
+@Injectable({
+    providedIn:'root'
+})
+
+
+export class TagService {
+
+    private baseUrl: string = environment.apiUrl;
+    
+    constructor(private http: HttpClient){}
+
+    public addTag(tagDTO:TagDTO): Observable<IApiResponse>{
+
+        const url = `${this.baseUrl}/tag`;
+        return this.http.post<IApiResponse>(url, tagDTO)
+        .pipe(catchError(this.handleError<IApiResponse>('addTag')));
+    }
+
+    public editTag(id: number, tagDTO: TagDTO): Observable<IApiResponse>{
+        const url = `${this.baseUrl}/tag/${id}`;
+        return this.http.put<IApiResponse>(url, tagDTO)
+        .pipe(catchError(this.handleError<IApiResponse>('editTag')));
+    }
+
+    public deleteTag(id: number): Observable<IApiResponse>{
+        const url = `${this.baseUrl}/tag/${id}`;
+        return this.http.delete<IApiResponse>(url)
+        .pipe(catchError(this.handleError<IApiResponse>('deleteTag')));
+    }
+
+    public isTagNameUnique(name: string, id?: number): Observable<IApiResponse>{
+        const url = `${this.baseUrl}/tagValidation/IsTagNameUnique?tagName=${name}&id=${id}`:
+        return this.http.get<IApiResponse>(url).pipe(catchError(this.handleError<IApiResponse>('isTagNameUnique')));     
+    }
+
+        public isEmailUnique(email: string, id:string|null = null):  Observable<IApiResponse>{
+        const url = `${this.baseUrl}/user/isEmailUnique?email=${email}&id=${id}`;
+        return this.http.get<IApiResponse>(url).pipe(catchError(this.handleError<IApiResponse>('isEmailUnique')));
+    }
+
+
+    public getAllTags(): Observable<TagGetDTO[]> {
+
+        const url = `${this.baseUrl}/tag`;
+        return this.http.get<TagGetDTO[]>(url).pipe(catchError(this.handleError<TagGetDTO[]>('getAllTags')));        
+    }
+
+    public getById(id: number): Observable<TagGetDTO> {
+
+        const url = `${this.baseUrl}/tag/${id}`;
+        return this.http.get<TagGetDTO>(url).pipe(catchError(this.handleError<TagGetDTO>('getAllTags')));        
+    }
+
+    private handleError<T>(operation = 'operation', result?: T) {
+        return (error: any): Observable<T> => {
+            console.error(error);
+            // You can log the error to remote logging infrastructure if needed
+            // Let the app keep running by returning an empty result
+            return of(result as T);
+        };
+    }
+}
+
+------------------------------------------------------------------------------------------------------------------------------------
+
+- at component
+	- this.tagService.addTag(tagDTO).subscribe({
+
+            next: (data: IApiResponse)=>{ },
+
+            error: (error)=>{ showSweatAlert('error', 'Error', `error while adding new tag`) }
+          })
+	  
+	  - note: there is no need to determine that the data data type is IApiResponse as it is detected explicitly
+
+- Using forkJoin for Parallel Execution
+
+  forkJoin({
+    projectData: this.projectService.getById(this.projectId),
+    tagsData: this.tagService.getAllTags(),
+    technologiesData: this.technologyService.getAllTechnologies(),
+    dependenciesData: this.dependencyService.getAllDependencies(),
+
+  }).subscribe({
+    next:({ projectData, tagsData, technologiesData, dependenciesData })=>{
+      this.ProjectGetDTO = projectData; 
+      this.allTags = tagsData; 
+      this.allTechnologies = technologiesData;
+      this.allDependencies = dependenciesData;
+      
+      this.initializeTagsSelect(); // method i want to ensure it's called after data are fetched from API
+    }
+  })
+
+-----------------------------------------------------------------------------
+
+
+

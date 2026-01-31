@@ -1,0 +1,177 @@
+// create ServicesConfiguration folder
+
+public static class ServiceExtensions
+{
+    public static IServiceCollection AddDatabaseConfiguration(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddDbContext<ApplicationContext>(options =>
+            options.UseLazyLoadingProxies()
+                   .UseSqlServer(configuration.GetConnectionString("cs")));
+
+        return services;
+    }
+
+    public static IServiceCollection AddAutoMapperConfiguration(this IServiceCollection services)
+    {
+    	services.AddAutoMapper(typeof(MappingProfile));
+    	return services;
+    }
+
+    public static IServiceCollection RegisterIdentityService(this IServiceCollection service)
+    {
+        service.AddIdentity<ApplicationUser, IdentityRole>(options =>
+        {
+            // Customize Identity options here
+            options.User.AllowedUserNameCharacters = null; // Allow all characters in username
+        })
+        .AddEntityFrameworkStores<ApplicationContext>();
+
+        return service;
+    }
+
+    public static IServiceCollection AddCorsConfiguration(this IServiceCollection services, string corsPolicyName)
+    {
+        services.AddCors(options => {
+            options.AddPolicy(corsPolicyName, builder => {
+                builder.AllowAnyOrigin();
+                builder.AllowAnyMethod();
+                builder.AllowAnyHeader();
+            });
+        });
+
+        return services;
+    }
+
+    public static IServiceCollection ConfigureErrorResponse(this IServiceCollection services) 
+    {
+        services.Configure<ApiBehaviorOptions>(options =>
+        {
+            options.InvalidModelStateResponseFactory = ActionContext =>
+            {
+                var errors = ActionContext.ModelState.Where(error => error.Value.Errors.Count > 0)
+                .SelectMany(value => value.Value.Errors)
+                .Select(error => error.ErrorMessage).ToArray();
+
+                var errorResponse = new ApiValidation
+                {
+                    Errors = errors
+                };
+
+                return new BadRequestObjectResult(errorResponse);
+            };
+        });
+
+        return services;
+    }
+    
+    public static IServiceCollection AddLocalizationService(this IServiceCollection services)
+    {
+        services.AddLocalization(opt => opt.ResourcesPath = "Resources");
+
+        services.AddControllersWithViews()
+            .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
+            .AddDataAnnotationsLocalization();
+
+        services.Configure<RequestLocalizationOptions>(options =>
+        {
+            var supportedCultures = new[] {
+                new CultureInfo("en"),
+                new CultureInfo("ar")
+            };
+
+            options.DefaultRequestCulture = new RequestCulture("ar", "ar");
+            options.SupportedCultures = supportedCultures;
+            options.SupportedUICultures = supportedCultures;
+        });
+
+        return services;
+    }
+    
+    public static IServiceCollection DisableDataAnnotationValidation(this IServiceCollection services) {
+        services.AddFluentValidationAutoValidation(config =>
+        {
+            // Disable DataAnnotations validation to ensure only FluentValidation is used
+            config.DisableDataAnnotationsValidation = true;
+        });
+        return services;
+    }
+
+    public static IServiceCollection DisableModelStateInvalidFilter(this IServiceCollection services)
+    {
+     
+        services.Configure<ApiBehaviorOptions>(options =>
+        {
+            // Disable automatic 400 Bad Request when ModelState is invalid
+            options.SuppressModelStateInvalidFilter = true;
+        });
+        return services;
+    }
+
+    public static IServiceCollection RegisterFluentValidation(this IServiceCollection services)
+    {
+        return services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+    }
+    
+
+    public static IServiceCollection RegisterJWT(this IServiceCollection services)
+    {
+        services.AddAuthentication(
+            option => option.DefaultAuthenticateScheme = "myscheme")
+            .AddJwtBearer(
+                "myscheme",
+                op =>
+                {       
+                    string key = "welcome to my secret key Ahmed Mohamed Samir Elsayed";
+                    var secertkey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(key));
+                    op.TokenValidationParameters = new TokenValidationParameters()
+                {
+                    IssuerSigningKey = secertkey,
+                    ValidateIssuer = false,
+                    ValidateAudience = false
+
+                };
+            });
+
+        return services;
+    }
+}
+
+
+-----------------------------------------------------------------------------------------------------------
+
+<< options >>
+
+- - you sometimes see Configure<T>() method  which always include the options for example
+
+- The Configure<T>() method simplifies the process of adding configurations to the DI container.
+
+- example  
+	services.Configure<ApiBehaviorOptions>(options =>
+	{
+    		// Disable automatic 400 Bad Request when ModelState is invalid
+    		options.SuppressModelStateInvalidFilter = true;
+	});
+
+
+- the Configure<T>() is an extension method to IServiceCollection 
+	namespace Microsoft.Extensions.DependencyInjection{
+		public static class OptionsServiceCollectionExtensions{
+			public static IServiceCollection Configure<TOptions>(this IServiceCollection services,
+			Action<TOptions> configureOptions) where TOptions : class
+		}
+	}
+
+- TOptions:
+	- Represents the type of options being configured (e.g., ApiBehaviorOptions in your example).
+
+- Action<TOptions>
+	- A delegate (lambda or method) that takes an instance of TOptions and modifies it.
+
+- What Happens Under the Hood?
+	- services.Configure<TOptions>(...) registers a delegate in the DI container to configure the TOptions object.
+	- At runtime, when ASP.NET Core needs ApiBehaviorOptions, it resolves it from the DI container.
+	- The configuration delegate runs, modifying the ApiBehaviorOptions object before it’s used.
+	
+- final important note:
+	- it changed the object that provided from DI
+	- 

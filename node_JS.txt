@@ -1,0 +1,379 @@
+
+
+- nodejs : is a server side javascript
+
+- js is a single-thread language
+
+- non-blocking : no request is blocked
+
+- Asynchronous language
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+
+- install node
+	from --> https://nodejs.org/en/download/prebuilt-installer
+	download node.js installer
+
+- ensure that nodejs is istalled
+	node -v 
+
+
+----------------------------------------------------------------------------------------------------------
+
+<< intro >>
+
+- to communicate with nodejs engine : at cmd write -> node 
+
+- it's not nodejs engine : it's js engine that is server side .
+
+
+
+- to run js file 
+	- open cmd on the file directory + write -> node jsfile
+	  ex: node main  // it's js engine so we do not need to write the js extension
+	- open your terminal on vs code +  write -> node jsfile
+
+------------------------------------------------------------------------------
+<< global object >>
+
+- node has global object named ->  global  , it has settimeout(), setinterval(), process  
+-------------------------------------------------------------------------------
+
+<< modules by commonjs >>
+
+- all exports of nodejs file exists inside exports object
+
+- normal export
+	- at script.js file
+		let userName = "ahmed";
+		let age = 24;
+
+		module.exports.userName = userName;
+		exports.age = age;  // shortcut [use exports object direct]
+
+	- at main
+		const {userName, age} = require("./script"); 
+	
+
+- require("./script") ==> require == import
+- require("./script") // it executes script file as encapsulated file , returns exports object of script file
+
+
+
+- default export
+	- rules
+		1. we should use module.exports  not shortcut
+		2. default export come first then normal export
+
+	- at script.js file
+		let userName = "ahmed";
+		let age = 24;
+		module.exports = ()=>{console.log("this is show")}; // default export
+		module.exports.age = age;
+		module.exports.userName = userName;
+
+	- at main
+		const script = require("./script");
+		script();			// this is show
+		console.log(script.age);	// 24
+		console.log(script.userName);   // ahmed
+
+
+---------------------------------------------------------------------------------------------------
+
+<< node packages >>
+
+- there are packages (libraries) downloaded with nodejs, located at C:\Program Files\nodejs\node_modules\npm\node_modules
+ 	- to import internal package : for example
+	 	const http = require("http")  // engine by default looks for package on downloaded node_modules folder
+		
+- npm is a command downloaded with node allows to communicate with npm website and install packages
+  npm : node package manager : website that has all nodejs package
+
+- to install express package at your project
+	- npm i express
+	- npm i express --save // previously
+
+- once you installed a package you will find at your project folder  
+		[ node_moduls folders ]
+		[package.json]  // file that has dependencies
+		[package-lock.json]
+
+	const express = require("express"); 
+	//engine at first looks for package on downloaded node_modules folder at your project, 
+	  if it's not found then try to get it from C:\Program Files\nodejs\node_modules\npm\node_modules
+
+- to uninstall package :
+	npm un package_name
+	npm uninstall package_name
+
+
+- npm i  => - open package.json and download all packages that exists at dependencies
+	    - it download dependencies packages and devDependencies dependencies 
+
+- npm i --production	   
+	download only dependencies packages
+	we don't download devDependencies dependencies at deployment			   		   
+	     
+- the normal when you deploy your project on specific host (server) you do not need to upload node_modules folder as its size large ->
+	on the host : npm i --production
+
+- you can install mre than one package at a time ->
+	npm i p1 p2 p3
+
+- devDependencies: refer to the packages that are necessary for development and testing purposes,
+	 	   but not for running the application in a production environment.
+		   - When you deploy your application, you would usually install only the regular dependencies
+
+- add package from npm as devDependancies.
+	npm i package_name --save-dev
+
+
+- to install package on the device, does not existed inside on dependancies
+	npm package_name -g
+
+- npm nodemon -g        // to monitor the running of server like -> [open live server]
+	nodemon js_file
+	"dev": "nodemon js_file"
+----------------------------------------------------------------------------------------------------------------------------
+
+ << create new project node >>
+
+- npm init -y   // it intialize package.json
+
+	{
+  		"name": "test",     // project folder 
+  		"version": "1.0.0", 
+  		"description": "",
+  		"main": "index.js", // entry point
+  		"scripts": {  // store commands and apply them using npm 
+    			"test": "echo \"Error: no test specified\" && exit 1"
+  		},
+  		"keywords": [],
+  		"author": "",    
+  		"license": "ISC" 
+	}
+
+
+--------------------------------------------------
+
+<< "scripts" >>
+
+- scripts that exists at package.json file
+- alias name from long commands
+- you can store command and apply it using npm for example 
+	- i will store the command [ node main ] in name start -> 
+		 "start": "node main",
+	- at cmd -> npm run start ==> it equals to--> node main
+	- npm start , npm test //  only these valid without run because they are identified by npm
+
+---------------------------------------------------------------------------------------------------------------------
+
+<< http package >>
+
+- it's downloaded with express package
+- used teach the engine how to act as a server on the network, and listening for any http request that hit the server and respnse with http response
+
+- info to help
+	- domain name : ip-adress, port_num
+	- the host has many app that has been deployed on it : each app deployed on specific port number
+  	  This allows the host to distinguish between different applications and route incoming requests to the appropriate application.
+
+	- you can absolutely have more than one server running on the same host.
+	  Each server would typically listen on a different port, allowing them to handle incoming requests independently.
+
+	- your machine consider local host with more than one server You might have 
+		a web server    : Apache 
+		appSever        : Node.js
+	        Database Server : SQL Server
+
+
+--steps of creating server using native nodejs
+   step 1 -> const http = require("http");
+
+   step 2 : Creating the Server -> const server = http.createServer((request, response) => {console.log("request is received")}); 
+   		
+	// create http server instance from server
+	// createServer method takes a callback function as an argument, which will be called whenever a request is received by the server,
+	   it's invoked with two arguments: 
+		 - the request object, which contains information about the incoming HTTP request,
+		 - the response object, which is used to send back an HTTP response to the client.
+
+  step 3 : Listening for Requests  --> server.listen(PORT, () => {  console.log(`Server running on port ${PORT}`); });
+
+	After creating the server, you call the server.listen() method,
+        specifying the port number and optionally the hostname where the server should listen for incoming requests. 
+	This tells the Node.js runtime to start listening for HTTP requests on the specified port.
+	
+	- by not specifying a hostname this means it will be accessible both locally (e.g., localhost) 
+	  and from any external IP address reaching your machine on port
+
+	- server.listen() takes 2 arguments :
+		post_num , callback function called when server listens to port num 
+
+
+ step 4 : handling requests
+	When a request is received by the server, the callback function provided to http.createServer()
+
+-- this is the native js	
+const http = require("http");
+const server = http.createServer((request, response)=>{
+
+    console.log(`request is hitting server: url: ${request.url}`);
+
+    if(request.url=="home"&& request.method=="get"){
+        // code ....
+    }else if(false){
+
+    }else if(false){
+
+    }else{
+
+    }
+    // request loading untill I start reply with reponse 
+    response.write("ssss");
+    response.end(); 
+  
+});
+
+server.listen(7777, ()=>{
+    console.log(`Server running on port ${7777}`); 
+})
+
+------------------------------------------------------------------------------------
+
+
+<< RESTFUL API >>
+
+client -----------http request-------------> sever
+       <---------http response------------- 
+
+- channel between client and server to exchange data
+
+--------------------------------------------------------------------
+
+the difference between API, REST API, RESTFUL API
+
+API: allows different software applications to communicate with each other.
+
+
+------------------------------------------------------------------------------------
+
+<< backend structure >>
+
+- BOX WEB-API
+	logging middleware -> authentication middleware -> studentRouter -> departmentRouter -> .......  -> not found middleware -> error middleware
+
+
+endpoint:  typically refers to a specific URL that represents a particular resource or service on a server.
+
+- note: when a request enters an endpoint it waits for response, but 
+--------------------------------------------------------------------------------------------------------------------
+
+<< using express >>
+
+- it's like jequery for javascript
+- facilitate nodejs code
+- instead of handling all requests inside server.createServer() callback function in native nodejs which may be complicated you will
+  be able to divide your code in MVC
+
+- has a middlawares: control the flow of http request
+
+- ability to divide your code in MVC
+
+
+-- steps of creating server using express
+ 
+	const express = require("express");
+
+	// creating server-------------------
+		const server = express();
+
+		server.listen(7777, ()=>{
+    			console.log(`Server running on port ${7777}`); 
+		})
+
+//-------- box webApi---------------
+
+// 1. logging MW
+	server.use((request, response, next)=>{
+    		console.log('url:'+ request.url, '  method: '+ request.method);
+
+    		next(); // you're free to go to the next MW
+    		// next : takes only error object and in this case it will jump to error MW
+	});
+
+// 2. Auth MW
+	server.use((request, response, next)=>{
+    	let auth = true;
+    	if(auth){ // true
+        	console.log('hello from Auth MW');
+        	next();
+    	}else{
+        	next(new Error("error man"));
+    	}
+	});
+
+	// 3. routes [end points]
+
+
+	//4. not found MW
+	server.use((request, response)=>{
+    		response.status(404).json({data: "not found"});
+	});
+
+	//5. error middleware takes four arguments in callback function
+	server.use((error, request, response, next)=>{
+	    response.status(500).json({data: error.message });
+	});
+--------------------------------------------------------------------------------------------------------------
+
+<< morgan package >>
+
+install
+	npm install morgan --save-dev
+
+used to log details about incoming request, such as the HTTP method, URL, response status code, response time, and more
+
+server.use(morgan(':method :url :status'));
+
+
+
+
+-------------------------------------------------------------
+<< cors package >>
+
+npm install cors
+
+- CORS is a security feature implemented to restrict requests from one specific domain
+- CORS allows servers to specify which origins are allowed to access its resources
+
+- origin: in the context of web security refers to the combination of protocol (e.g., http, https), domain, and port 
+	http://example.com
+	https://sub.example.com
+	http://localhost:3000
+
+- CORS Headers:
+	- When a browser makes a cross-origin request, it includes an Origin header indicating the origin of the request.
+	- The server can respond with CORS headers to inform the browser whether the request is allowed.
+	- CORS headers include Access-Control-Allow-Origin, Access-Control-Allow-Methods, Access-Control-Allow-Headers, Access-Control-Allow-Credentials, etc.
+
+
+
+steps: 
+	const cors = require("cors");
+
+	server.use(cors({
+  		origin: ['http://example.com', 'https://sub.example.com']
+	}));
+
+ - Requests from any of these origins will be allowed.
+--------------------------------------------------------------------------------------------------------------------------------
+
+http object: url, method(get, post, put, patch, delete)
+		put: replace row
+		patch: update row
+
+
+

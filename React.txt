@@ -1,0 +1,358 @@
+<< intro>>
+
+- ES7 React/Redux/Styled
+	rfc
+
+- enure that you install nodejs on your device
+
+
+- in react we don't interact direct with dom
+
+
+- to create new project: 
+	npx create-react-app project_name
+	new folder with name project_name will be created containing the files of project
+
+- to run project : npm start
+
+
+- component can be created using:
+	class component 
+	function component
+
+-- React project structure:
+	-- index.html --> your single page or main file
+		at body --> <div id="root"></div> // acts as the container for the entire React application
+		Notice that there is no explicit <script> tag pointing to index.js. This is because Create React App handles this behind the scenes.
+
+	-- index.js : renders the root component ( <App /> ) into the DOM 
+
+- index.html file --> 
+- App componenet  --> the root component
+
+
+- we Render component using function component name
+	
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+
+<< JSX >>
+
+- java scriot XML
+
+- syntax sugar for code that will be converted to js, it enable us to make 
+
+- example 
+	function App() {
+  	  return (
+    		<div className="App">
+      		    <div>hello</div>
+    	 	</div>
+  	);
+       }
+
+-- the function must return container including all
+-- we here use className instead of class
+-- style={{color:'red', backgroundColor:'green'}}
+
+
+-----------------------------------------------------------------
+
+<< components >>
+
+- make folder for components 
+
+- create component example
+	- create file for  example eith name Header.jsx, the implementation
+	  export function Header(){
+		return (<header> <h1>Welcome</h1></header>)
+  	  }
+ 	- at App.js file
+		import {Header} from '' 
+		<Header/> or <Heaader> </Header>
+
+
+
+- when you import component its imports are included also
+
+- <React.Fragment> <React.Fragment/> -> it's container that not rendered in page DOM , you can use <> </>
+
+------------------------------------------------------------------------------------------------------------------------
+
+<<binding>>
+
+let variable = "content section"
+
+export function Header(){
+		return (<header> <h1>{variable}</h1></header>)
+  	  }
+
+-----------------------------------------------------------------------------------------------------------
+
+<< images >>
+
+-- add the images in the public and use img tag as usual
+
+-- at src make folder assets and add folder into it but you need to import the image you want to use
+	import flower_image from ''
+	<img src={flower_image}/>
+	
+-------------------------------------------------------------------------------------------------------------
+
+<< react packages>>
+
+- bootstrap
+	npm i boostrap
+	at index.js
+		import "bootstrap/dist/css/bootstrap.min.css"
+		import "bootstrap/dist/js/bootstrap.bundle.js"
+
+- react-bootstrap
+	- npm i react-bootstrap
+
+- install bootstrap and react-bootstrap
+	npm i bootstrap react-bootstrap
+
+
+- install bootstrap-icon
+	npm i bootstrap-icons
+	at index.js
+		- import "bootstrap-icons/font/bootstrap-icons.css"; 
+
+
+
+
+- npm i react-router-dom@6.4
+
+- npm i axios  // to connect with API
+
+-----------------------------------------------------------------------------------
+
+<< react virtual dom >>
+
+- each element has a unique key that enhance the performance
+  key = {index}
+
+------------------------------------------------------------------------------------------------------------
+
+<< css module >>
+
+1. create file -->  ProductItem.module.css 
+	.cardImg{
+    		width: 100%;
+    		height: 220px;
+  	}
+	// note you can not make the name of class card-Img
+
+2. at component import it --> import styles from '../CssModules/ProductItem.module.css' 
+
+3. use it at your element --> <Card.Img className={styles.cardImg}
+---------------------------------------------------------------------------------------------------------------------------
+
+<< destructuring >>
+	
+	let obj = {title: 'Child', desc: 'hello from child'}
+	
+    let {title} = obj; // note that you must use name like object key
+    console.log(title);  // 'Child'
+
+    let {X} = obj;
+    console.log(X);  // undefined 
+
+    let Y = {...obj}; // Y = {title: 'Child', desc: 'hello from child'}
+
+
+	let obj = { data: {title: 'Child', desc: 'hello from child'} }
+	let {data: {title, desc}} = obj;
+	console.log("title ="+title+ ", desc=" +desc); / title =Child, desc=hello from child
+
+
+<< componenet interaction >>
+
+-- send data from parent component to child component
+	- at parent 
+ 		return (
+    		<div> <ChildComponent title="Child" desc="hello from child"></ChildComponent> </div>
+  		)
+	- at child component
+		// the data sent from parent to child will be in the form of object	
+		export function ChildComponent(props) {
+		console.log(props);  // {title: 'Child', desc: 'hello from child'}
+    	return ( <div> child component </div>)
+	}
+	// ChildComponent( {title, desc} )
+
+
+-- send data from child to parent
+	1. at parent we will send a function ,
+	2. calling of this function will be at child
+	3. at calling I send to the function the data
+
+
+------------------------------------------------------------------------------
+
+as a prent componenet I can send children with child component
+
+- at parent componenet
+	<ChildComponent>
+		<p>hello from p</p>
+	</ChildComponent>
+
+- at ChildComponent
+	{props.chiildren}
+------------------------------------------------------------------------------------
+
+
+<< firing event in react >>
+
+let increase(){
+	console.log("increase function called");
+}
+
+<button onClick={increase}></button> // note: we don't onClick={increase()} like ordinary
+<button onClick={()=>{}console.log("function called");}></button>
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+
+<< React Hooks >>
+
+- useState() // to rerender the component 
+	let [stateName, setStateName] = use(init val to state)
+	let [count, setCount] = useState(0)
+	// count = 0;
+	// setCount is the function that will be called to change the value(state) of count
+	// commonly method call the method that change the state of variable setCount(count+1)
+
+- useEffect()
+	- called explicitly after initial render of component 
+	- useEffect(callback function, array)
+	- if array = [] // called only once, (component did mount)
+	- if array = [count] // called  after initial rendering and called after any change in state count (component did update & mount)
+	- if array not passed to useEffect the callback function will be called after init rendering and after any change of any state
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+<<<  routing >>>
+
+- npm i react-router-dom@6.4
+
+- import { Route, RouterProvider, createBrowserRouter, createRoutesFromElements,} from "react-router-dom";
+
+- at App.js
+	const Router = createBrowserRouter(
+		createRoutesFromElements(
+			<>
+				<Route path='/' element= {</Home>} />
+				<Route path='*' element= {</NotFound>} />
+			</>
+		)
+	);
+
+	return (
+		<>
+			<MyNav/>
+			<RouterProvider router={Router}></RouterProvider>
+		</>
+	);
+	-------------------------------------------------------------------------------------
+	// use this one
+	const Router = createBrowserRouter(
+		createRoutesFromElements(
+		   <>
+		       <Route path='/' element={<SharedLayout />}>
+			 <Route index element={<Home />} />
+			 <Route path='products' element= {<Products/>} />
+			 <Route path='products/:id' element= {<ProductDetails/>} />
+			 <Route path='products/:id/edit' element= {<ProductForm/>} />
+			 <Route path='*' element= {</NotFound>} />
+		       </Route>
+		   </>
+		)
+	);
+
+	return (
+		<>
+		   <RouterProvider router={Router}></RouterProvider>
+		</>
+	);
+
+	at SharedLayout.jsx
+		<>
+			<MyNav>
+			<Outlet>
+		<>
+		NOTE: 
+			// / --> render SharedLayout and Home
+			// /products --> render SharedLayout and products
+
+	----------------------------------------------------------------------------------------- 
+	at navBar component
+	<Link to="/products" className="nav-link">products</Link>
+	
+	<NavLink className={( { isActive } ) => isActive ? 'text-success nav-link' : 'nav-link'} to="/products">Products</NavLink>
+	isActive property is used to determine whether the path specified in the to attribute matches the current URL Path
+
+
+----------------------------------------------------------------------------
+
+<< navigation >>
+
+- react router dom
+
+let navigate = useNavigate();
+
+navigate('/products');
+
+-------------------------------------------------------------------------------
+
+<< parameter >>
+
+react router dom
+
+const {id} = useParams();
+
+-----------------------------------------------------------------------------------
+
+way to organize your code
+
+at pages folder 
+	- create index.js file and write the imports you need
+		import { Home } from "./Home";
+		import { NotFound } from "./NotFound";
+		export { Home, NotFound }
+
+	- at another js file
+	   - import { Home, NotFound } from "./pages";  //if you write folder name ./pages directly it will refer to index.js file inside that folder
+
+--------------------------------------------------------------------------------------------------------------------------------------
+
+<< consume API >>
+
+-- npm i axios
+
+import axios from "axios";
+
+const baseURL = "http://localhost:3333/products";
+
+const getAllProducts = () => axios.get(baseURL);
+
+const getProductById = (productId) => axios.get(`${baseURL}/${productId}`);
+
+const addNewProduct = (product) => axios.post(baseURL, product);
+
+const editProduct = (productId, product) => axios.put(`${baseURL}/${productId}`, product);
+
+const deleteProduct = (productId) => axios.delete(`${baseURL}/${productId}`);
+
+export {
+	getAllProducts,
+	getProductById,
+	addNewProduct,
+	editProduct,
+	deleteProduct,
+};
+
+------------------------------------------------------------------
+

@@ -1,0 +1,105 @@
+.mudlike-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+}
+
+    .mudlike-table th,
+    .mudlike-table td {
+        padding: 5px;
+        border: 1.7px solid #b8b8b8;
+        vertical-align: middle;
+    }
+    .mudlike-table th {
+        border-width: 3px;
+        border-color: #707378;
+    }
+
+
+    /* Table header styling */
+    .mudlike-table thead {
+        background-color: black; /* light gray */
+        color:white;
+        font-weight: 600;
+    }
+
+    /* Zebra striping for rows */
+    .mudlike-table tbody tr:nth-child(odd) {
+        background-color: #f9fafb;
+    }
+
+    .mudlike-table tbody tr:nth-child(even) {
+        background-color: #ffffff;
+    }
+
+    /* Responsive labels */
+    .mudlike-table td::before {
+        content: attr(data-label);
+        display: none;
+        font-weight: bold;
+        color: #495057;
+    }
+
+    /* Actions cell style */
+    .mudlike-table .action-cell > * {
+        margin:5px;
+    }
+
+/* Mobile view */
+@media (max-width: 800px) {
+    .mudlike-table thead {
+        display: none;
+    }
+
+    .mudlike-table, .mudlike-table tbody, .mudlike-table tr, .mudlike-table td {
+        display: block;
+        width: 100%;
+    }
+
+    .mudlike-table tr {
+        margin-bottom: 1rem;
+        border: 1px solid #dee2e6;
+        border-radius: 0.5rem;
+        padding: 0.75rem;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        background-color: #fff;
+/*        font-weight:bold*/
+    }
+
+    .mudlike-table td {
+        border: none;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #f1f1f1;
+    }
+
+    .mudlike-table td::before {
+        display: inline-block;
+    }
+
+    .mudlike-table td:last-child {
+        border-bottom: none;
+    }
+
+    /* Stack action buttons vertically on small screens */
+    .mudlike-table .action-cell {
+        flex-direction: column;
+        gap:5px;
+        width: 100%
+    }
+
+    @media(max-width: 576px){
+        .mudlike-table .action-cell > * {
+            width: 100%;
+        }
+    }
+    
+    @media(min-width: 576px) {
+        .mudlike-table .action-cell > * {
+            width: 50%;
+            align-items: center;
+        }
+    }
+}

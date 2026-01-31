@@ -1,0 +1,192 @@
+<< array >>
+
+- to make an array --> let val = ["ahmed", "mohamed", "samir"];
+	console.log(va1[0][1]); // h
+
+	let val = ["ahmed", "mohamed", "samir", ["ali" , "wael" ] ];  
+	console.log(val[3][1]);  // wael 
+	console.log(val[3][1][2]);  // e 
+
+- note we can ovveride element in array with array and vice versa
+  val[2] = ["sameh" , "ibrahem"];
+
+- to check if the variable is array --> Array.isArray(val);
+
+- var arr = [1, "ahmed", true, function(){console.log("ahmed")}]
+
+- to get the length of array --> arr.length 
+- let arr = ["ahmed" , "mohamed" , "samir"];
+  arr.length // 3
+  arr[5]="wael"; // it will added to arr and the value at index 3 , 4 will be empty
+
+- unshift("item1", "item2" , ...) -> add elements at first
+- shift(); remove the first element
+- push("item1", "item2" , ...) -> add elements at end
+- pop(); remove the last element
+
+- indexOf(value[req], start_index= 0 [optional]); 
+	// get the index of element , start search for element from index  0 , return -1 if the value not exist
+- lastIndexOf(value [mandatory] , start=str.length-1[optional])  
+	// start searching from end and return the index of value, return -1 if the value not exist
+- includes(value[req] , start_index= 0 [optional])   // check if element exist in array or not
+
+- sort(); // sort based on ascii code
+	let arr = [1,2,10,100,7];
+	console.log(arr.sort());  // [1, 10, 100, 2, 7]
+
+- slice(start index=0 [optional] , end = length [optional] not including end) , if end param -1 means the last index // return new array
+
+- splice(start_index [req] , deleteCount [opt] = arr.length - start_index ,items_to_add[opt])
+  Removes elements from an array inserts new elements in their place if you want 
+  returning the deleted elements.
+	let arr = ["ahmed" , "mohamed", "samir"];
+	console.log(arr.splice(0));  // ["ahmed" , "mohamed", "samir"]
+	console.log(arr);   // []
+	console.log(arr.splice(0,1));  // ['ahmed']
+	console.log(arr);	      // ['mohamed', 'samir']
+	console.log(arr.splice(0,1,"amr" , "omer")); // ['ahmed']
+	console.log(arr);			     // ['amr', 'omer', 'mohamed', 'samir']
+
+- concat() // Combines two or more array and returns one array
+	let arr1 = ["ahmed" , "mohamed", "samir"];         
+	let arr2 = ["wael" , "fatma"];
+	let arr3 = ["ali" , "mohamed",];
+	console.log(arr1.concat(arr2));		// ['ahmed', 'mohamed', 'samir', 'wael', 'fatma']
+	console.log(arr1.concat(arr2, arr3));	// ['ahmed', 'mohamed', 'samir', 'wael', 'fatma', 'ali', 'mohamed']
+	console.log(arr1.concat(arr2, arr3 , "fawzy")); // ['ahmed', 'mohamed', 'samir', 'wael', 'fatma', 'ali', 'mohamed', 'fawzy']
+	console.log(arr1.concat(arr2, arr3 , "fawzy" , ["basem" , "khaled"])); // ['ahmed', 'mohamed', 'samir', 'wael', 'fatma', 'ali', 
+							'mohamed', 'fawzy', 'basem', 'khaled']
+
+- join(separator=',') // Adds all the elements of an array into a string, separated by the specified separator string .
+	let arr1 = ["ahmed" , "mohamed", "samir"];
+	let arr2 = ["wael" , ["fatma" , 'ali'] ];
+	console.log(arr1.join());     // ahmed,mohamed,samir
+	console.log(arr1.join(''));   // ahmedmohamedsamir
+
+	console.log(arr2.join('|'));  // wael|fatma,ali
+	console.log(arr2.join(""));   // waelfatma,ali
+	
+- reverse() // reverse array elements
+
+- find()
+	- find(function(arrElement[req], currentElementIndex[opt], current_array[opt] array that find perform operation on){});
+	- Returns the value of the first element that match the condition , return undefined if there is no element match 
+	  var arr = [1,5,4,7,8,4,2,5,6,99,7,4];
+	  var res = arr.find(function(element){
+    		return element > 44;
+	  });
+	  console.log(res);	// 99
+
+findIndex(): 
+	- it's like find() but the difference it returns the index of the element that match the condition
+- map()
+	- creates a new array from calling a function for every array element.
+	- does not execute the function for empty elements.
+	- does not change the original array.
+	- can take a function as paramter
+	- map(function(arrElement[req], currentElementIndex[opt], current_array[opt] array that map perform operation on){}, 
+		thisArg[opt] An object to which the this keyword can refer to);
+	- can takes a normal function as paramter
+
+	let arr = [1,2,3,4];
+	console.log(arr.map(element=>2*element)); // [2,4,6,8]
+	console.log(arr.map(function(element){
+    		return 5*element;
+	}));   // [5,10,15,20]
+
+	function double(num){
+		return num*2;
+	}
+	console.log(arr.map(double));  // [2,4,6,8]
+
+
+- filter 
+	- create new array with elements that passes the condition
+	- map(function(arrElement[req], currentElementIndex[opt], current_array[opt] array that map perform operation on){}, thisArg[opt] An object to which the this keyword can refer to);
+	- can takes a normal function as paramter
+	let arr =  ["ahmed" , "amgad", 'khaled'];
+	console.log(arr.filter((ele)=>
+    		ele.startsWith('a')
+	));
+
+- every() : check if all elements pass the condition
+- some()  : check if one element element pass the condition
+
+- forEach
+	- forEach(function(arrElement[req], currentElementIndex[opt], current_array[opt] array that map perform operation on){}, thisArg[opt] An object to which the this keyword can refer to);
+	- calling a function for every array element
+	- doesn't return anything	
+	- can takes a normal function as paramter
+	- used when you need to loop on html elements, and no need to make another array
+
+- reduce
+	used to perform operations on array elements and return one single value as example sum of array elements
+	reduce(function(accumulator, currentVal, currentIndex, currentArray){}, initialValue)
+		- accumulator : the variable that hold the previous result of last oprtation , it starts with the first value of array or initialValue if provided
+		- currentVal  : the current element being proccessed in array , it starts with the first element of array or second value if initialValue not provided
+		- index	      : the index of current element being proccessed in array 
+		
+		let arr = [1,2,3,4,5];
+		console.log(arr.reduce(function(acc,curVal){
+    			return acc+curVal;	
+		}));
+		// 15
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+// < array destructing >>
+// allow us to extract data from arrays, maps and objects and set them into distinct variables 
+
+let arr = ["ahmed", "mohamed", "samir", "elsayed"];
+
+let [a, b, c] = arr;
+console.log(a); // ahmed
+console.log(b); // mohamed
+console.log(c); // samir
+
+[a, , , b] = arr;
+console.log(a); // ahmed
+console.log(b); //elsayed
+
+
+var arr = ["ahmed", "mohamed", "samir"];
+var [y,x] = arr;
+console.log(x); // mohamed
+console.log(y); // ahmed
+
+[y,,x] = arr;
+	console.log(x); // samir
+	console.log(y); // ahmed
+
+[x,...y] = arr;
+console.log(x);  // ahmed
+console.log(y);  // ["mohamed", "samir"]
+
+
+let person = {
+	fname: "ali",
+	lname: "ahmed",
+	age: 20,
+	color: "red",
+};
+
+let { fname: n, age: a } = person;
+	console.log(n);  // ali
+    	console.log(a);  // 20
+
+let { fname: fname, age: lname } = person;  // the syntax sugar => let { fname, lname } = person; in case of key and variable is the same name
+	console.log(n);  // ali
+	console.log(a);  // ahmed
+
+----------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+----------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+----------------------------------------------------------------------------------------------------------------------------------------

@@ -1,0 +1,236 @@
+
+-- at shared folder
+   at PaginationSettings.ts file
+	export class PaginationSettings{
+    		static pageSize: number = 1;
+	}
+
+-- at ts file
+
+//----------- pagination variables ------------------
+  pageProjects: ProjectGetDTO[] = []; // array to store the current page projects
+  count:number = 0;		  // #search results
+  currentPage: number = 1;	  // current page
+  pageNumbers: number[] = [];	  // array that has the paginations numbers
+  totalPages: number = 0;	  // #total pages
+
+  // ------------- search variable -----------------------------
+   selectedSearchType: SearchType = SearchType.ProjectName; 
+  private searchInputSubject = new Subject<HTMLInputElement>();
+  private inputSearchTxt: string| null = null;
+
+
+  constructor(private projectService: ProjectService){
+    this.currentPage = 1; 
+    this.searchInputSubject.pipe(
+      debounceTime(1500),  
+    ).subscribe((searchInput: HTMLInputElement) => {   
+      this.performSearch(searchInput);  // Call your search function here
+    });
+  }
+
+  ngOnInit(): void {
+    this.startUp();
+  }
+
+  startUp(){
+    
+    this.getProjectsCount();  // setCountAndTotalPages() is called within, generatePageNumbers()
+    this.getProjectsByPage(this.currentPage);
+  }
+
+
+  performSearch(searchText: HTMLInputElement) {
+ 
+    console.log(`performSearch(${searchText.value}) is called`)
+
+    if(searchText.value.trim()!=""){
+
+      this.currentPage = 1;
+      forkJoin({
+        projectsData:  this.projectService.getProjectsByPage(this.currentPage, this.selectedSearchType, searchText.value),
+        projectsCount: this.projectService.getProjectsCount(this.selectedSearchType, searchText.value)
+  
+      }).subscribe({
+        next: ({projectsData, projectsCount})=>{
+         this.pageProjects = projectsData;
+         this.setCountAndTotalPages(projectsCount.count);
+        }
+      })
+      
+    }
+  }
+
+
+  ngOnDestroy() {
+    this.searchInputSubject.complete();
+  }
+
+  onSearchInputChange(event: Event) {
+    const target = event.target as HTMLInputElement;
+    this.inputSearchTxt = target.value.trim()
+
+    if (this.inputSearchTxt) {
+
+      console.log(`onSearchInputChange(${this.inputSearchTxt}) is called and search input has a value`);
+      this.searchInputSubject.next(target);
+
+    } else {
+
+      console.log("onSearchInputChange() is called and search input has no value");
+      this.startUp();
+      return;
+    }
+  }
+
+
+
+  getProjectsCount(){
+    this.projectService.getProjectsCount().subscribe({
+      next:(data)=>{
+      
+        console.log(`getProjectsCount() is called and count = ${data.count}`)
+        this.setCountAndTotalPages(data.count);
+      },
+      error: (error)=>{console.log(error);} 
+    })
+  }
+
+
+  setCountAndTotalPages(count: number){
+    this.count = count;
+    this.totalPages = Math.ceil(this.count / PaginationSettings.pageSize);
+    this.generatePageNumbers();
+    console.log(`setCountAndTotalPages() is called, #pages = ${this.totalPages}, count=${count}`)
+  }
+
+
+  generatePageNumbers(): number[] { 
+    const start = Math.max(1, Number(this.currentPage) - 2);
+    const end = Math.min(Number(this.totalPages), Number(this.currentPage) + 2);
+
+    this.pageNumbers = [];
+    for (let i = start; i <= end; i++) {
+      this.pageNumbers.push(i);
+    }
+    return this.pageNumbers;
+  }
+
+
+  getProjectsByPage(pageNumber: number){
+    this.currentPage = pageNumber;
+    this.projectService.getProjectsByPage(pageNumber, this.selectedSearchType, this.inputSearchTxt).subscribe({
+      next: (data: ProjectGetDTO[])=>{
+        this.pageProjects = data;
+        console.log(`getProjectsByPage(${pageNumber}) is called`)
+      },
+      error: (error)=>{console.log(error)}
+    })
+  }
+
+
+  deleteProject(id: number, name: string){
+    showSweatAlert('warning', 'Delete Project', `do you want to delete the [${name}] project`,true).then(result=>{
+      if(result.isConfirmed){
+        this.projectService.deleteProject(id).subscribe({
+          next: (data)=>{ 
+              if(data.success){
+                showSweatAlert('info', 'Information', 'project deleted successfully').then(res=>{
+                  this.pageProjects = this.pageProjects.filter(project => project.id !== id);
+
+                  if(res.dismiss || res.isConfirmed ){     
+                    this.count--;               
+                    this.setCountAndTotalPages(this.count)
+                    if(this.pageProjects.length==0 && this.currentPage > 1 ){
+                      this.currentPage--;
+                      this.getProjectsByPage(this.currentPage);
+                    }
+
+                  }
+                });
+              } 
+            },
+            error: (error)=>{
+              console.log('error');
+              showSweatAlert('error', 'Error', 'error while performing operation');
+
+            }
+        })
+      }
+    })
+  }
+
+
+
+  onSearchIconClick(){
+    this.getProjectsByPage(this.currentPage);
+  }
+
+
+
+----- at html-----
+
+<div class="input-group" style="width: 300px;">
+        <div class="input-group-prepend">
+          <select class="form-select bg-light rounded-0 h-100" id="select-search" [(ngModel)]="selectedSearchType">
+            <option value="1" selected>Name</option>
+            <option value="2">Owner</option>
+            <option value="3">Tag</option>
+          </select>
+        </div>
+        <input type="text" class="form-control rounded-0" placeholder="Enter keyword man" (input)="onSearchInputChange($event)">
+
+        <button class="btn btn-primary rounded search-icon rounded-0" (click)="onSearchIconClick()">
+            <i class="bi bi-search"></i>
+        </button>
+</div>
+
+
+
+<nav aria-label="Page navigation">
+    <ul class="pagination" style="cursor: pointer;">
+        
+        <!-- Previous Button -->
+        <li class="page-item" [class.disabled]="currentPage === 1">
+            <a class="page-link" (click)="getProjectsByPage(currentPage - 1)">Previous</a>
+        </li>
+
+        <!-- First Page and Ellipsis if needed -->
+        <ng-container *ngIf="currentPage > 3">
+            <li class="page-item">
+                <a class="page-link" (click)="getProjectsByPage(1)">1</a>
+            </li>
+            <li *ngIf="currentPage > 4" class="page-item disabled">
+                <span class="page-link">...</span>
+            </li>
+        </ng-container>
+
+        <!-- Page Number Buttons -->
+        <ng-container *ngFor="let i of generatePageNumbers()">
+            <li class="page-item" [class.active]="i === currentPage">
+                <a class="page-link" (click)="getProjectsByPage(i)">{{ i }}</a>
+            </li>
+        </ng-container>
+
+        <!-- Last Page and Ellipsis if needed -->
+        <ng-container *ngIf="currentPage < totalPages - 2">
+            <li *ngIf="currentPage < totalPages - 3" class="page-item disabled">
+                <span class="page-link">...</span>
+            </li>
+            <li class="page-item">
+                <a class="page-link" (click)="getProjectsByPage(totalPages)">{{ totalPages }}</a>
+            </li>
+        </ng-container>
+
+        <!-- Next Button -->
+        <li class="page-item" [class.disabled]="currentPage === totalPages">
+            <a class="page-link" (click)="getProjectsByPage(currentPage + 1)">Next</a>
+        </li>
+    </ul>
+</nav>
+
+
+
+
+
+

@@ -1,0 +1,48 @@
+<< HttpErrorResponse >>
+- this is an example when you call end point and this end point returns BadRequest(), or Unauthorized
+
+post 
+https://localhost:7128/api/User/login 401 (Unauthorized)
+
+
+HttpErrorResponse
+	status: 401
+	ok: false
+	url: "https://localhost:7128/api/User/login"
+	error:
+   	message: "wrong email or password"
+   	success: false
+	error: [the error returned from API]
+
+- The catchError operator in Angular’s HttpClient catches errors of type HttpErrorResponse
+
+-------------------------------------------------------------------------------------------------------
+
+
+<< to make your custom HttpErrorResponse >>
+
+- at Interfaces folder
+	create IHttpErrorResponse.ts 
+
+import { HttpErrorResponse } from '@angular/common/http';
+export interface IHttpErrorResponse<T> extends HttpErrorResponse {
+    apiErrorResponse: T | null; // Custom backend error response
+}
+
+
+- using at Login service
+
+public Login(userLoginDTO: LoginDTO): Observable<LoginResultDTO> {
+   const url = `${this.baseUrl}/User/login`;
+   return this.http.post<LoginResultDTO>(url, userLoginDTO)
+       .pipe(   
+           catchError((httpError: IHttpErrorResponsee<LoginResultDTO>) => {
+              httpError.apiErrorResponse = httpError.error;
+              return of(httpError.apiErrorResponse!); // wraps a value inside an Observable and immediately emits it.
+           })
+       );
+}
+
+--------------------------------------------------------------------------------------------------------------
+
+

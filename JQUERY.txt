@@ -1,0 +1,199 @@
+<<introduction >>
+
+JQuery : is a JS library that facilitates JS code
+JQuery sologan: write less do more
+JQuery : designed for supporting animation , facilitates dom operations
+
+$ :  refers to jQuery object
+$ == jQuery
+$("selector").action() // the main standard
+
+
+<div>
+    <h3>ahmed</h3>
+    <h3>mohamed</h3>
+    <h3>samir</h3>
+</div>
+jQuery("div h3:first-of-type").css("color","red");
+$("div h3:first-of-type").css("color","red");
+
+// when your page is rendered and be ready do this function
+$(document).ready(function(){
+    // your code
+});
+------------------------------------------------------------------------------------------------------
+
+<< select element >>
+
+- $("p")        // get all p 
+- $("p")[0]     // once you use [] you convert the jQuery object to html object use instead $("p").eq(0)
+- $("p").eq(0)  // the p at index 0 in the returned collection
+
+- $("p").css("color","red");          // implement css method on all elements inside returned collection
+- $("p").slice(2).css("color","red"); // implement css on method elements starts from index 2 to end
+
+- $("li").not(":last-child")
+- $("li").even()
+
+- $(":input")   // any element accept input from user
+- $("h3:contains('test')")  // the h3 that contains test  ,it's not a valid css selector 
+- $(":header")  // all header elements
+- $(":focus")   // the element currently focus 
+- $(":focus")   // the element currently focus 
+- $("div").has("p").css("color", "red"); // element that has p in its ancestors
+- $(":parent")  
+- $(":empty")   
+- $(this) // refer to element that fires the selector , current element
+------------------------------------------------------------------------------------------------------
+
+<< content >>
+
+jQuery("div h3:first-of-type").text("this is hhh");
+$("h3").eq(0).text("change your plan");   // it overwrites the old content
+$("h3").eq(0).html("change your plan2"); 
+$("div").eq(0).html("<h3>aaa</h3>");      // it overwrites the old content
+$("input").val("add");                      
+console.log($("h3").eq(2).text());       // get the text inside the element
+console.log($("h3").eq(2).html());       // get the content inside the element like innerHTML
+
+-----------------------------------------------------------------------------------------------------------------
+
+<< create element >>
+    let element = $("<h3>hello from h3</h3>");
+
+-------------------------------------------------------------------------------------------------------
+
+<< actions >>
+
+- each() : 
+    $("h3").each(function(){
+        console.log($(this).text());
+    });  // it will get the text of each h3
+
+- click : deprecated
+    $("h3").click(function(){console.log("clicked")});
+
+- on("event", function(){})
+    $("h3").on("click", function(){console.log("clicked")});
+
+-what if i want to make an click event to p elements that are created and will be created
+    $("p").on("click", function(){}); // it will work with the created p only, what about p that will be created
+    the sol: $(".container").on("click", "p", function(){}); //the current and future p inside .container will have click event
+
+off() : to remove function from event 
+    $(".container").off("click","p",functioName) // must assign functionName not anonymous function
+
+- css()  // add properties in inline style
+    $("h3").css("color", "red");
+    $("h3").css({
+        'padding':'10px',
+        'background-color':"grey"
+    }); // note do not write [;] inside ''
+
+- addClass() , removeClass(), toggleClass()
+    $("h3").eq(0).addClass("styledClass");
+
+- attr()  // assign and get attribute of element
+    $("h3").eq(0).attr("id", "hID");
+        $("h3").attr({
+            'id':'hID',
+            'class':"myClass"
+    });
+    $("#w3s").attr("href"); // get attribute value
+
+- append()
+    let ele1 = $("<h3>hello from h3</h3>");
+    let ele2 = $("<h3>hello from h3</h3>");
+    $("h3").append(ele1, ele2);
+
+- prepend() // insert at first
+    $("h3").prepend(ele1);
+    let item = $(".container").eq(0);
+    $("body").prepend(item)  // it will move the element
+
+- insertBefore() , insertAfter()
+    let ele1 = $("<h3>hello from h3</h3>");
+    $(ele1).insertBefore(".main");
+    $(ele1).insertAfter(".main");
+
+- before(), after()
+    $(".main").before(ele1); // before .main insert ele1
+    $(".main").after(ele1); // after   .main insert ele1
+
+- remove()
+    $("h3").eq(0).remove();
+
+- empty()
+    $("div").empty();
+
+- clone()
+    $("body").append($(".main").clone());
+    let e = $("div").clone();
+
+- hover()
+    $("div h3").hover(mouseinFunc, mouseoutFunct)
+
+--------------------------------------------------------------------------------
+
+<< animation >>
+
+- slideUp() : it make element display: none
+    $(".main").on("click",function(){
+        // $(this).slideUp(1000);
+        $(this).slideUp(2000 , function(){console.log("click")}); // the function will be fired when the event finished
+
+    })
+
+- slideDown() : it makes the element display from none to its default 
+
+- slideToggle();
+    $(".main").slideToggle(500);
+
+- fadeOut() , fadeIn(), fadeToggle()
+
+- animate(): customized animation
+    $(".main").animate(
+        {
+            'width':'500px',
+            'height':'500px',
+        }
+        ,2000)
+
+stop(): 
+     $("#animatedDiv2").stop(clearQueue,jumptoEnd);
+     // clearQueue: animation clearQueue
+     // jumptoEnd : move to the end of animation
+     $("#animatedDiv2").stop(false,false);  // default
+     $("#animatedDiv2").stop(true,false);   
+     $("#animatedDiv2").stop(true,true);
+     $("#animatedDiv2").stop(false,true);
+
+--------------------------------------------------------------------------------------------------
+
+<< chaining >>
+
+- $("p").eq(0).text("NEw Text").css({'color':'orange','background-color':'red'});
+--------------------------------------------------------------------------------------------------
+
+<< traversing >>
+
+- children() : get the direct children of element
+    $(".main").children();
+    $(".main").children("p");
+
+- find("p") : get all direct and inside paragraph 
+
+- next()    // direct next
+- prev()    // prev
+- sibling() // all childs[prev and next] on the same level
+- parent()  // 
+
+- end()   // step backword
+    $("#mainContainer").children('a').css("color",'yellow')
+        .end().children('p').css("color",'green');
+   // got to #mainContainer -> children('a') and implement css styles -> step back to #mainContainer -> children('p)-> implement css styles
+------------------------------------------------------------------------------------------------------------------------------
+
+<< make jQuery function >>
+
+$.fn.myFun = function(){ // code }

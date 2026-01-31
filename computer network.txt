@@ -1,0 +1,515 @@
+ 
+what's network : group of devices connected together to share resources 
+any service on the internet called web based -> like web based compiler , web based email , and so on  
+<< network components >>
+
+- computers(end devices) : devices that can send and receives data like pc, tablets, smart phones, labtop , embeded system in machine(IOT)
+- computer peripherals   : any device can connect to PC like printer , scanner
+- connecting devices     : like router and switch and access points help to send data from sender to reveiver
+- transmission medium    : if data transfer via cables [wired media] , wireless media  
+			   
+cable(wired) media: 
+- twisted piar cable: 
+  1. UTP [unshielded twisted pair], 
+     Most common,
+     Easy to install,
+     Less expensive ,
+     Effected By electromagnetic interference 
+     Use RJ-45 connectors
+  
+  2. STP [shielded twisted pair],
+     Hard to install
+     Use RJ-45 connectors
+     
+  3. Coaxial cable
+     High capacity cable
+     Used for video transfer
+     Use BNC connector
+
+– Fiber Optic Cables	
+  The core that carries the signals. It is made of plastic or glass
+  Fiber Optic Types
+	- Single Mode 
+	- Multi-Mode       
+--------------------------------------------------------------------------------------
+
+<< network topologies >>
+ - the organizational way of interconnected nodes of computer network. 
+ - there is Different network topologies
+	- point to point topology : the sender and receiver only with transmission media
+	- bus topology  : Each computer connects to a common cable via connertors,
+			  The ends of the cable have a terminator installed to prevent signal reflections
+	- Ring topology : computer are connected in a physical ring or circle.
+	- Star topology : It has a central connection point [ hub, switch, or router] . the most common
+	- mesh topology : each node has direct cable to each another node on the networks
+ 
+<< computer network categories >>
+- transmission mode
+	simplex     : all the time device is the sender and device is the receiver  [direction of data:  sender -> receiver ]
+	half duplex : at some instance of time only one device can send data
+		      [direction of data:  sender ---> receiver] or [direction of data:  receiver <--- sender ]
+	full duplex : device can be sender and receiver at the same time  [direction of data:  receiver <---> sender ]
+
+- geographical area: LAN (local area network), WAN (wide area network)
+
+- adminstration(model) type: 
+	peer to peer network: all devices have same abilities , no central server , devices used client operating system like windows 10
+			      allowing two or more computer systems to connect and share resources
+                              each device on the network can be a server or a client.
+	
+ 	client server network: client machines conntect to central server , server opering system 
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+- device communicates on a network : means device can send and receive data
+
+NIC (network interface card) : device can't communicate on a network without NIC , link between computer and computer network , 
+
+hub : - have only one collision domain , which means the devices connected to a hub are in a single collision domain 
+      - in a situation where two devices send out their messages simultaneously, a collision will occur, This can cause traffic problems.
+      - have only one broadcast domain
+      - half duplex
+
+switch: - each port of a switch is in one collision domain.
+	- which means the number of collision domains for a switch is related with the switch ports number 
+	- but there is still a problem with switches, there is only a single broadcast domain in the switch.
+	  which means it is not a broadcast domain separator so If a device sends a broadcast message, it will still cause congestion.
+	- work on data link layer
+	- connect devices on the same network
+
+router: - each port is in one collosion domain like switch ,ecah port is in one broadcast domain 
+      : - used to pass data between one or more local area networks (LANs)
+	- connect between networks
+	- port also called -> ethernet port	
+	- work on network layer
+
+access point: - device that provide connection between Peripheral devices
+              - on one hand it connects wireless by its antenna 
+	      - on second hand it connects with infrustructure of the place by using RG-45 connector
+	      - one collision domain : solved by csma/ca (carrier sense multiple access/ collision avoidance) technology that allow
+				       device to send RTS (request to send) and waiting  CTS (clear to send) to send the data
+	      - one broadcast domain  
+	      - can hold more than SSID (service set identifier)
+	      - access point security: - hidden SSID
+				       - filtering the devices that allowed to use my network using MAC address , IP address
+		                       - encryption  data on access point using encryption algorithms like AES  
+
+Repeater: Regenerate the signal over the same network before the signal becomes too weak or corrupted
+-------------------------------------------------------------------------------------------------------------------------------------
+<< websites  info >>
+
+Collision domain:  is a single physical line that a collision can occur. In other words, it is a network domain that allows only 
+	           one device to transfer data at a time. If one more device tries to send data at the same time in a collision domain,
+	 	   collision occurs. This means that there will be data loss
+ 
+broadcast domain: In networking, a broadcast means that we send something that everyone receives, whether they need/want it or not
+		  
+Network congestion refers to a reduction in quality of service (QOS) that causes packet loss, queueing delay
+
+Bandwidth:  is the amount of data that can be transmitted within a fixed time period.
+Latency  :  is the amount of time it takes data to travel from source to destination.
+	   
+
+---------------------------------------------------------------------------------------------------------------------------------------
+
+<< how data is sent from device to another although data type can be text, video , audio , etc... >>
+
+- protocol : rules must be approved by sender and receiver
+
+- yesterday every company created protocol for communication , ISO in 1983 make reference model for communication
+
+- OSI organization make standards for sending data (communication) called  OSI Model -> open system interconnection model
+
+OSI/RM : Open Systems Interconnection Reference Model
+
+
+7. application layer
+	- the layer that interact with the user , the link between user and other 6 layers
+	- Interface to end users
+	- responsible for making communication between applications (application layer) on others computers
+	- specify the suitable protocol according to user request like https,http,DNS, FTP, telnet
+	- provides Many services like: File transfer , Network management , Email 
+
+6. Presentation layer
+	- Finding common presentation between source and Destination
+	- it responsible for making format for data using encryption and compression that can be transmitted over the internet
+	- encrption and compression -> during sending data
+	- decryption and decompression-> during receving data
+
+5. Session layer
+	- establish connection(communication sessions) between sender and receiver
+	- This layer allows users on different machines to communicate
+	- synchronization opertion done by session layer , means adding checkpoints into stream of data -> ALAA ELDIN GAME [checkpoint]
+	- it terminates the session after data is sent from sender to receiver
+
+4. Transport layer
+	- divide Organize) data into segements 
+	- each segement attached with a sequence number and check sum
+	- End-to-end error recovery , End-to-end flow control
+        - Provide reliable transport between sender and receiver
+	- when receving data it makes reassembly opertion using the segment sequence
+	- connection oriented : ensure that there is a connection between sender and receiver before sending data 
+	- connectionless oriented (best effort delivery) : sending data without ensure that there is a connection between sender and receiver
+	- flow control : control the speed of sending and receiving frames between sender and receiver
+	- Session multiplexing:
+	- source and destination ports are added  
+
+3. Network layer 
+	- receiving data in the form of segements and converting it ito packets by adding header 
+	- this header contains the source IP address and destination IP Adress [addressing]
+	- routing operation is done [when device trying to communicate with device on other network network]
+	- It know the best path for the destination (Routing)
+	- it deals with router
+
+2. Data link layer
+	- consist of 2 parts 
+	- the first called logical link contol (LLC) that responsible for converting data into frames ,
+	  
+	- second part : MAC (media access control ) that add to each frame sender and receiver unique physical address (mac address),
+	  connected with physical layer
+	- ensure that frames without errors and complete by adding FCS (frame check sequence ) to each frame
+	- Hop to hop addressing
+	- Error notification(detection) : detects damaged or lost frames
+	- communication on data link layer 
+		unicast   : message from device to device
+		broadcast : message to all devices
+		multicast : message to group of devices existed externally
+
+
+1. Physical layer : 
+	- responsible for converting data into bits and send it
+	- responsible for placing data on transmission media whether it wired or wireless
+	  data is converted to bits then into Electrical form -> with copper
+  	  data is converted to bits then into ligh form -> with fiber optic cable
+	  data is converted to bits then Electromagnetism form -> wireless transmission
+	  
+
+- OSI model not used now -> the used is tcp/ip protocol 
+TCP/IP : Transmission Control Protocol/Internet Protocol
+4. application 
+3. transport
+2. internet
+1. link
+
+
+1. application layer protocols: Communication between processes or applications
+		                specify the suitable protocol according to user request like : 
+	                        HTTP, DNS, FTP, TELNET, SSH, RDP, SMTP, POP3, IMAP4
+	
+  http protocol : 
+	transfer web pages from server to client , 
+	transfer info from client to server
+	Supports the delivery of web pages to the client
+
+  FTP (file transfer protocol): transfer files between client and server  
+  SMTP (simple mail tranfer protocl): send email from client to sender
+  POP3 (Post office transfers Protocol) : receives email from server and emails stored at local storage
+  IMAP4 : receives email from server and emails are not stored at local storage, user can go to his inbox and control it 
+  DNS (domain name system protocol): map(convert) domain name with its IP address
+  DHCP (dynamic host configuration protocol): assign ip address to devices on the network
+  TELNET : manage device remotely has shortage on security as authenticated data doesn't encypted which means data exspose to sniffing
+  SSH    : manage device remotely but it more secure as it encrypt data
+  RDP    : Microsoft protocol used to manage windows device remotely 
+
+2. transport layer protocol : 
+  TCP [transmission control protocol]: 
+	- reliable [ sender will receives acknowledgennt that message is sent without error ] 
+	- synchoronization , 
+        - connected oreinted,
+	- data recovery, using when sending documents, text
+	- Use port numbers
+	- Full duplex
+
+
+  UDP protocol : need high speed of it , unreliable , connectionless , using with video streaming, no recovery, Best-effort delivery 
+
+3. network layer protocol
+   ICMP : check connectivity betweeb devices using command ping
+   ARP  : 
+   IP   :  
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+how many network interface card in your labtop(device) : 3 NIC [wifi , ethernet , bluetooth] which means 3 mac addresses
+					       : and if you have virtual machine it will have vitrual mac also 
+
+<< IP ADDRESS >>
+- IPv4 it's 32 bits (4bytes) (4 octets)
+- IPv6 it's 128 bits
+- The loopback address is a special address (usually 127.0.0.1 in IPv4)
+- 1 octet represented number from 0 to 255
+- it's also known as a logical address
+- any device on the network has an unique IP ADDRESS (like house number in street)
+- unique number assigned to device to communicate with the network
+- operate at nework layer
+- IP address can't ends with 0 as it's reserved for network id
+- IP address can't ends with 255 as it's reserved for broadcasting
+
+- calss A -> 1.0.0.0    to 126.255.255.255     -> network.host.host.host
+- class B -> 128.0.0.0  to 191.255.255.255     -> network.network.host.host
+- class C -> 192.0.0.0  to 223.255.255.255     ->  network.network.network.host
+- class D -> 224.0.0.0  to 239.255.255.255     -> reserved for multicasting
+- class E -> 240.0.0.0  to 254.255.255.255     -> experimental
+- note class A addresses from  127.0.0.1 [local host] to 127.255.255.255 is reserved for loobacking testing
+
+- number of ip addresses is not enough for all devices so ICAN oragnization divide ip address to 
+  1. public ip addresses  [real IP ]  -> routed which means can communicate with internet ,  
+	class A [ public IP range ]   -> 1.0.0.0   to 9.255.255.255
+	class B [ public IP range ]   -> 128.0.0.0 to 172.15.255.255   , 172.32.0.0   to 191.255.255.255 
+	class C [ public IP range ]   -> 192.0.0.0 to 192.167.255.255  , 192.169.0.0  to 223.255.255.255 
+ 
+  2. private ip addresses [local IP]  -> not routed which means can't communicate with internet
+	class A [ private IP range ]  -> 10.0.0.0     to 10.255.255.255 
+	class B [ private IP range ]  -> 172.16.0.0   to 172.31.255.255 
+	class C [ private IP range ]  -> 192.168.0.0 to 192.168.255.255
+
+
+- Nat is used to Translate the private IP address to public IP addresses.
+- ISP [internet service provider] : is a company or organization that provides access to the internet
+
+- router has 2 NIF : internal NIC ( gateway of network devices 192.168.1.1 [local IP address] ) , 
+  external NIC with public IP address that allow devices connected on the network to communicate with the internet
+  the public IP address that assigned to external NIC is given BY ISP [internet service provider]
+	
+- DHCP protocol : is a network management protocol used to assign IP addresses to devices connected to the network 
+- DHCP service : a service exists on your router that give an IP address to the devices , 
+	         and you can limit the devices that take ip address using their mac addresses  
+
+-IP address assigned by 3 ways
+  1. manually by assign static ip address for each device => casue conflict in internal network 
+ 
+  2. automatically using DHCP protocol , each ip address has expired time 
+     the device send broadcasting message [discover message ] and DHCP server will reply on the message with offer ip address , 
+     the device will request for this ip and DHCP server will reply with acknowledgment of using the ip, this operation called dora process 
+ 
+  3. apepa address if there is no ip address assigned to device , operating system will do this mission and assign rondom ip address for the 
+     device and network devices can communicate internally only (not routed), but it's possible that 2 devices has the same ip address as 
+     it assigned rondomly and this lead to conflict
+     apepa IP address always start with -> 169.254.X.X
+ 
+- if you have a server that povide a service on the internet you have better to assign static ip address to this server why 
+   in case of problem occur to DHCP service don't affect on the service
+
+ipconfig/release    -> device will be without ip address
+ipconfig/renew      -> renew the period of expired time of IP address
+------------------------------------------------------------------------------------------------------------------------------------
+
+<< mac address >>
+
+mac address : called also physical address
+	    : stands for Media Access Control address
+	    : static and burned in NIC
+	    : 6 bytes -> first 3 bytes for organization unique identifier , second 3 bytes for the NIC (device identifier) 
+	    : used for local network communication
+	    : operates at data-link layer
+
+<< how the device know the mac address of the destination >>
+	- destination ip you have by its owner  
+	- at first source device make the destination of mac address broadcast as it didn't know the mac address of destination
+	- message is sent to switch and switch store the mac-address in its table if not exist 
+	- message is sent by switch to all devices on the network , data link layer of at each device check the ip-address attached with message 
+	- the device with the same ip-address will respond to the message and switch will store the mac-address of this device in its table if not exist 
+	- once device communicate with another device, it will store the mac address of this device at arp-table to get it faster
+	  rather than using the broadcast that make the network delay , arp table [ip-address , mac address]
+		 
+	- switch has mac-address table [switch_port, mac address]
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------
+<< DNS protocol >>
+
+- application layer protptcol
+- DNS protocol (domain name server ):
+
+- senario is client at first check at its cashing to find the IP address of domain name , if not exist ,
+  client search on hosts file existed locally on C:\Windows\System32\drivers\etc [that was used before DNS] if not exist ,
+  client search at dns service that assigned by DHCP that has a table that map each domain name with its ip address
+	
+  briefly: try to find the ip address of domain name at cashing then hosts file then client search at 
+	   dns service that assigned by DHCP that has a table that map each domain name with its ip address
+
+- it's better for DNS service to be provided by google DNS server [which is 8.8.8.8 and it's assigned automatically in your router]
+- port : 53
+
+command   -> ipconfig/displaydns -> display the cashed domain names with its ip addresses on the device cashaing
+nslookup  -> to query on dns [lets you to enter a host name and find out the corresponding IP address]
+-------------------------------------------------------------------------------------------------------------------------------------
+
+<< ftp protocol >>
+- file transfer protocol
+- responosible for download and upload the file [transfering files between server and receiver]
+- to make the device ftp server
+	- set up ftp server on pc ->  by set up software like fileZella server
+	- create home directory
+	- configure the user by making username and password to the user who can access our home directory
+	- set permission for the user [read(download files) , write (upload files)]
+- to connect to ftp server
+	1. using url     --> write at browser: ftp://ip_address_of_ftp_server then pop up menu will ask you for user name and password
+	2. using command -->
+	   - to connect with the destination ftp device using cmd first make the cmd cursor on c:\ by enter cd.. , then write ftp 
+  	    then ->  open ip_address_of_ftp_server
+	   - to display the shared files using command -> ls
+	   - to display the shared files and permissions using command -> dir
+	   - to get(download) file from the shared directory -> get file_name.extension
+	   - to display the directory of the downloaded file -> lcd
+	   - to uoload file to the shared directory ->  put file_name.extension
+	   - to end the session -> close 
+  	   - to go out from ftp -> bye
+	
+	3. software tool [most commomly used] like fileZella client
+
+
+- uses both TCP and UFP
+- (FTP) : Port 21 for command and control,
+- (FTP) :Port 20 for data transport .
+
+---------------------------------------------------------------------------------------
+<< TELNET , SHH , RDP >>
+
+- protocols used to manage device remotely
+
+- telnet : has shortage on security as authenticated data sends in the form of clear text [doesn't encypted]
+- SSH    : manage device remotely but it more secure as it encrypt data
+- RDP    : Microsoft protocol used to manage windows device remotely 
+
+how to make a device accepts to be managed remotely
+	- enable remote desktop protocol
+	- authentication 
+	- set permission
+
+
+- to create user on your device that you want it mangage remotely -> pc -> right click -> manage -> local users and groups ->
+  users -> right click on window -> new user ->  create user ITI as example -> select user ITI -> right click -> properties ->
+  enter member of tab -> add -> advanced -> find now -> select remote desktop users
+
+- to allow remote access for a user -> go to control panel -> system and security -> allow remote access ->
+   allow remote connection to this computer -> select user -> select ahmed
+
+- how can i connect to device remtoly 
+  on search -> write remote desktop connection -> enter ip of device you want to control it -> enter user and password
+---------------------------------------------------------------------------------------------------------
+
+
+------------------------------------------------------------------------------------------------------------------------------------
+
+<< ports >>
+
+  - there are 65,535 ports on NIC device
+  - ports : منافذ لدخول وخروج الداتا
+
+  - port allows client device to enter the destination device , and use the service published on the port
+  - Each port is associated with a specific process or service , each service published on the server can be accessed by specific port
+  - Ports allow computers to easily differentiate between different kinds of traffic: emails go to a different port than webpages
+  - Most ports are reserved for certain protocols for example, all HTTP messages(request) go to port 80
+  - ports of source and destination are specified in tcp header
+
+port categorized into 3 category :
+1. well known ports  from 1 to 1023 assigned and controlled by ICANN
+2. registered ports  from 1024 to 49151  
+3. dynamic ports   from 49152 to 65535
+
+- ((FTP)) : Port 21 for command and control,
+- (FTP)   : Port 20 for data transport .
+- TFTP : 69
+- HTTP : 80
+- HTTPS: 443
+- TELNET: 23
+- SHH : 22
+- DNS : 53
+- POP : 110
+- smtp 25
+- imap: 143
+- SNMP 161
+
+netstat -n  -> check opened ports on tcp protocol
+netstat -a  -> check opened ports on udp protocol
+
+- you can scan the opened ports on devices on network ,  you can use software like lanPortScanner 
+
+- you can block the port using network firewall
+- firewall : control the traffic [inbound traffic [from out to in] , outbound traffic]
+- firewall is like the rules and the traffic that match the rules will be allowed  
+
+to block a port  : goto firewall-> advanced setting -> select inbound or outbound  -> new rule -> select port -> select tcp or udp  , select port number ->
+		  select the action (block connection) ->  
+------------------------------------------------------------------------------------------------------------------------------
+
+<< http protocol >>
+- protocol that used in web server
+- your browser knows that all web servers that use nonsecure HTTP listen on port 80 , secured uses 443
+
+if you open browser and write : https://www.google.com:80/search    --> url (universal resource locator)
+	https, http or ftp -> protocol
+	www.google.com     ->  domain name that mapped to IP Adress of the device that website is published on and your device will connect with
+			       , device that perform mapping operation is DNS server
+	80 : port number -> المنفذ اللى بيدخلنى على الجهاز بتاع ال destination علشان افرق انا عايز انى سيرفيز من السيرفيز اللى موجودة
+	80 : to enter the destination device through port 80 and use the service published on it but , port number not written by end user as browser do it
+	     automatically	
+
+- the senario: user enter  http://www.google.com -> the DNS server will convert the domain name google.com to its ip address
+  the client device will use the ip address to connect to detination and enter to destination through port 80 [ the port that reserved to http request]
+  and use the service published on this port
+
+HTTP: 80
+HTTPS: 443
+
+------------------------------------------------------------------------------------------------------------------------------
+
+<< mail protocols >>
+
+SMTP (simple mail tranfer protocl):  send email from client to sender
+POP3 (post office protocl version3) : receives email from server and emails stored at local storage
+				      free up server storage , allow uer to read email offline
+				      the risk : losing data if computer crashes
+IMAP4 : receives email from server and emails are not stored at local storage he is only see header, user can go to his inbox and control it 
+
+mail adminstrator configure emails for employees by make for each empolyee Qota on the server to receive and send emails from it 
+
+------------------------------------------------------------------------------------------------------------------------
+<< network layer >>
+
+- ip routing : sending message from network to network
+
+router has 2 NIF : internal NIC ( gateway of network devices 192.168.1.1 [local IP address] ) , 
+  external NIC with public IP address that allow devices connected on the network to communicate with the internet
+  the public IP address that assigned to external NIC is given BY ISP [internet service provider]
+
+nating operation : when router replace the source local ip address of packet with its real ip address to communicate with external network 
+
+routing senario : 
+  if one of the devices on the network try to communicate with IP address not exist on the network, the router will store source ip address 
+  and detination in its translation (routing)table , and replace the local source ip address with its public ip address existed in external NIC [nating] 
+  to be allowed to communicated with external network
+
+------------------------------------------------------------------------------------------------------------------------
+<< ICMP protocol >>
+
+- check connectivity between devices using command ping
+- ping ip_address  -> check connectivity
+- ping ip_address -n 10 -> ping 10 packets
+- ping ip_address -t    -> ping unlimited packets , it's stopped by ctrl+c
+
+- ping command used in dos(denial of service) attack 
+- NIC has a buffer that receives all requests
+- ping ip_address -l 40000 -t -> ping unlimited packets with 40000 bytes // dos attack
+
+- organization is always block outbound traffic of ping
+------------------------------------------------------------------------------------------------------------------------
+ipconfig         -> to see the IP address of the device (ipv4) 127.0.0.1 -> let's say 192.168.81.129
+ipconfig/release    -> device will be without ip address
+ipconfig/renew      -> renew the period of expired time of IP address
+
+getmac/v            -> get all mac addresses on your devices
+ipconfig/all     -> To check your physical address
+
+arp -a	            -> display the mac adresses that your devices communicate with
+
+curl ifconfig.me    -> to get the public ip address of the router
+ipconfig/displaydns -> display the cashed domain names with its ip addresses
+nslookup  -> to query on dns [lets you to enter a host name and find out the corresponding IP address]
+netstat -n  -> check opened ports on tcp protocol
+netstat -a  -> check opened ports on udp protocol
+
+route print ->
+
+- 
+
+

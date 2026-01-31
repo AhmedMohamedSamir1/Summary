@@ -1,0 +1,249 @@
+
+Install-Package AutoMapper
+
+--------------------------------------------------------
+
+- Profile is a class
+
+- Profile.CreateMap<Source, Destination>()   // return IMappingExpression<Source, Distination> interface
+
+- CreateMap<int, Tag>().ConvertUsing(i => new Tag { Id = i });  // return IMappingExpression<int, Tag> interface
+
+- The constructor is where mappings are defined.
+
+
+----------------------------------------------------------------------------------------------------------------
+<< syntax >>
+
+- Global Conversion
+
+
+
+
+----------------------------------------------------------------------------------------------------------------
+<< AutoMApper >>
+
+ public class MappingProfile: Profile
+ {
+     public MappingProfile()
+     {
+         CreateMap<CustomerDTO, ApplicationUser>()
+             .ForMember(dst=>dst.PasswordHash, opt=>opt.MapFrom(src=>src.password)).ReverseMap();
+     }
+ }
+
+- builder.Services.AddAutoMapper(typeof(MappingProfiles));
+- builder.Services.AddAutoMapper(typeof(AutoMapper.MappingProfile), typeof(Application.AutoMapper.MappingProfile));
+	- add two different Mapping classes	
+
+- private readonly IMapper mapper
+-  inject in constructor
+
+
+- var appUser = mapper.Map<EmployeeDTO, ApplicationUser>(employeeDTO);
+
+- var tagForCreation = mapper.Map<Tag>(tag);  // result is a tag
+
+- mapper.Map(projectDTO, project);  // when edit [from projectDTO to Project]
+
+- var project = mapper.Map<Project>(projectDTO);
+
+- CreateMap<int, Supplier>().ConvertUsing(i => new Supplier { Id = i });
+	- from int create Supplier object
+
+- CreateMap<Shipment, ShipmentGetDTO>().AfterMap((src, des) =>
+            {
+                string userName;
+                if (src.ApplicationUser.AccountType == AccountType.Individual)
+                {
+                    IndividualUser? individualUser = src.ApplicationUser as IndividualUser;
+
+                    userName = individualUser!.FirstName.Trim() + " " + individualUser.LastName.Trim();
+                }
+                else
+                {
+                    CompanyUser? companyUser = src.ApplicationUser as CompanyUser;
+                    userName = companyUser!.CompanyName.Trim();
+                }
+                
+                des.UserName = userName;
+            });
+
+- very important: 
+	- if my existingProject.Tags contains [{Id: 3}, {Id: 7}]
+	- projectDTO.Tags contains [3, 4, 5, 6]
+		- Since projectDTO.Tags is a list of integers, AutoMapper will try to convert them into a list of Tag objects
+		  which These are new objects, not the same instances as those in existingProject.Tags
+	
+	- Instead of updating the existing Tags collection, AutoMapper replaces it with the new list [which means existingProject.tags will be removed and new items are added]
+	- Final Result (After Mapping): existingProject.Tags = [{ Id: 3 }, { Id: 4 }, { Id: 5 }, { Id: 6 }];
+		- But here's the problem: when existingProject.Tags are replaced with new elements the EF will try to track these elements by default as existingProject is tracked
+			- The { Id: 3 } in existingProject.Tags is now a new instance (not the same one EF Core was tracking before).
+				- EF Core is now tracking two Tag objects with Id: 3, which causes the error
+ 		
+-----------------------------------------------------------------------------------------------------------------------------------------------
+
+
+<< ConvertUsing >>
+
+- ConvertUsing()
+	- is a powerful method that allows you to define custom logic for converting one type to another during the mapping process. 
+
+
+- Global Conversion
+	- CreateMap<SourceType, DestinationType>()
+    		.ConvertUsing((source, context) => /* custom conversion logic */ );
+
+
+	- EX 1: 
+           CreateMap<Source, Destination>().ConvertUsing( (src, des) =>
+	   {
+    		var names = src.FullName.Split(' ');
+    		return new Destination()
+    		{
+        		FirstName = names[0],
+        		LastName = names.Length > 1 ? names[1] : string.Empty
+    		};
+	   });
+
+	- EX 2:
+ 	   CreateMap<int, Supplier>().ConvertUsing(i => new Supplier { Id = i });
+
+
+- Property-Level Conversion
+
+	- CreateMap<SourceType, DestinationType>()
+    		.ForMember( dest => dest.Property, opt => opt.MapFrom((src, dest) => /* custom conversion logic for the property */ ));
+
+	- EX 1:
+	  CreateMap<CustomerDTO, ApplicationUser>()
+             .ForMember(dst=>dst.PasswordHash, opt=>opt.MapFrom(src=>src.password)).ReverseMap();
+
+- Using a Custom Type Converter
+	- CreateMap<SourceType, DestinationType>()
+	  	.ConvertUsing<CustomConverter>();  // where CustomConverter of type ITypeConverter, ITypeConverter needs to implement the convert method
+	
+	 
+	- EX 1:
+	 public class SourceToDestinationConverter : ITypeConverter<Source, Destination>
+	 {
+    	    public Destination Convert(Source source, Destination destination, ResolutionContext context)
+    	    {
+        	var names = source.FullName.Split(' ');
+        	return new Destination
+        	{
+            	   FirstName = names[0],
+            	   LastName = names.Length > 1 ? names[1] : string.Empty
+        	};
+    	    }
+	 }
+
+	EX 2:
+         public class PagedListConverter<Src, Dst> : ITypeConverter<PagedList<Src>, PagedList<Dst>>
+	 {
+    	   public PagedList<Dst> Convert(PagedList<Src> source, PagedList<Dst> destination, ResolutionContext context)
+    	   {
+        	var convertedList = new PagedList<Dst>(context.Mapper.Map<List<Dst>>(source));
+
+	        convertedList.TotalPages = source.TotalPages;
+        	convertedList.CurrentPage = source.CurrentPage;
+        	convertedList.PageSize = source.PageSize;
+        	convertedList.TotalCount = source.TotalCount;
+    
+   	        return convertedList;
+    	   }
+	}
+
+	- at MappingProfile constructor
+		CreateMap(typeof(PagedList<>), typeof(PagedList<>))
+   			.ConvertUsing(typeof(PagedListConverter<,>));
+
+
+	Ex 3:
+	       - 
+		public class PaginationResult<T>
+		{
+    		   public List<T> Items { get; set; }
+    		   public int CurrentPage { get; set; }
+    		   public int TotalPages { get; set; }
+    		   public int PageSize { get; set; }
+    		   public int TotalCount { get; set; }
+    		   public bool HasNext { get; set; }
+    		   public bool HasPrevious { get; set; }
+		}
+
+		- public class PagedListConverter<Src, Dst> : ITypeConverter<PagedList<Src>, PaginationResult<Dst>>
+		  {
+    		     public PaginationResult<Dst> Convert(PagedList<Src> source, PaginationResult<Dst> destination, ResolutionContext context)
+    		     {
+        		var destList = context.Mapper.Map<List<Dst>>(source); // this to convert from tag to tagGetDTO
+        		var convertedList = new PaginationResult<Dst>();
+
+        		convertedList.Items = destList;
+        		convertedList.TotalPages = source.TotalPages;
+        		convertedList.CurrentPage = source.CurrentPage;
+        		convertedList.PageSize = source.PageSize;
+        		convertedList.TotalCount = source.TotalCount;
+			convertedList.HasPrevious = source.HasPrevious;
+            		convertedList.HasNext = source.HasNext;
+        		return convertedList;
+    		    }
+		  }
+
+		- at MappingProfile constructor  
+			CreateMap(typeof(PagedList<>), typeof(PaginationResult<>))
+				.ConvertUsing(typeof(PagedListConverter<,>));
+
+
+-----------------------------------------------------------------------------------------------------------------------------------
+
+<< exampel why mapping entities with navigation properties can lead to performance issues (e.g., N+1 queries) : note from omer offbeat>>
+
+public class Project
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public List<Supplier> Suppliers { get; set; }
+}
+
+public class Supplier
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public int ProjectId { get; set; }
+    public Project Project { get; set; }
+}
+
+public class SupplierDTO
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
+}
+
+public class ProjectDTO
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public List<SupplierDTO> Suppliers { get; set; }
+}
+
+
+var projects = _context.Projects.ToList(); // Fetches all projects
+	- SELECT [p].[Id], [p].[Name] FROM [Projects] AS [p]
+
+var projectDTOs = _mapper.Map<List<ProjectDTO>>(projects);
+	- When AutoMapper accesses the Suppliers property for each project during mapping, lazy loading triggers a separate query for each project
+	- SELECT [s].[Id], [s].[Name], [s].[ProjectId] FROM [Suppliers] AS [s] WHERE [s].[ProjectId]  -- Repeated for each project
+
+- If there are 100 projects, this results in 1 query for projects + 100 queries for suppliers.
+
+- the solution is using the eager loading
+	- var projects = _context.Projects.Include(p => p.Suppliers).ToList(); // Single query with joins to fetch projects and their suppliers
+	     SELECT p.Id, p.Name, s.Id, s.Name, s.ProjectId
+	  	FROM Projects P LEFT JOIN Suppliers AS S 
+	        ON p.Id = s.ProjectId
+	- var projectDTOs = _mapper.Map<List<ProjectDTO>>(projects);
+
+--------------------------------------------------------------------------------------------------------------------------------------------
+
+

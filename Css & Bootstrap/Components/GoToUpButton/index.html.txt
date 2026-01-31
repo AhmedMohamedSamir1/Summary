@@ -1,0 +1,14 @@
+<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+<link rel="stylesheet" href="~/css/bootstrap-icons.min.css" />
+
+
+
+<!-- direct parent is body ->
+
+<div class="up-btn">
+    <i class="bi bi-arrow-up"></i>
+</div>
+
+<script src="~/js/GoToTopButton.js"></script>
+
+

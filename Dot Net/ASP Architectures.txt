@@ -1,0 +1,120 @@
+<<<< N-Tier Architecture >>>>
+
+
+- A physical separation of an application into multiple tiers, where each tier runs(live) on a separate machine or process.
+- N-Tier means the system is deployed on multiple physical machines
+- keep in mind if all layers are in 1 project run on one server, that is NOT N-Tier it becomes a Layered Architecture
+	- There are no network boundaries ( on 1 server:)
+
+- Network boundaries between tiers 
+	- means each tier runs(live) on different servers, so the communication between them happens over the network
+  	- [ Web Server ]  -- network boundary -->  [ Application Server ]  ---- network -->  [ Database Server ]
+	- The database runs on a highly protected server Isolated behind final firewall (put in a private network)
+
+
+- It is usually made of:
+  1- Presentation Tier runs on a public server
+  2- (Business Tier) Application Tier runs on an internal server
+  3- Infrastructure (Data) Tier runs on a highly protected server
+
+
+Public Server: Web Server (ASP.NET Core app), API Gateway
+	cessible from the internet
+	Anyone can send a request to it
+	Usually placed in a DMZ (Demilitarized Zone)
+
+Internal Server: Application Server (Business Logic), Microservices, Internal APIs, Background services
+	Not exposed to the internet
+	Only accessible from inside the company network
+	Public servers can call it, but users cannot
+
+
+
+when to use
+	- Use N-Tier when you want actual physical deployment on multiple servers.
+	- N-Tiers is recommended when each part of the system must scale independently.
+	- You want to isolate the database behind firewalls
+		
+
+Why use N-Tier (Microsoft Reasons)
+	- Scalability: You can scale a tier independently (e.g., more web servers).
+
+	- Security: You can isolate DB servers behind firewalls, only business tier can talk to DB.
+
+	- Manageability: Each tier can be maintained and deployed separately.
+
+	- Separation of concerns: Presentation ≠ Business ≠ Data.
+
+
+
+-- summary
+
+N-Tier Architecture is a physical separation of an application into multiple tiers Presentation, Business/Application, and Data, each deployed 
+on a separate server. This creates network boundaries, allowing scalability, security, and independent manageability.
+Public servers (UI) are exposed to the internet, internal servers (business logic) are inside the company network, and protected servers (DB)
+are isolated behind firewalls. If all layers are on one server, it is only layered architecture, not N-Tier.”
+
+
+---------------------------------------------------------------------------------------------------------------------------------------
+
+<< Onion Architecture >>
+
+---- Domain (Core) Layer (Center)
+	Entities, business rules, domain logic
+	Pure C# classes without references to UI, database, or frameworks
+	The heart of your application
+
+---- Domain Services / Application Layer
+
+	Orchestrates workflows
+	Defines interfaces for repositories, messaging, etc.
+	Depends only on Domain Layer
+
+---- Infrastructure Layer
+	- Implements interfaces defined in the Domain/Application layers
+	- Database access, file storage, external services
+	- Can change without affecting core domain
+
+---- Presentation Layer / UI Layer (Outer Layer)
+	- Web, API, desktop apps
+	- Calls application services
+	- Depends on the inner layers, not vice versa
+	
+Example:
+   - Domain Layer
+	- Entities (Order, ETC).
+	- Interfaces in the Domain Layer should express pure business , not infrastructure or UI concerns
+		public interface IDiscountPolicy { decimal ApplyDiscount(Order order); }  	 // pure business abstractions
+		public interface IShippingCalculator { decimal CalculateShipping(Order order); } // pure business abstractions
+	- implmentations of pure business interfaces
+	- Developers write pure business logic that: uses only entity properties, uses value objects, enforces domain invariants, 
+	  has NO database, NO infrastructure, NO external API
+
+   - Application Layer
+	- IOrderRepository, IGenericRpository
+	- IOrderService
+	- OrderService
+	- DTOS
+	- External Services Interfaces (Payment, Email, SMS, Files)
+	- Depends only on Domain Layer
+	- 
+
+
+  - Infrastructure
+	- OrderRepository, GenericRepository
+	- Infrastructure Layer depends on Application Layer only via interfaces.
+	- External systems should be implemented in the infrastructure layer
+		- (Payment) PayPalPaymentService
+		- (Files) LocalFileStorage, CloudFileStorage
+		- (Caching) RedisCacheService, MemoryCacheService
+		- (BackgroundJobs) HangfireJobs.cs
+
+  - Presentation Layer / UI
+	- Depends on application layer, Calls services like IOrderService
+	- refers to Infrastructure for EF purposes
+
+---- summary
+   Onion Architecture is a logical architecture with strict dependency rules.
+   All layers typically run within the same server, and the Domain is the center that everything depends on.
+
+

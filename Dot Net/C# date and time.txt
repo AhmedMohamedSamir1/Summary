@@ -1,0 +1,63 @@
+yyyy -> year
+MM   -> month
+mm   -> minutes
+hh   -> 12h
+HH   -> 24h
+dd   -> day
+tt   -> for am and pm
+
+
+
+----------------------------------------------------------------------------------
+
+<< DateTime  >>
+
+DateTime dateTime = DateTime.Now;
+Console.WriteLine(dateTime);   // 3/25/2024 3:46:55 PM --> month/day/year hour:min:sec tt
+
+
+string formattedDateTime = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss tt");
+DateTime s = DateTime.Parse(formattedDateTime);
+
+
+@@@@@@@@@
+
+DateOnly date = DateOnly.FromDateTime(DateTime.Now);
+private TimeOnly time = TimeOnly.FromDateTime(DateTime.Now);
+DateTime combined = date.ToDateTime(time);
+
+------------------------------------------------------------------------------------------------------------
+
+<< UTC >>
+
+- UTC --> Coordinated Universal Time [ Greenwich Time ]
+- cairo time --> UTC+2
+
+
+- DateTime.UtcNow --> Greenwich Time
+
+- storing --> use DateTime.UtcNow
+- displaying --> use ToLocalTime
+
+
+--------------------------------------------------------------------------------------------------------------
+
+- What is DispatcherTimer in WPF
+
+DispatcherTimer is a timer that runs on the UI thread in WPF applications
+It’s part of the System.Windows.Threading namespace.
+
+Code
+  DispatcherTimer _timer = new DispatcherTimer(); 
+  _timer.Interval = TimeSpan.FromSeconds(5);
+  _timer.Tick += Timer_Tick;
+  _timer.Start();
+
+private void Timer_Tick(object? sender, EventArgs e)
+{
+    _timer.Stop();                                 // Stop the timer (to prevent it from firing again)
+    App.Navigate(typeof(HomePage));                // Navigate to HomePage
+}
+
+
+
