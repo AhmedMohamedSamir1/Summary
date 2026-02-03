@@ -29,9 +29,16 @@
 - to display the version of installed angular --> ng v			 
 
 - after install angular and you are trying to create new componenet and you get this error
-	The term 'ng' is not recognized as the name of a cmdlet
-	open PowerShell and write this command --> Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+	- The term 'ng' is not recognized as the name of a cmdlet
+	- sol1: open PowerShell and write this command --> Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 
+	- sol2: 
+	   1- open cmd and write : npm config get prefix C:\Users\amsamir\AppData\Roaming\npmC:\Users\amsamir\AppData\Roaming\npm 
+	   2- from Start Menu, search for "Edit the system environment variables," and open it.
+	   - In the window that appears, click the Environment Variables button at the bottom.
+	   - Under User variables (the top section), find the variable named Path and click Edit.
+	   - Click New and paste the path you found in Step 1 (e.g., %AppData%\npm).
+	   - Click OK on all windows to save.
 - this is Angular 17
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------
