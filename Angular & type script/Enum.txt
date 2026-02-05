@@ -7,7 +7,7 @@ enum SearchType {
 }
 
 
-(SearchType["Name"]); // 1
+console.log(SearchType["Name"]); // 1
 console.log(SearchType[1]);      // Name
 
 console.log(Object.keys(SearchType));  // ['1', '2', '3', '4', '5', 'Name', 'Owner', 'Tag', 'Technology', 'Dependency']
@@ -24,8 +24,7 @@ export interface IEnum{
     Value: number|string;
 }
 
-
-export function FromEnumToArrOfObject( enumObj: { [key: string]: string | number } ): IEnum[] {
+export function FromEnumToArrOfObject(enumObj: { [key: string]: string | number } ): IEnum[] {
   return Object.keys(enumObj)
     .filter(key => isNaN(Number(key)))
     .map(key => ({

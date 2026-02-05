@@ -97,8 +97,6 @@ Example:
 	- DTOS
 	- External Services Interfaces (Payment, Email, SMS, Files)
 	- Depends only on Domain Layer
-	- 
-
 
   - Infrastructure
 	- OrderRepository, GenericRepository
@@ -118,3 +116,167 @@ Example:
    All layers typically run within the same server, and the Domain is the center that everything depends on.
 
 
+-----------------------------------------------------------------
+
+-- Onion architecture Of Tamweely
+  - Domain Folder
+     - Tamweely.Domain.CallCenter "class lib"
+
+     - Tamweely.Domain.common 	  "class lib"
+	 - Entities folder
+		- BranchService: Service<Branch> , IBranchService { private IUnitOfWorkAsync _uow; IRepositoryAsync<Branch> _repo; }
+	 - Interfaces folder
+		- IBranchService: IServiceBranch<Branch> 
+	 - DependencyResolver.cs
+	      
+  - Infrastructure folder
+	- Tamweely.Infrastructure.Logging   DLL 
+	- Tamweely.Infrastructure.ViewModel DLL 
+		- Common folder
+		   - CommonVM.cs 
+		- Security folder
+		   - SecurityVM.cs
+	- Tamweely.Infrastructure.Core	    DLL 
+		- Infrastructure folder
+		    - EntityFramework folder
+			- DataContext.cs
+			- Entity.cs
+			- QueryFluent.cs
+			- Repository.cs
+			- StateHelper.cs
+			- UnitOfWork.cs
+		    - ManageEntityFramework folder
+			- ComponentLoader.cs
+			- IComponent.cs
+			- IRegisterComponent.cs
+			- RegisterComponent.cs
+		    - RepositoryPattern folder
+			- Buz Folder
+			   - IService
+			   - Service
+			- Data
+			   - DataContext folder
+				- IDataContext.cs
+				- IDataContextAsync.cs
+			   - Helpers folder
+				- IOjectState.cs
+				- ObjectState.cs
+			   - Repositories folder
+				- IQueryFluent.cs
+				- IQueryObject.cs
+				- IRepository.cs
+				- IRepositoryAsync.cs
+			   - UnitOfWork folder
+				- IUnitOfWork.cs
+				- IUnitOfWorkAsync.cs
+
+	- Tamweely.Infrastructure.Data dll
+		- Migrations Folder
+		- Project_Modules Folder
+		    - CallCenter Folder
+		    - Common Folder
+			- Mapping Folder
+			    - BranchMap.cs
+			    - CompanyMap.cs
+			- Branch.cs
+			- Company.cs
+			- .....
+		    - Log folder
+		    - Security Folder
+		- context.cs
+			#region DbSets
+			   #region common
+				public DbSet<Branch> Branches {get; set;} 
+			   #end region
+			#end region
+
+			OnModelCreating(modelBuilder){
+			   #region common
+				modelBuilder.Configuration.Add(new BranchMap());
+				modelBuilder.Configuration.Add(new CompanyMap());
+			   #end region
+			}
+	- Tamweely.Infrastructure.DependencyResolver // cancelled
+	- 
+
+  - Service folder
+	- Tamweely.Service.WebAPI
+	    - Controller Folder
+		- Common Folder
+		   - BranchController
+			
+
+public class BranchMap: EntityTypeConfiguration<branch> {
+    public BranchMap(){
+        // PK
+	this.HasKey(t=>t.BranchId)
+
+	// Properties
+	this.Property(t=>t.BranchNameAR).HasMaxLength(250);
+    }
+}
+
+
+
+  public interface IService<TEntity> where TEnity : IObjectState
+
+  public interface IObjectState{
+     [NotMapped]
+     ObjectState {get; set; }
+  }
+  
+public enum ObjectState {
+  Unchanged,
+  Added,
+  Modified,
+  Deleted
+}
+
+public interface IService<TEntity> where TEntity: IObjectState {}
+public abstract class Service<TEntity> : IService<TEntity> where TEntity : class, IObjectState {}
+public interface IBranchService: IService<branch> {}
+public BranchService : Service<Branch>, IBranchService {
+   private IUnitOfWorkAsync _uow;
+   IRepositoryAsync<Branch> _repo;
+}
+
+[Export(typeof(IComponent)]
+public class DependencyResolver: IComponent {
+    public void Setup (IRegisterComponent registerComponent){
+	registerComponent.RegisterType<IRepositoryAsync<User>, Repository<User>>();
+
+	registerComponent.RegisterType<IUserService, UserService>();
+    }
+}
+
+
+public class BranchController : BaseApiController
+{
+	private readonly IBranchService _service;
+	public BranchController(IUnitOfWorkAsync unitOfWork, IBranch Service){
+	    UOW = unitOfWork;
+	    _service = service;
+	}
+
+	[HttpGet]
+	[Route("api/Common/BranchController/GetAll")]
+	public HttpResponseMessage GetAll(){
+	   try
+	   {
+	   }
+	   catch
+	   {
+	   }
+	}
+
+	[HttpPost]
+	[Route("api/Common/BranchController/Post")]
+	public HttpResponseMessage Post([FromBody] Branch entity){
+	   try
+	   {
+	   }
+	   catch
+	   {
+	   }
+	}
+}
