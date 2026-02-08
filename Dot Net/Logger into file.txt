@@ -1,0 +1,88 @@
+install-package Serilog.AspNetCore	    // Integrates Serilog with ASP.NET Core apps.
+install-package Serilog.Sinks.File          // Purpose: Enables logging to plain text files.
+install-package Serilog.Sinks.Console	    // Logs to the console (useful during development)
+
+
+
+
+// Creates a global Serilog logger (Log.Logger) that the whole app will us
+
+Log.Logger = new LoggerConfiguration()
+.WriteTo.Console()
+.WriteTo.File(
+    "Logs/errors.log",
+    restrictedToMinimumLevel: LogEventLevel.Error, // write to file when exceptions
+    rollingInterval: RollingInterval.Day,
+    outputTemplate: "[{Timestamp:yyyy-MM-dd hh:mm:ss tt} {Level:u3}] {Message:lj}{NewLine}" +
+        "--------------------------------------------------------------- {NewLine}{NewLine}")
+.CreateLogger();
+
+
+builder.Host.UseSerilog();
+
+--- Explain outputTemplate parameter
+	- {Timestamp:yyyy-MM-dd HH:mm:ss} // when the log happened
+	- { Level: u3}   //Serilog log level (Information, Error, etc.) , 3-character uppercase abbreviation
+        	      	// ERR → Error , INF → Information, WRN → Warning
+	- {Message:lj}  // the log message you pass to Log.Information(), Log.Error(), etc.
+    		- :lj → “literate JSON” / literal JSON”? Actually in Serilog
+    		- l → literals: don’t escape characters unnecessarily
+    		- j →  jJSON formatting for objects, only if your message is structured
+
+	- {NewLine} Adds a line break after each log entry. Otherwise, all log entries would run together.
+
+// middleware
+
+public class ExceptionHandlingMiddleware
+{
+    private readonly RequestDelegate _next;
+    private readonly IWebHostEnvironment _env;
+
+    public ExceptionHandlingMiddleware(RequestDelegate next,IWebHostEnvironment env)
+    {
+        _next = next;
+        _env = env;
+    }
+
+    public async Task InvokeAsync(HttpContext context)
+    {
+        try
+        {
+            await _next(context);
+        }
+        catch (Exception ex)
+        {
+            // Extracts only the first stack trace line, usually The exact file + line number where the crash happened
+            var firstStackLine = ex.StackTrace?.Split(Environment.NewLine).FirstOrDefault();
+
+            var exceptionDetails = $"{ex.GetType()}: {ex.Message}\n{firstStackLine}";
+            Log.Error("Unhandled exception occurred\n{ExceptionDetails}", exceptionDetails);
+
+
+            context.Response.ContentType = "application/json";
+            context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+
+            var response = new
+            {
+                success = false,
+                message = _env.IsDevelopment() ? ex.Message : "An unexpected error occurred",
+                statusCode = context.Response.StatusCode
+            };
+            var json = JsonSerializer.Serialize(response);
+            await context.Response.WriteAsync(json);
+        }
+    }
+}
+
+--------------------------------------------------------------------------------------------------------------------------------------------
+
+<<  >>
+
+- 
+- 
+- 
+- 
+- 
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+
