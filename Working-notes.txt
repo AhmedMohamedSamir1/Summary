@@ -1,11 +1,12 @@
 -- master (Core, Micro) the production 
     <add name="DefaultConnection" connectionString="Data Source=10.10.91.150,1433;Initial Catalog=Core_Micro_Prod;User ID=sa;Password=P@$$123$$@AIM" providerName="System.Data.SqlClient" />
 
--- test connection string
+-- testing DB connection string
    <add name="DefaultConnection" connectionString="Data Source=10.10.92.192;Initial Catalog=MF_Test;User ID=sa;Password=P@ssw0rd" providerName="System.Data.SqlClient" />
 
 
 
-----------------------------
+------------------------------------------------
 
+	
 10.10.92.192
