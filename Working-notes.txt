@@ -8,11 +8,21 @@
 
 ------------------------------------------------
 
-	
+Server of MicroDB =10.10.92.192 
+Password=P@ssw0rd
 
 
 Payments
    - Aman
    - Alahly momken
    - EG Post
+   - Sahl
+   - Fawry
+
+-- NID (National ID card)
+	- GET info about about citizen via his id, 
+
+-----------
+
+the id of funding request: 28310280102541
 
