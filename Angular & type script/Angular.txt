@@ -830,7 +830,7 @@ at html
 
 ------------------------------------------------------------------------------------------
 
-<<  reference (template reference  variable)  , @ViewChild() >>
+<<  reference (template reference variable)  , @ViewChild() >>
 
 - template reference variable in ts is --> TemplateRef<any>
 

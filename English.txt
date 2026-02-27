@@ -274,7 +274,9 @@
 
 - it’s still inferior to your current solution: لا تزال أقل جودة من حلك الحالي
 
-- 
+- I'm happy for being your dad
+
+- set service To be Disabled: 
 ---------------------------------------------------------------------------------------
 
 << life >>
@@ -411,15 +413,21 @@ it turns out: اتضح
 
 - in response to : ردا على 
 
--  Disbursement: صرف
 
-- Collection: تحصيل
+---- the financial 
+	-  Disbursement: صرف
+	- Collection: تحصيل
 
-- refund: يسترد
+	- refund: يسترد
+	- Non-refundable:  غير مستردة
 
-- Non-refundable:  غير مستردة
+	- exempted : معفاه 
 
-- exempted : معفاه 
+	- deportation: ترحيل
+
+	- interest: الفايدة
+
+	- repayment cycle : دورية السداد
 
 
 ---------------------------------------------------------------------------------------------------

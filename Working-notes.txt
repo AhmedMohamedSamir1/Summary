@@ -22,7 +22,9 @@ Payments
 -- NID (National ID card)
 	- GET info about about citizen via his id, 
 
------------
+----------------------------------------------------------
+micro testing app : https://core_system.tamweely.local:5020/#/sign-in
+
 
 the id of funding request: 28310280102541
 
