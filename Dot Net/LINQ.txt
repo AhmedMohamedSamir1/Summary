@@ -495,3 +495,27 @@ private Expression<Func<Deployment, bool>> GetDeploymentFilter(DeploymentParam p
     return predicate;
 }
 
+-------------------------------------------------------------------------------------
+
+<< LINQ Query Expression Syntax >>
+
+from frm in Flow_Rejections_main
+                            join frs in Flow_Rejections_SubOne
+                            on frm.FRM_ID equals frs.FRM_ID
+                            join fa in Flow_Action
+                            on frm.Reject_by_phase equals fa.Definition_number
+                            join ft in Flow_Tabs
+                            on frs.tabs_code equals ft.tabs_code
+                            select new Flow_Rejections_mainFieldVM
+                            {
+                                FRM_ID = frm.FRM_ID,
+                                Comment = frs.Comment,
+                                Screen_name_Ar = ft.Description,
+                                Screen_name_Eng = ft.Screen_name_Eng,
+                                tabs_code = frs.tabs_code,
+                                filed_name = frs.Field_name,
+                                Filed_code = frs.Filed_code,
+                                Name_stepAR = fa.Name_stepAR,
+                                Name_stepEN = fa.Name_stepEN,
+                                Scr_DefCode = ft.Scr_DefCode
+                            };

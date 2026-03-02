@@ -1,0 +1,48 @@
+private string GetClientIpFromRequest()
+{
+	// Check for the X-Forwarded-For header
+        
+	in case of there is an intermediate server between client and server --> Client  --->  Proxy/Load Balancer  --->  Web Server
+	
+	string clientIp = HttpContext.Current.Request.Headers["X-Forwarded-For"];  // the client Ip is added via Proxy server into header "X-Forwarded-For"
+
+        if (!string.IsNullOrEmpty(clientIp))
+        {
+                // X-Forwarded-For can contain a list of IPs (comma-separated). Take the first one.
+                return clientIp.Split(',').First().Trim();
+        }
+
+            // Fallback to the standard UserHostAddress
+            return HttpContext.Current.Request.UserHostAddress; // get the IP Connected to the server directly
+}
+
+----
+
+protected int EncodedID(string decodedid)
+{
+	// decodedid value is from AES encryption
+	
+	try
+       	{
+		if (decodedid.Contains("COLDHEART"))
+                    decodedid = decodedid.Replace("COLDHEART", "/");
+                
+		decodedid = decodedid.Replace(" ", "+");
+                
+		string decoded = DecryptStringAES(decodedid, encryptionKey, encryptionIV);
+                
+		int numberOfCharactersToRemove = 8;
+                
+		if (decoded.StartsWith("yee12321"))
+                    decoded = decoded.Substring(numberOfCharactersToRemove);
+                
+		_ = int.TryParse(decoded, out int i);
+                
+		return i;
+        }
+            catch
+            {
+                return 0;
+            }
+}
+
