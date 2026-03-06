@@ -816,10 +816,16 @@ int questionId = (int)questionIdParameter.Value;
     		{
         		try
         		{
-            			context.Add(new YourEntity { Property = "Value1" });
-            			context.SaveChanges();
+				context.Add(new YourEntity { Property = "Value1" }); // id generation 
+				context.delete();
+				context.delete();
+				context.update();
+				
+            			context.SaveChanges(); // after saveChanges is completed successfully the id is generated;
 
-            			context.Add(new YourEntity { Property = "Value2" });
+            			context.Add(new YourEntity { Property = "Value2" }); // HERE WE WILL USE THE ID THE GET FROM THE ABOVE CODE
+				context.delete();
+				context.update();
             			context.SaveChanges();
 
             			transaction.Commit(); // Commit the transaction

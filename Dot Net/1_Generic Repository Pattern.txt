@@ -1,59 +1,264 @@
---- Creating the Generic Repository Interface
+ public class GenericRepository<TEntity, TKey> : GenericRepository, IGenericRepository<TEntity, TKey> where TEntity : class, IBaseEntity<TKey>
+ {
+     public GenericRepository(ApplicationDbContext context):base(context) { }
+     public virtual async Task AddAsync(TEntity entity)
+     {
+         if (entity is null)
+             throw new ArgumentNullException(nameof(entity), "Object to be added is null");
 
-public interface IGenericRepository<T> where T : class
-{
-    Task<IEnumerable<T>> GetAllAsync();
-    Task<T?> GetByIdAsync(int id);
-    Task AddAsync(T entity);
-    void Update(T entity);
-    void Delete(T entity);
-    Task SaveAsync();
-}
+         await context.Set<TEntity>().AddAsync(entity);
+     }
+     public virtual async Task AddWithSaveAsync(TEntity entity)
+     {
+         if (entity is null)
+             throw new ArgumentNullException(nameof(entity), "Object to be added is null");
+
+         await context.Set<TEntity>().AddAsync(entity);
+         await context.SaveChangesAsync();
+     }
+     public virtual async Task<TEntity?> AddWithSaveAndReturnAsync(TEntity entity, params string[] includesValues)
+     {
+         if (entity is null)
+             throw new ArgumentNullException(nameof(entity), "Object to be added is null");
+
+         await context.Set<TEntity>().AddAsync(entity);
+         await context.SaveChangesAsync();
+         if (includesValues.Any())
+         {
+             IQueryable<TEntity> query = context.Set<TEntity>();
+             query = query.IncludeExpression(includesValues);
+             return await query.FirstOrDefaultAsync(E => E.Id!.Equals(entity.Id));
+         }
+         return entity;
+     }
+     public virtual async Task AddRangeAsync(IEnumerable<TEntity> entities)
+     {
+         try
+         {
+             await context.Set<TEntity>().AddRangeAsync(entities);
+         }
+         catch (Exception ex)
+         {
+             throw new Exception("An unexpected error occurred.", ex);
+         }
+     }
+     public virtual async Task<bool> HasAnyRecordAsync()
+     {
+         return await context.Set<TEntity>().AnyAsync();
+     }
+     public async Task<bool> Exists(Expression<Func<TEntity, bool>> condition)
+     {
+         return await context.Set<TEntity>().AnyAsync(condition);
+     }
+     public async Task<int> GetCountAsync()
+     {
+         return await context.Set<TEntity>().CountAsync();
+     }
+     public async Task<int> GetCountWithFilterAsync(Expression<Func<TEntity, bool>> filter = null)
+     {
+         var query = context.Set<TEntity>().Where(filter);
+         return await query.CountAsync();
+     }
+     public void Delete(TEntity entity)
+     {
+         if (entity is null)
+             throw new ArgumentNullException(nameof(entity), "Object to be deleted is null");
+         context.Set<TEntity>().Remove(entity);
+     }
+     public async Task DeleteWithSaveAsync(TEntity entity)
+     {
+         if (entity is null)
+             throw new ArgumentNullException(nameof(entity), "Object to be deleted is null");
+         context.Entry(entity).State = EntityState.Deleted;
+         await context.SaveChangesAsync();
+     }
+     public void DeleteRange(IEnumerable<TEntity> entities)
+     {
+         context.Set<TEntity>().RemoveRange(entities);
+     }
+     public void DeleteRange(params TEntity[] entities)
+     {
+         context.Set<TEntity>().RemoveRange(entities);
+     }
+     public virtual async Task<TEntity?> GetByIdAsync(TKey id)
+     {
+         return await context.Set<TEntity>().FindAsync(id);
+     }   
+     public virtual async Task<TEntity?> GetByIdAsync(params object[] keyValues)
+     {
+         return await context.Set<TEntity>().FindAsync(keyValues);
+     }
+     public virtual async Task<TEntity?> GetByIdAndIncludeAsync(TKey id, params string[] includesValues)
+     {
+         IQueryable<TEntity> query = context.Set<TEntity>().Where(e => e.Id!.Equals(id));
+         query = query.IncludeExpression(includesValues);
+         return await query.FirstOrDefaultAsync();
+     }
+     public Task<(IQueryable<TEntity> Collection, int EntityTotalCount)> GetPagedListAsync(PaginationParameters<TEntity> resourceParameters)
+     {
+         if (resourceParameters == null)
+             throw new ArgumentNullException(nameof(resourceParameters));
+
+         var entityCollection = context.Set<TEntity>().AsQueryable().AsNoTracking();
+
+         if (resourceParameters.Includes.Length > 0)
+             entityCollection = entityCollection.IncludeExpression(resourceParameters.Includes);
+
+         if (resourceParameters.Filter is not null)
+         {
+             entityCollection = entityCollection.Where(resourceParameters.Filter);
+         }
+         if (resourceParameters.OrderBy is not null)
+         {
+             entityCollection = resourceParameters.OrderBy(entityCollection);
+         }
+         int collectionCount = entityCollection.Count();
+
+         int totalPages = (int)Math.Ceiling(collectionCount / (double)resourceParameters.PageSize!.Value);
+
+         if (resourceParameters.PageNumber > totalPages)
+             resourceParameters.PageNumber = totalPages > 0 ? totalPages : 1;
+
+         var collection = entityCollection
+             .Skip((resourceParameters.PageNumber!.Value - 1) * resourceParameters.PageSize!.Value)
+             .Take(resourceParameters.PageSize.Value);
+
+         return Task.FromResult((collection, collectionCount));
+     }
+     public virtual async Task<TEntity?> GetFirst(params string[] includesValues)
+     {
+         return await context.Set<TEntity>().IncludeExpression(includesValues).FirstOrDefaultAsync();
+     }
+     public virtual async Task<TEntity?> GetFirst(Expression<Func<TEntity, bool>> predicate, params string[] includesValues)
+     {
+         return await context.Set<TEntity>().IncludeExpression(includesValues).FirstOrDefaultAsync(predicate);
+     }
+     public virtual async Task<IReadOnlyList<TEntity>> ListAllAsync(params string[] expression)
+     {
+         var query = context.Set<TEntity>().AsQueryable();
+         if (expression.Length > 0)
+             query = query.IncludeExpression(expression);
+
+         return await query.AsNoTracking().ToListAsync();
+     }
+     public virtual async Task<IReadOnlyList<TEntity>> ListAllAsync(
+       Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
+       params string[] expression
+     )
+     {
+         var query = context.Set<TEntity>().AsQueryable();
+         if (expression.Length > 0)
+             query = query.IncludeExpression(expression);
+
+         if (orderBy != null)
+             query = orderBy(query);
+
+         return await query.AsNoTracking().ToListAsync();
+     }
+
+     public virtual async Task<IReadOnlyList<TEntity>> ListAllAsync(
+         Expression<Func<TEntity, bool>> SearchQuery,
+         Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null, params string[] expression
+     )
+     {
+         var query = context.Set<TEntity>().AsQueryable();
+         if (expression.Length > 0)
+             query = query.IncludeExpression(expression);
+
+         if (SearchQuery != null)
+             query = query.Where(SearchQuery);
+
+         if (orderBy != null)
+             query = orderBy(query);
+
+         return await query.AsNoTracking().ToListAsync();
+     }
+
+     public virtual void Update(TEntity entity)
+     {
+         if (entity is null)
+             throw new ArgumentNullException(nameof(entity), "Object to be modified is null");
+         context.Entry(entity).State = EntityState.Modified;
+     }
+     public virtual async Task UpdateWithSaveAsync(TEntity entity)
+     {
+         if (entity is null)
+             throw new ArgumentNullException(nameof(entity), "Object to be modified is null");
+         context.Entry(entity).State = EntityState.Modified;
+         await context.SaveChangesAsync();
+     }
+     public virtual async Task<TEntity> UpdateWithSaveAndReturnAsync(TEntity entity, params string[] includesValues)
+     {
+         if (entity is null)
+             throw new ArgumentNullException(nameof(entity), "Object to be modified is null");
+
+         context.Entry(entity).State = EntityState.Modified;
+         await context.SaveChangesAsync();
+
+         if (includesValues != null && includesValues.Any())
+         {
+             var entityType = context.Model.FindEntityType(typeof(TEntity));
+
+             if (entityType == null)
+                 return entity;
+
+             foreach(var value in includesValues)
+             {
+                 bool isIncludeValExist =  entityType.GetNavigations().Any(N=> N.Name == value);
+                 if (!isIncludeValExist)
+                     continue;
+
+                 var navigationEntry = context.Entry(entity).Navigation(value);
+                 if (!navigationEntry.IsLoaded)
+                 {
+                     await navigationEntry.LoadAsync();
+                 }
+             }
+         }
+         return entity;
+     }
+     public void UpdateRangeAsync(IEnumerable<TEntity> entity)
+     {
+         context.Set<TEntity>().UpdateRange(entity);
+     }
+     public void Attach(TEntity entity)
+     {
+         context.Attach(entity);
+     }
+     public void Attach(List<TEntity> entities)
+     {
+         foreach (var entity in entities)
+         {
+             context.Attach(entity);
+         }
+     }
+ }
 
 
--- Implementing the Generic Repository
+ public class GenericRepository: IGenericRepository
+ {
+     protected readonly ApplicationDbContext context;
+     public GenericRepository(ApplicationDbContext context)
+     {
+         this.context = context;
+     }
 
-public class GenericRepository<T> : IGenericRepository<T> where T : class
-{
-    protected readonly AppDbContext _context;
-    protected readonly DbSet<T> _dbSet;
+     public IEnumerable<EntityEntry> AllEntries()
+     {
+         return context.ChangeTracker.Entries();
+     }
 
-    public GenericRepository(AppDbContext context)
-    {
-        _context = context;
-        _dbSet = _context.Set<T>();
-    }
+     public async Task<IDbContextTransaction> BeginTransactionAsync()
+     {
+         return await context.Database.BeginTransactionAsync();
+     }
 
-    public async Task<IEnumerable<T>> GetAllAsync() => await _dbSet.ToListAsync();
-
-    public async Task<T?> GetByIdAsync(int id) => await _dbSet.FindAsync(id);
-
-    public async Task AddAsync(T entity) => await _dbSet.AddAsync(entity);
-
-    public void Update(T entity) => _dbSet.Update(entity);
-
-    public void Delete(T entity) => _dbSet.Remove(entity);
-
-    public async Task SaveAsync() => await _context.SaveChangesAsync();
-}
-
--- Creating a Specific Repository
-	- Although the generic repository works for most cases, we can create specific repositories for custom queries.
-
-
-public interface IProductRepository : IGenericRepository<Product>
-{
-    Task<IEnumerable<Product>> GetProductsByCategoryAsync(int categoryId);
-}
-
-public class ProductRepository : GenericRepository<Product>, IProductRepository
-{
-    public ProductRepository(AppDbContext context) : base(context) { }
-
-    public async Task<IEnumerable<Product>> GetProductsByCategoryAsync(int categoryId)
-    {
-        return await _dbSet.Where(p => p.CategoryId == categoryId).ToListAsync();
-    }
-}
-
-
+     public void ClearChangeTracker()
+     {
+         context.ChangeTracker.Clear();
+     }
+     public async Task<bool> SaveAsync()
+     {
+         return await context.SaveChangesAsync() > 0;
+     }
+ }

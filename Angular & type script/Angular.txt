@@ -1154,25 +1154,6 @@ This happens because the server is returning a plain text response instead of JS
 		</div>
 
 -------------------------------------------------------------------------------------------------------------------------------------------
-<< environments >>
-
-- at Environments folder
-	
-	- Create environment.development.ts
-		export const environment = {
-    			production: false,
-    			'http://localhost:5299/api' ,  // change it as needed
-  		};	
-
-	- Create environment.production.ts	
-		export const environment = {
-    			production: true,
-    			apiUrl: 'https://api.production.com/',  // change it as needed
-  		};
-  
-
-------------------------------------------------------------------------------------------------------------------------------------------------------------
-
 << debouncing >>
 
 
@@ -1295,3 +1276,42 @@ new Types
 	
 	- TemplateRef<any>
 		- This is the official Angular type for any <ng-template> reference.
+
+--------------------------------------------------------------------------------
+
+
+--Inside app
+
+  -- core : contains the things that is are not connected with UI
+	- Interceptors
+	- gaurds
+	- services
+	- constants
+	   - Global.Constant.ts
+	- models
+	   - classes
+	   - Interfaces : 
+		- ColorOptionDTOs
+	- enums
+	- Helpers
+	   - Helper.ts
+	- resolvers
+	
+  -- Pages: contains the components which is not reusable and could be accessed via route
+	    - employee
+		- employee-list component
+		- new-employee  component	
+		
+  -- Shared: contains things that are connected with UI like 
+	    - Directives
+	    - Pipes,
+	    - ReusableComponents
+		- header
+		- footer
+		- sidebar
+  -- Layouts
+	MainLayout
+	AuthLayout
+
+-- assets folder
+-- css folder

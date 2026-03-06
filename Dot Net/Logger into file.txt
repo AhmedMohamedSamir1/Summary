@@ -6,7 +6,7 @@ install-package Serilog.Sinks.Console	    // Logs to the console (useful during 
 
 
 // Creates a global Serilog logger (Log.Logger) that the whole app will us
-
+// 
 Log.Logger = new LoggerConfiguration()
 .WriteTo.Console()
 .WriteTo.File(
@@ -16,9 +16,7 @@ Log.Logger = new LoggerConfiguration()
     outputTemplate: "[{Timestamp:yyyy-MM-dd hh:mm:ss tt} {Level:u3}] {Message:lj}{NewLine}" +
         "--------------------------------------------------------------- {NewLine}{NewLine}")
 .CreateLogger();
-
-
-builder.Host.UseSerilog();
+builder.Host.UseSerilog(); // it is placed before builder.Build();
 
 --- Explain outputTemplate parameter
 	- {Timestamp:yyyy-MM-dd HH:mm:ss} // when the log happened
@@ -73,6 +71,10 @@ public class ExceptionHandlingMiddleware
         }
     }
 }
+
+
+--- register middleware 
+	app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 --------------------------------------------------------------------------------------------------------------------------------------------
 
