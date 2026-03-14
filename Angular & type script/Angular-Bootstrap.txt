@@ -45,3 +45,14 @@ this.modalService.open(content, { centered: false, keyboard: true, backdrop:'sta
   </div>
 
 </ng-template>
+
+
+
+
+-------------------------
+
+
+
+
+
+

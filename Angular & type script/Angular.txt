@@ -1291,10 +1291,14 @@ new Types
 	- models
 	   - classes
 	   - Interfaces : 
-		- ColorOptionDTOs
-	- enums
+		- DTOs
+		   - ColorOptionDTOs
+		- Results
+		   - OperationResult
+	- Enums
 	- Helpers
-	   - Helper.ts
+	   - Helper.ts [Helper Class]
+		- ToQueryString()
 	- resolvers
 	
   -- Pages: contains the components which is not reusable and could be accessed via route
@@ -1313,5 +1317,6 @@ new Types
 	MainLayout
 	AuthLayout
 
--- assets folder
--- css folder
+  -- assets folder
+  
+  -- css folder
