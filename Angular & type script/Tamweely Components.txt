@@ -1,0 +1,52 @@
+<div class="content-wrapper">
+    <section class="content">
+	<section class="contentheader">
+
+	    <ol class="breadcrumb">
+		<li class="active">
+                    <i class="fa fa-dashboard"></i>{{'DashBoard' | translate}}
+                </li>
+		<li> {{'WorkFlow' | translate}} </li>
+                <li>{{ 'TransactionsofBranches' | translate }} </li>
+		<li>
+                   <a routerLink="/BranchTransaction/edit-customer-name">{{'EditCustomerName' | translate}}</a>
+                </li>
+	    </ol>
+
+	</section>
+    </section>
+</div>
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+
+
+<< Box >>
+
+<div class="col-md-4 col-lg-4 col-sm-12">
+   <div class="box box-solid box-primary">
+	<div class="box-header">
+    	   <h3 class="box-title"> {{'RequestId' | translate}}</h3>
+	</div>
+	<div class="box-body">
+	   {{Request_id}}
+        </div>
+   </div>
+</div>
+
+
+------------------------------------------------------------
+
+
+<< Input With label above >>
+
+<div class="col-md-4">
+  <div class="form-group">
+	<label for="product_name">{{'FundingType' | translate}}</label>
+	   <input
+              [attr.disabled]="disabled==true?true:null"
+              formControlName="product_name"
+              [(ngModel)]="funding_data.product_name"
+              type="text" class="form-control" required />
+  </div>
+</div>
