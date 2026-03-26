@@ -50,3 +50,27 @@
               type="text" class="form-control" required />
   </div>
 </div>
+
+
+-------------------------------------------------
+
+
+<!-- رقم إثبات الشخصية -->
+                            		   <div class="col-md-6">
+                              <div class="form-group">
+                                <label for="QID">
+                                  <span *ngIf="submittedCG && f['QID'].errors" class="invalid-feedback">
+                                    <span class="errors" *ngIf="f['QID'].errors?.['required']" data-toggle="tooltip"
+                                      data-placement="top"
+                                      title="{{ 'Enter' | translate }} {{ 'Identityencodednumber' | translate }}">
+                                      *
+                                    </span>
+                                  </span>
+                                  {{ 'Identityencodednumber' | translate }}
+                                </label>
+                                <input [attr.disabled]="disabled==true?true:null"  formControlName="QID" name="QID" [(ngModel)]="CustGuar.QID" type="text"
+                                  class="form-control" [ngClass]="{ 'is-invalid': submittedCG && f['QID'].errors }"
+                                  required />
+                              </div>
+                            </div>
+
