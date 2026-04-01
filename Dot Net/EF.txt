@@ -113,6 +113,7 @@
 --- when Database first:
    - Scaffold-DbContext "Server=.;Database=ITI;Trusted_Connection=True;TrustServerCertificate=True;"Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models
      Scaffold-DbContext "Server=SQLList;Database=test1;User ID=sa;Password=P@ssw0rd;TrustServerCertificate=True;" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models
+     Scaffold-DbContext "Server=SQLList;Database=DBtest1;User ID=sa;Password=P@ssw0rd;TrustServerCertificate=True;" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models
 
   	• the following command to create a model from the existing database
   	• Scaffold-DbContext-> the command that make reverse engineering

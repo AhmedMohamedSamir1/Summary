@@ -1,19 +1,18 @@
+
 <div class="content-wrapper">
     <section class="content">
+
 	<section class="contentheader">
-
 	    <ol class="breadcrumb">
-		<li class="active">
-                    <i class="fa fa-dashboard"></i>{{'DashBoard' | translate}}
-                </li>
-		<li> {{'WorkFlow' | translate}} </li>
-                <li>{{ 'TransactionsofBranches' | translate }} </li>
-		<li>
-                   <a routerLink="/BranchTransaction/edit-customer-name">{{'EditCustomerName' | translate}}</a>
-                </li>
-	    </ol>
-
+                <li class="active"><i class="fa fa-dashboard"></i>{{'DashBoard' | translate}}</li>
+                <li>{{'WorkFlow' | translate}}</li>
+                <li>{{ 'TransactionsofBranches' | translate }}</li>
+                <li><a routerLink="/BranchTransaction/edit-customer-name">{{'EditCustomerName' | translate}}</a></li>
+            </ol>
 	</section>
+	<fieldset>
+	   ... 
+	</fieldset>
     </section>
 </div>
 
@@ -73,4 +72,48 @@
                                   required />
                               </div>
                             </div>
+
+
+------------------------------------------------------
+
+<< Validation *  >>
+
+<label class="form-label"
+	<span *ngIf="EditForm.controls['SecondName'].touched && EditForm.controls['SecondName'].errors">
+        	<span class="errors" *ngIf="EditForm.controls['SecondName'].hasError('required')" data-toggle="tooltip" data-placement="top" title="{{ 'Enter' | translate }} {{ 'Secondname' | translate }}">*</span>
+        </span>
+        {{"Secondname" | translate}}
+</label>
+
+
+--------------------------------------------------------
+
+<< SweatAlert >>
+
+
+--- Are you sure dialog
+Swal.fire({ icon: 'question', title: this.translate.instant('EditCustomerName'),text: this.translate.instant('ContinueText'),
+        allowEscapeKey: true,    
+        allowOutsideClick: false, 
+        backdrop: true,
+        showCancelButton: true,
+        cancelButtonText: this.translate.instant('Cancel'),
+        confirmButtonText: this.translate.instant('OK'),
+
+})
+
+
+--- info dialog
+
+Swal.fire({
+	icon: 'error',
+        title:this.translate.instant('error'),
+	text: this.translate.instant('OperationFailed'),
+	allowEscapeKey: true,    
+	allowOutsideClick: false, 
+	backdrop: true,
+	confirmButtonText: this.translate.instant('OK'),
+})
+
+
 
