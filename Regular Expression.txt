@@ -1,0 +1,46 @@
+[abc]     	// is string contains a or b or c
+
+[^abc]    	// is string contains chars other than a , b , c
+
+^[abc]		// is string start with a or b or c
+
+^(15|23|32);  // start with 15 or 23 or 32
+
+^[a-zA-Z]{4}  //  must start with 4 chars
+
+\s --> s is small , it indicate to any white space like 
+			A space character 
+			A tab character
+
+\w --> Matches any word character (alphanumeric plus underscore _).
+
+. → any character (except newline by default)
++     --> 1 or more
+*     --> 0 or more
+\d    --> digits 
+\d*   --> Matches zero or more digits
+?= → is a lookahead
+	- (?=A)	Lookahead: next character must be A
+	- (?=.*A) Lookahead: after any number of characters, must be A
+
+
+
+ regax to password
+	^(?=.*[A-Z])(?=.*[\dA-Za-z]{4,})(?=.*[_$@|/\\.&])[A-Za-z\d_$@|/\\.&]{8,}$
+		(?=.*[A-Z]): Positive lookahead to ensure at least one uppercase letter ([A-Z]).
+		(?=.*[\dA-Za-z]{4,}): Positive lookahead to ensure at least four alphanumeric characters
+		(?=.*[_$@|/\\.&]): Positive lookahead to ensure at least one special character
+		[A-Za-z\d_$@|/\\.&]{8,}: Matches the actual characters of the password.
+
+
+egypt phone number RX: 
+	[RegularExpression(@"^[0](10|11|12|15)[0-9]{8}$", ErrorMessage = "invalid phone number format")]
+
+regax to start with number from 1:9 following by any number
+	[RegularExpression(@"^[1-9]{1}[0-9]*", ErrorMessage = "enter valid governmentId")]
+
+regax to email
+	[RegularExpression(@"[\w]{4,}[a-zA-Z0-9]{0,}\@(gmail|yahoo|hotmail)\.com$", ErrorMessage = "Enter a valid email")]
+
+
+[RegularExpression(@"^[a-zA-Z\s]{3}.*", ErrorMessage = "name must start with at least 3 charachters")]

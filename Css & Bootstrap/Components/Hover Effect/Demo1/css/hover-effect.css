@@ -1,0 +1,99 @@
+*, *:after, *:before {
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+.hovereffect-card {
+	position: relative;
+	clear: both;
+	max-width: 1000px;
+	list-style: none;
+	text-align: center;
+	height: 350px;
+	padding: 5px !important;	/* this to determine the space  between Items*/
+}
+
+
+/* Common style */
+.hovereffect-card figure {
+	position: relative;
+	float: left;
+	overflow: hidden;
+	margin: 0; /**/
+	min-width: 100%;
+	max-width: 480px;
+	max-height: 100%;
+	width: 100%;
+	height: auto;
+	background: #3085a3;
+	text-align: center;
+	cursor: pointer;
+}
+
+.hovereffect-card figure img {
+	position: relative;
+	display: block;
+	min-height: 100%;
+	max-width: 100%;
+	opacity: 0.8;
+}
+
+.hovereffect-card figure figcaption {
+	padding: 2em;
+	color: #fff;
+	text-transform: uppercase;
+	font-size: 1.25em;
+	-webkit-backface-visibility: hidden;
+	backface-visibility: hidden;
+}
+
+.hovereffect-card figure figcaption::before,
+.hovereffect-card figure figcaption::after {
+	pointer-events: none;
+}
+
+.hovereffect-card figure figcaption,
+.hovereffect-card figure figcaption > a {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+}
+
+/* Anchor will cover the whole item by default */
+.hovereffect-card figure figcaption > a {
+	z-index: 1000;
+	text-indent: 200%;
+	white-space: nowrap;
+	font-size: 0;
+	opacity: 0;
+}
+
+.hovereffect-card figure h2 {
+	word-spacing: -0.15em;
+	font-weight: 300;
+}
+
+.hovereffect-card figure h2 span {
+	font-weight: 800;
+}
+
+.hovereffect-card figure h2,
+.hovereffect-card figure p {
+	margin: 0;
+}
+
+.hovereffect-card figure p {
+	letter-spacing: 1px;
+	font-size: 68.5%;
+}
+@media screen and (max-width: 50em) {
+	.hovereffect-card figure {
+		display: inline-block;
+		float: none;
+		margin: 0px auto;
+		width: 100%;
+	}
+}
+

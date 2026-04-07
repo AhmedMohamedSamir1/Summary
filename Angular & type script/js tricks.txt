@@ -1,0 +1,89 @@
+JSON.stringfy(Js_Value)
+	- convert JavaScript value to java script object notation (JSON	) string
+	- used when sending data to API
+
+-----------------------------------------------------------------------------------------------------------------------
+
+const tags: TagInfoDTO[] = [
+    { id: 1, name: "Tag1" },
+    { id: 2, name: "Tag2" },
+    { id: 3, name: "Tag3" },
+];
+
+// Extracting the array of ids
+const tagIds = tags.map(tag => tag.id);
+
+console.log(tagIds); // Output: [1, 2, 3]
+
+
+----------------------------------------------------------------------------------------------------------------------
+
+let projectDTO: ProjectDTO = {
+	brand: this.getProjectBrand.value || null,  // if this.getProjectBrand.value has a falsy value null will be returned
+}
+
+-----------------------------------------------------------------------------------------------------------------------------------
+
+<< convert object to array >>
+
+let options = 
+ { 
+   {text: "text1", id: 1 }
+   {text: "text2", id: 2 }
+   {text: "text4", id: 3 }
+ }
+
+const arrOptions = Object.values(options);
+
+-------------------------------------------------------------------------------------------------------------------------------
+
+<< working with numbers >>
+
+Number(value) ==> returns number
+
+Math.ceil(x: number): number
+
+---------------------------------------------------------------------------------------------------------------------------------
+
+<< Filter >>
+
+- this.pageProjects = this.pageProjects.filter(project => project.id !== id);
+
+----------------------------------------------------------------------------------------------------
+
+<< Find >>
+
+- this.products.find( (product)=>{ product.id==id } );
+
+- 
+
+----------------------------------------------------------------------------------------------------
+<< Checks if an array contains a specific value. >>
+
+const roles = ["Admin", "User", "Manager"];
+const roleToCheck = "Admin";
+
+roles.includes(roleToCheck)  // Returns true if the value exists, otherwise false.
+
+---------------------------------------------------------------------------------------------------
+
+
+<< convertToArrayOfNumber >>
+
+convertToArrayOfNumber(input: string | string[] | undefined): number[] {
+
+    if (Array.isArray(input)) {
+      return input.map(Number); // If input is an array of strings, convert each item to a number
+
+    } else if (typeof input === "string") {
+     
+      return [Number(input)];  // If input is a single string, convert it to a number and wrap in an array
+    }
+    // If input is undefined or null, return an empty array
+    return [];
+  }
+
+	
+
+--------------------------------------------------------------------------------
+

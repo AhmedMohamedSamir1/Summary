@@ -1,0 +1,26 @@
+- Install QR Coder Package
+	Install-Package QRCoder
+
+- Create Helper Folder
+	- create QRCodeHelper class
+
+
+public static class QRCodeHelper
+{
+    public static string GenerateQRCode(string qrText)
+    {
+        QRCodeGenerator qrGenerator = new QRCodeGenerator();
+        QRCodeData qRCodeData = qrGenerator.CreateQrCode(qrText, QRCodeGenerator.ECCLevel.Q);
+
+        Base64QRCode qrCode = new Base64QRCode(qRCodeData);
+        string base64QRCode = qrCode.GetGraphic(20);
+        return "data:image/png;base64," + base64QRCode;
+    }
+}
+
+------------------------------------------------
+
+at html
+   <img src="@Model.QRCode" alt="User QR Code" width="200" height="200"/>
+
+

@@ -1,0 +1,36 @@
+<< Projects Section >>
+
+1) Swift Shipping System, Angular-Link
+•Description: It's a web app designed to facilitate the delivery of orders from merchants to clients through tracking them from creation to receipt
+•Technologies: Entity Framework, C#, Angular, SQL, TypeScript, ASP .NET Core API, API-Link
+•Skills: Unit of Work, Repository pattern, Dependency injection, Authentication Authorization, Validation, AutoMapper 
+
+
+4) RetailReel
+   •Description: An e-commerce platform that supports product presentation by categories, cart management, and order processing.
+   •Technologies: HTML5, CSS3, JavaScript, Local-Storage as DB.
+   •Skills: Client-side API Handling.
+
+
+
+
+
+
+Offbeat Wiki is a collaborative web-based platform designed to document and manage internal software projects.  
+It allows authorized users to add, view, and search for project details via a user-friendly interface or RESTful API.  
+Role-based access ensures that only admins can edit or delete projects, and users can submit new projects for review.
+
+
+
+
+
+
+
+
+
+--------------------------------------------------
+
+<< company.wiki >>
+
+Angular --> https://github.com/AhmedMohamedSamir1/Company.Wiki.git
+API     --> https://github.com/AhmedMohamedSamir1/CompanyWiki.API.git

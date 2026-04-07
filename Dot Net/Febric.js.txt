@@ -1,0 +1,88 @@
+<< installation >>
+   - <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
+
+
+
+-- Html Code 
+	- <canvas id="my-canvas" height="500" width="700" class="mx-auto"></canvas>
+		
+-- Js Code
+
+  - const canvas = new fabric.Canvas('my-canvas');
+	- my-canvas is the id of my-canvas
+
+  - Properies to use
+	- left: canvas.width / 2,
+	- originX: 'center',  // It tells Fabric from which point the object is measured, 
+				 // OriginX: 'left' ,  OriginY: 'top'  // DEFAULT
+
+	- selectable: true,   // allow select the element by user,  true by default
+ 	- hasControls: true   // allow rotate and scallling to element, true by default
+	- hasBorders: true    // allow border, true by default
+	- lockScalingX: true,
+	- lockScalingY: true
+
+  - to add image on the canvas
+
+	fabric.Image.fromURL('/designy-images/T-shirt.PNG', function(img) {
+            img.set({
+                left: 100,   // Measured from the left edge of the canvas (100px from left)
+                top: 100,    // 
+                scaleX: 0.5, // 1 = original width, < 1 = smaller, > 1 = larger   
+                scaleY: 0.5 
+            });
+            canvas.add(img);
+        });
+
+---- printing area
+     const printArea = new fabric.Rect({
+        left: canvas.width / 2+6,
+        top: canvas.height / 2 - 25,
+        originX: 'center',
+        originY: 'center',
+        width: 250,
+        height: 320,
+        fill: 'rgba(0,0,0,0)',
+        stroke: '#00aaff',
+        strokeDashArray: [6, 4],
+        selectable: false,
+        evented: false,
+        visible: false
+    });
+    canvas.add(printArea)
+
+---- CLIP PATH (this is the secret)
+    - 
+    const clipRect = new fabric.Rect({
+        left: printArea.left,
+        top: printArea.top,
+        originX: 'center',
+        originY: 'center',
+        width: printArea.width,
+        height: printArea.height,
+        absolutePositioned: true
+    });
+    // it is not a visible object on the canvas
+
+---- Add TExt
+   const text = new fabric.IText('New Text', 
+   {
+      textBaseline: 'alphabetic',
+      left: printArea.left,
+      top: printArea.top,
+      originX: 'center',
+      originY: 'center',
+      fontSize: 32,
+      fill: '#000',
+      fontWeight: 'bold',
+
+      // IMPORTANT
+      clipPath: clipRect,     // only the part inside clipRect is allowed to appear.
+      lockScalingFlip: true,  
+      // This prevents: Flipping text horizontally, Flipping text vertically
+      // Without it: Scaling past zero flips the text Looks broken / unprofessional
+
+   });
+   canvas.add(text);
+   canvas.setActiveObject(text); 
+------------

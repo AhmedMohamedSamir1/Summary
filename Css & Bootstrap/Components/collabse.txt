@@ -1,0 +1,27 @@
+
+<a class="btn btn-primary" role="button" data-bs-toggle="collapse" href="#collapseExample"  aria-expanded="false" aria-controls="collapseExample">test</a>
+
+	- data-bs-toggle="collapse"
+		It tells Bootstrap that this element will be used to toggle (show/hide) a collapsible element (element with class collapse).
+
+	- href="#collapseExample" or data-bs-target="#collapseExample"
+		the collapsable element that will be toggled
+		
+	- role="button"
+		indicating that this link behaves as a button.
+
+	- aria-expanded="false"
+		means the collapsible content is initially hidden
+
+	- aria-controls="collapseExample"	
+		attribute that establishes a relationship between the control (the link/button) and the element it controls (the collapsible content).
+
+
+<div class="collapse show" id="collapseExample"  data-bs-parent="#sidebar">
+   <div class="card card-body">Anim pariatur cliche reprehenderit,cred nesciunt sapiente ea proident. </div>
+</div>
+	- show: means collapsable element is starting visible
+	- class="collapse" : A Bootstrap class that makes the element collapsible
+	- class="collapse-horizontal" control the direct of collapse
+	- data-bs-parent="#sidebar" : it will close any other open section within the specified parent container. (element with "sidebar")
+	- when you click on the element that has data-bs-toggle="collapse" it will add class show to its target

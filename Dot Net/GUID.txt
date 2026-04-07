@@ -1,0 +1,30 @@
+-- to make the GUID length is 9
+	Guid.NewGuid().ToString("N").Substring(0, 9);   // ToString("N") // No hyphens (-)
+
+-- Guid id = Guid.NewGuid(); // e.g. b2106c48-7f4c-4fc7-8f8a-a845d4e48b0d
+	string idString = id.ToString(); // convert to string
+	Guid parsedBack = Guid.Parse(idString); // convert back to Guid
+
+
+
+	Guid id = Guid.NewGuid();
+	string base64 = Convert.ToBase64String(id.ToByteArray());    // Encode (Guid → Base64)
+	Guid decoded = new Guid(Convert.FromBase64String(base64));   // Decode (Base64 → Guid)
+	Console.WriteLine(id == decoded); // True ✅
+
+
+-- 
+--------------------------------------------------------------------------------------------------
+
+<< Encode and decode string >>
+
+
+---- Encode
+    var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(plainText);
+    Convert.ToBase64String(plainTextBytes);
+
+
+
+---- Decode
+    var base64Bytes = Convert.FromBase64String(base64EncodedData);
+    System.Text.Encoding.UTF8.GetString(base64Bytes);

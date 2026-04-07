@@ -1,0 +1,266 @@
+<< this keyword, call(), apply(), bind(), closure >>
+
+- this refer to object that calls the method
+- this can refer to button or html element -> document.getElememntById("cl").onClick = function(){ console.log(this) } 
+
+- you can call the function and determine which caller object you want this refers to using function call
+	person1.func.call(product)  // this inside the method func will refer to product object
+	person1.func.call()         // this will refer to window object if you do not determine which object you want this refer to
+	person1.func.call(product, param1, param2, .....)	
+	person1.func.call(null) 
+
+- you can call the function and determine which caller object you want this refers to using function apply()
+  the difference between apply() and call() is : apply() takes the parameter on the form of array
+	person1.func.call(product, [ele1, ele2]);
+
+- bind() : return the function with specified caller of  this 
+	pesrson1.display.bind(product);  // the function display returned with this refers to product
+
+- closure
+
+   function greet() {
+	var x = "hello";
+	var y = "alaa";
+	function sayHello() {	console.log(x); }
+	return sayHello;
+   } 
+  var res = greet();
+  res();           // hello due to the closure of the x
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<< creating an object using Factory Pattern >>
+
+function product(_id, _title, _price, _quantity) {
+	return {
+		id: _id,
+		title: _title,
+		price: _price,
+		quantity: _quantity,
+		display: function () {
+			console.log(this.price);
+		},
+	};
+}
+var p1 = product(1, "Book", 200, 10);
+console.log(p1);
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<< new keyword, constructor function, prototype, __proto__ >>
+
+-  the convention name of constructor function is to start with capital -> Product, Machine, Person
+-  constructor function is an object so it has a prototype object as a key 
+-  constructor function is an instance of JS Object so it has a property __proto__ that refers to the prototype of JS Object 
+-  any instance of constructor function has a property __proto__ that refer to prototype of function constructor
+
+- when new keyword used before function 
+	1. the function will be => constructor function
+	2. it creates an empty object with property __proto__ that refers to constructor function prototype, this inside function will refer to object
+	3. return the created object
+
+- the constructor function is like class in native JS , and we create an object from this function contructor using new keyword
+
+example: 
+  function Product(_name, _price){
+      this.name  = _name;
+      this.price = _price;
+      this.display = function(){
+          console.log(this.name +" "+ this.price);
+      }
+  }
+  var p1 = new Product("mobile", 120);
+  // p1 = {name: 'mobile', price: 120, display: ƒ}
+
+- any object at JS has a prototype object as a key
+
+- because of every object we will create from constructor function will has the same function display(), 
+  instead we create it at the prototype of constructor function 
+  
+ function Product(_name, _price){
+    this.name  = _name;
+    this.price = _price;
+ }
+ Product.prototype.display = function(){
+    console.log(this.name +" "+ this.price);
+ }
+ var p1 = new Product("mobile", 120);
+ p1.display();
+ 
+
+- note : - any instance of constructor function has a property __proto__ that refer to prototype of function constructor
+	 - Every instance created using new Product() has a __proto__ property which points to the Product.prototype. 
+	   This is the chain that is used to traverse to find a property of a particular object.
+	 
+         - Product.prototype == p1.__proto__
+	 - console.log(p1.__proto__.__proto__ == Object.prototype); // true
+
+- when you ask for a key and this key does not exist at the object js engine try to find the key at the prototype 
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<< inhertinace and overriding using native JS >>
+
+// parent
+function Person(fname, lname) {
+	this.fname = fname;
+	this.lname = lname;
+}
+
+Person.prototype.display = function(){
+    console.log(this.fname + " _ " + this.lname);
+}
+
+// child
+function User(fname, lname, age){
+    Person.call(this, fname, lname); // by which i inherit the properties
+    this.age = age;
+}
+
+// inhertance
+User.prototype = Object.create(Person.prototype);
+
+
+// override
+User.prototype.display = function(){
+    console.log(this.fname + " _ " + this.lname + " _ "+ this.age);
+}
+
+-------------------------------------------------------------------------------------------------------
+
+<< static members >>
+
+Person.staticMethod = function(){
+    console.log("hello from static method");
+}
+
+Person.staticProperty = "static_prop";
+
+----------------------------------------------------------------------------------------------------------------
+
+<< abstract >>
+
+// parent
+function Person(fname, lname) {
+    if(this.constructor == Person)
+        throw "Error can't take an object from abstract class";
+	this.fname = fname;
+	this.lname = lname;
+}
+
+Person.prototype.display = function(){
+    throw "Method not implemented";
+}
+
+// child
+function User(fname, lname, age){
+    Person.call(this, fname, lname); // by which i inherit the properties
+    this.age = age;
+}
+
+// inhertance
+User.prototype = Object.create(Person.prototype);
+User.prototype.constructor = User;
+
+
+// var p1 = new Person("ahmed", "mohamed", "12"); // error  can't take an object from abstract class
+// p1.display();  // error Method not implemented
+
+
+----------------------------------------------------------------------------------------------------------------
+
+<< Encapsulation >>
+
+var product = {
+	name: "book",
+	price: 200,
+};
+
+Object.defineProperty(product, "quantity", {
+	value: 10,
+	writable: true,     // it allow setter on the property def = false
+	configurable: true, // it allow deleting the property def = false
+	enumerable: true,   // allow property to be accessed using loop def = false
+});
+
+product.quantity = "new quant";
+// delete product.quantity;
+console.log(product);
+
+
+for (var i in product) {
+	console.log(product[i]);
+}
+
+example 2 :
+
+function Person(fname, lname) {
+	var myPassword = "123";
+	this.fname = fname;
+	this.lname = lname;
+
+	Object.defineProperty(this, "getPassword", {
+		get: function () {
+			return myPassword;
+		},
+		set: function (value) {
+			myPassword = value;
+		},
+	});
+}
+
+var p1 = new Person("ali", "ahmed");
+
+p1.getPassword = "new Password"; // set
+console.log(p1.getPassword); // get
+
+-------------------------------------------------------------------------------------------------------------------------------
+
+
+<< oop in EC6>> 
+
+class Person {
+    #id; // private member
+
+    // constructor that called automatically
+    constructor(_name, _age){
+
+        if(this.constructor==Person)
+            throw new Error("you can not define an object from abstract Person");
+
+        this.name = _name;
+        this.age = _age; 
+    }
+    // abstract method
+    display(){ throw new Error("method must be implemented"); }
+
+    get id() {	return this.#id; }
+
+	set id(value) {
+		// validation
+		this.#id = value;
+	}
+
+    static test(){ console.log("Iam static method");}
+} 
+
+class User extends Person{
+    constructor(_name, _age, _job){
+        super(_name, _age);  // to call the constrcutor of parent class
+        this.job = _job;
+    }
+
+    // overriding
+    display(){ console.log(this.name + "_" + this.age);}
+}
+
+
+var p = new User("ahmed", 40);
+p.id="29909301412492";
+p.display();
+Person.test();
+
+
+--------------------------------------------------------------------------------------------------------------------------
+
+
+

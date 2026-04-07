@@ -1,0 +1,197 @@
+BOM: browser object model
+	- window object is the browser object
+	- window object is the main object of js page
+	- window object contains document object
+	- all global variables, functions, objects are member of window object
+
+---------------------------------------------------------------------------------------------------
+
+<< window objects => alert, confirm, prompt >>
+
+- they are methods of window object , it's optional to write window => alert("") is window.alert("");
+
+alert(msg[req]) :  // sweet alert link page-> 	 https://sweetalert2.github.io/
+	- alert(message); = window.alert(message); = this.alert(message);
+	- it stop the execution of the page until you click on ok 
+
+confirm(msg=[req]);
+	let res = confirm("are you sure ?"); // res = true if user click on ok , false if user click on cancel
+
+
+prompt(label[req], placeholder[opt]);
+	let res = prompt("press the wanted number"); // res = null if user write nothing in the input field , res = the written inside the field
+----------------------------------------------------------------------------------------------------------------------------------------------------------
+<< window objects=>
+	1. open() 
+ 	2. close()
+	3. moveTo()
+	4. moveBy()
+	5. resizeTo()
+	6. resizeBy() 
+	7. scrollY // property
+>>
+
+- they are window object methods
+
+1- window.open(url[opt]=about:blank, window_identifier or target[opt]=_blank , window_features[opt], history_replace[boolean][opt])
+    - about:blank -> open blank page
+    - target -> the default = _blank, or _self [open page in the same tap]
+    - window_features : width[num], height[num], top[num], left[num]
+    - window.open('https://google.com', '_blank', 'width=400px,height=400px,top=40px,left=300px');
+    
+    - window.open() // it return window object for the opened page , so
+      var newWindow = window.open('', '_blank', 'width=400px,height=400px,top=40px,left=300px');
+      newWindow.document.body.append(element);
+
+2- newWindow.close() // note: close() open the window that opened by open()
+
+3- newWindow.moveTo(x,y)
+4. newWindow.moveTo(x,y)
+5. newWindow.resizeTo(x,y)
+6. newWindow.resizeBy(x,y)
+7. window.scrollY  // Get the vertical scroll position
+------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<< setTimeout(), clearTimeout() >>
+
+- setTimeout() is an asynchronous function , meaning that the timer function will not pause execution of other functions in the functions stack
+- setTimeout(function(){}, milsecond, additional params) : you can call the function after specific time(milsec) , argument of function is placed in additional params
+	- it returns an id that's used as paramter for clearTimeout
+	- if you want to add params to function of setTimeout you should add it at additional params
+	setTimeout(function(){
+    		console.log('hello from setTimeout method after 3 sec');
+	}, 3000); // 3000 means 3 sec
+	//-------------------------------------------
+	setTimeout(function(num1, num2){
+    		console.log(`hello from setTimeout method after 3 sec ${num1}, ${num2}`);
+	}, 3000, 20, 30);
+
+	//-------------------------------------
+	function one(num1, num2){
+    		console.log(num1+num2);
+	}
+	setTimeout(one, 3000, 5, 7);
+	//---------------------------------------------------------------------------------------------------
+
+clearTimeout(setTimeout_id)
+	function one(num1, num2){
+    		console.log(num1+num2);
+	}
+	let id = setTimeout(one, 3000, 5, 7);
+	clearTimeout(id)
+
+--------------------------------------------------------------------------------------------------------------
+
+<< setInterval(), clearInterval() >>
+
+setInterval(function(){}, milsecond, additional params) : the function called repeatedly after specific time(milsec) , argument of function is placed in additional params
+
+clearInterval(setInterval_id);
+
+<p id="p">7</p>
+let p = document.querySelector('p');
+
+let id = setInterval(function(n1,n2){
+    console.log(`hello from function of set interval , the res = ${n1+n2}`);
+    p.innerText -= 1;
+    if(p.innerText=="0"){
+        clearInterval(id);
+    }
+}, 1000, 5 , 6);
+
+or 
+
+let p = document.querySelector('p');
+function fun(n1,n2){
+    console.log(`hello from function of set interval , the res = ${n1+n2}`);
+    p.innerText -= 1;
+    if(p.innerText=="0"){
+        clearInterval(id);
+    }
+}
+let id = setInterval(fun, 1000, 5, 6);
+-------------------------------------------------------------------------------------------------------------------------------------
+<< location object >>
+
+- it's one of window object properties
+
+location.href    // return the url of the page
+location.href = "https://www.google.com";  // move to google page and add the previous page to history
+location.href = "/#sec2";     // move to the element that has id=sec2 and the url will be page_url/#sec2
+
+console.log(location.host);     // 127.0.0.1:5500 --> hostName(site name):used port
+console.log(location.hostname); // 127.0.0.1      --> hostName(site name)
+console.log(location.port); // 5500
+console.log(location.protocol);  // http:
+
+console.log(location.pathname);    =>  /view.html
+location.pathname = "/about.html" 
+
+console.log(location.hash);   // if the url is : http://127.0.0.1:5500/#p , the hash = #p
+
+location.reload(); // reload the page
+
+location.assign('https://www.google.com');  // move to the specified page and add it to history
+
+location.replace('https://www.google.com'); // move to the specified page and does't store the current page to history object
+
+
+- If you want to navigate from one HTML page to another using JavaScript and pass a value between them,
+  you can use query parameters in the URL
+
+  	1. Sender HTML file (page1.html): You'll construct a URL with query parameters containing the value you want to pass.
+   	
+            	var valueToSend = "example";  // Value to be sent
+
+    		var nextPageUrl = "page2.html?value=" + encodeURIComponent(valueToSend); // Constructing the URL with query parameter
+
+    		window.location.href = nextPageUrl; // Navigate to the next page
+	
+	2. Receiver HTML file (page2.html): You'll extract the value from the URL's query parameters.
+	
+	// Function to get query parameter by name
+    	function getQueryParam(name) {
+        	const urlParams = new URLSearchParams(window.location.search);
+        	return urlParams.get(name);
+    	}
+	var receivedValue = getQueryParam("value");
+------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<< history object >>
+
+history.length  // the length of page history
+history.back();    
+history.forward(); 
+history.go(position); // history.go(0) -> reload the page , history.go(-1) -> back , history.go(1) -> forward
+
+--------------------------------------------------------------------------------------------------------------------------------------------------- 
+
+<< stop() , print(), scrollTo(), scroll, scrollBy(), scrollX = pageXoffset, scrollY = pageYoffset>>
+
+window.stop();  // stop loading of page
+window.print(); // ctrl+p
+
+window.scroll(1500, 1200);
+console.log(scrollX); // 1500
+console.log(scrollY); // 1200
+
+window.scrollBy(900,100);
+window.scrollTo({
+    left:1500,
+    top:1200,
+    behavior:"smooth"
+});
+
+window.scrollTo({
+    left:0,
+    top:0,
+    behavior:"smooth"
+});
+
+-  window.scrollY  // Get the vertical scroll position
+------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+ 
+
+

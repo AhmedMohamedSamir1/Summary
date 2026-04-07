@@ -1,0 +1,1071 @@
+Blazor solutions files
+	• Pages folder:   custom components with URL --> Home.razor, Login.razor
+	• components:     you can create it to carry the components with no URL
+	• _Imports.razor: contains all imports that component will read
+	• App.razor:      is the root component that catch URL and return the component that has the URL if it’s found 
+	• index.html:     the single page application, existed at wwwroot 
+	
+
+----------------------------------------------------------------------------------------------------------------------------
+<< Routable component >>
+
+- Routable component
+	Routable components are Blazor components (.razor files) that can be navigated to via URLs.
+	- they are having the direcive page 
+
+
+- Non-routable components
+	- don't have @page directives
+
+- 
+-----------------------------------------------------------------------------------------------------
+
+<< App.razor >>
+	- is the root component that catch URL and return the component that has the URL if it’s found
+
+
+<Router AppAssembly="@typeof(App).Assembly">
+	- This creates the main Router component that handles navigation in your Blazor app.
+	- AppAssembly="@typeof(App).Assembly"
+		- AppAssembly parameter tells the router which assembly to scan for routable components
+		- You're telling the router: Look inside the assembly that contains the App class and find all components that have @page directives,
+           	  then make them available for routing.
+
+<Found Context="routeData">
+	- This section defines what happens when the router successfully finds a matching route for the current URL
+	- The Context="routeData" creates a variable called routeData that contains information about the matched route
+	- routeData contains several pieces of information about the matched route. Here's what's inside it
+		- PageType     --> Type pageComponent = routeData.PageType;  // If URL is "/counter", PageType would be typeof(Counter)
+		- RouteValues  --> A dictionary containing route parameters extracted from the URL:
+			For URL: "/product/123" --> routeData.RouteValues["id"] = "123"
+			for URL: @page "/user/{userId}/order/{orderId}" --> "/user/456/order/789" 
+				routeData.RouteValues["userId"] = "456"
+				routeData.RouteValues["orderId"] = "789"
+
+
+<RouteView RouteData="@routeData" DefaultLayout="@typeof(CustomLayout)" />
+	- This renders the matched page component. It passes the route data to determine which component to display and
+          sets CustomLayout as the default layout wrapper for pages that don't specify their own layout. 
+
+<FocusOnNavigate RouteData="@routeData" Selector="h1" />
+	- moves keyboard focus to the first h1 element on the page when navigation occurs.
+
+
+<NotFound>
+	- This section defines what to display when no matching route is found (404 scenarios).
+
+<PageTitle>Not found</PageTitle>
+	- Sets the browser tab title to "Not found" for 404 pages.
+
+<LayoutView Layout="@typeof(CustomLayout)">
+	- Wraps the 404 content in your CustomLayout, ensuring consistent styling even on error pages.
+
+
+
+
+-- Diagram scenarion
+
+ User types URL in browser
+           │
+           ▼
+     <Router> checks
+     all components
+    with [Route(...)]
+           │
+  ┌────────┴─────────┐
+  │                  │
+Found match?     No match?
+  │                  │
+  ▼                  ▼
+<Found>             <NotFound>
+  │                  │
+  ▼                  ▼
+<RouteView>      "404 Not found"
++ Layout         (using CustomLayout)
+  │
+  ▼
+Show Page inside CustomLayout
+  │
+  ▼
+Optionally move focus to <h1>
+(<FocusOnNavigate>)
+
+
+
+----------------------------------------------------------------------------------------------------------------------------
+
+<< Events , Event Binding>>
+
+
+- here are common events in Blazor, especially for components and HTML elements
+   - 🖱️ Mouse Events → Events of type --> EventCallback<MouseEventArgs>
+	- @onclick      : Fired when an element is clicked
+	- @ondblclick   : Triggered on a double-click
+	- @onmousedown  : When mouse button is pressed down
+	- @onmouseup	: When mouse button is released
+	- @onmouseover  : When mouse pointer enters the element
+	- @onmouseout   : When mouse pointer leaves the element
+	- @onmousemove  : When the mouse moves over the element
+	
+   - Keyboard Events → Events of type --> EventCallback<KeyboardEventArgs>
+	- @onkeydown    : When a key is pressed down
+	- @onkeyup      : When a key is pressed (deprecated in browsers, but still usable)
+	- @onkeypress	: When a key is released
+	
+	
+   - Input & Change Events → Events of type --> EventCallback<ChangeEventArgs> 
+ 	- @oninput	: Fires every time the user types or changes input value
+	- @onchange 	: Fires when the input loses focus after a value change
+
+
+   - 📋 Form Events → Events of type EventCallback<EventArgs>
+	- @onsubmit	: Triggered when a form is submitted
+	- @onreset	: Triggered when a form is reset
+
+   - 🌐 Focus Events →  Events of type EventCallback<FocusEventArgs>
+	- @onfocus	When an element gains focus
+	- @onblur	When an element loses focus
+
+
+   - 🖼️ Clipboard Events → Events of type EventCallback<ClipboardEventArgs>
+	- @oncopy	When content is copied
+	- @oncut	When content is cut
+	- @onpaste	When content is pasted
+
+
+   - Drag & Drop Events → Events of type EventCallback<DragEventArgs>
+	- @ondrag	While an element is being dragged
+	- @ondragstart	When dragging starts
+	- @ondragend	When dragging ends
+	- @ondrop	When an item is dropped
+	- @ondragover	When an element is dragged over a drop target [called continuously — again and again — as long as you are dragging over the element]
+
+
+- note that event binding in blzor is very smart how
+	<div @onclick="ToggleNavMenu"></div>  // @onclick type --> EventCallback<MouseEventArgs> which need a method that has MouseEventArgs
+	private void ToggleNavMenu()
+	{
+    	   collapseNavMenu = !collapseNavMenu;
+	}
+	- the @onclick event accept the ToggleNavMenu although it does not contain the MouseEventArgs param AND that is why it is samrt
+	  it convert it internally to --> @onclick="(args) => ToggleNavMenu()"
+	
+	----- Scenario 
+	  (click on) <div @onclick="ToggleNavMenu"></div> -> Blazor Engine checks ToggleNavMenu() -> has no parameter so call it like (args) => ToggleNavMenu()
+   
+
+
+---- EventCallback<string> myCallback;
+	“I can hold a reference to a method that takes a string as a parameter (and returns void or Task).”
+	myCallBack = (strValue)=> code // arrow method
+	myCallBack = method // where method take a string as parameter
+	
+----------------------------------------------------------------------------------------------------------------------------
+
+<< Layout >>
+
+- all layouts must inherit from LayoutComponentBase
+	- @inherits LayoutComponentBase
+
+
+	- @Body
+		- get the content to be rendered inside the layout
+
+-------------------------------------------------------------------------------------------------------------------------
+
+<< Index.html >>
+
+
+<div id="app"> ... content appeared until project is loaded</div>
+
+	- it just a placeholder for content
+	- It will be visible only until Blazor finishes downloading and bootstrapping.
+	- Once the Blazor runtime is ready, it will replace everything inside the app element
+
+	
+------------------------------------------------------------------------------------------------------------------------
+
+<< Directives >>
+
+- @layout: used to specify a layout component for a Razor component or page.
+ 	- Set Layout for a Single Razor Component
+	    @layout EmptyLayout --> override the default 
+
+- @page : To set URL to component 
+	Ex1 --> @page "/first"  , must start with /
+	
+	Ex2 --> @page "/first/{id:int}"    // id will pass to component at property named id
+
+	       [Parameter]
+	       public int id { get; set; }  // the name must be similar to route parameter
+
+
+	Ex3 -->
+		@page "/TrackingShipment/{ShipmentTrackingId}"
+		
+		[Parameter]
+		public string ShipmentTrackingId { get; set; }
+		
+		NavigationManager.NavigateTo($"/TrackingShipment/{TrackingShipmentModel.TrackingNumber}");
+
+		
+- @Body: where the child page’s content will be rendered.
+
+- @code {} // where c# code is written
+
+
+- @ref --> is a special directive that lets you get a reference to a component or HTML element. you can interact with referenced element in C# code
+   - Example:
+	<MudDialog @ref="myDialog" />
+	private MudDialog myDialog;
+	myDialog.Show(); // call a public method of the MudDialog
+  
+  - Blazor only assigns @ref after the component is rendered.
+  - if you are trying access element with @ref inside the OnInitializedAsync you will get null exception error because the UI isn’t rendered yet.
+    use OnAfterRenderAsync
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<< Blazor Elements>>
+
+---- for any Blazor element we have 
+	- Value : Holds the current value of the input
+	- ValueChanged : EventCallback<string> , trigger when user blur or press enter
+	- ValueExpression: Expression<Func<string>> , telling Blazor validation system which model property is bound to this field to be validated
+          Blazor’s validation system (EditForm, DataAnnotationsValidator, ValidationMessage) relies on ValueExpression  to
+		- Display field-specific validation messages.
+		- Track which fields are “dirty” or “touched”.
+			- Touched — means the user focused and then blurred (left) the field.
+			- Dirty — means the field’s value changed compared to its original model value.
+		- Blazor tracks the state of every input field through an internal class called FieldState, which lives inside the form’s EditContext.
+			FieldState values: Dirty, Touched, Valid/Invalid
+
+ → Based on validation rules.
+	- Use @bind-Value (Recommended)
+		- Blazor automatically wires up everything (Value, ValueChanged, and ValueExpression).
+		- so <InputText @bind-Value="userName" title="User name" /> equal to -> 
+			<InputText Value="userName" ValueChanged="v => userName = v" ValueExpression="() => userName" />
+
+-------- <InputText>
+   -- Properties
+	- Value : string
+	- ValueChanged: EventCallback<string>
+	- ValueExpression : Expression<Func<string>>
+	- Id: string , The HTML id attribute for the input element.
+	- Class: string, CSS class attribute (can be combined with Blazor validation classes).
+	- Style: string, inline style for input element
+	- Placeholder
+	- Disabled: bool
+	- Readonly: bool
+	- Type : string , ("text", "password", "email", etc.). Defaults to "text".
+	- Name: string , HTML name attribute (used in form submissions
+	- AdditionalAttributes: IDictionary<string, object> ,Used to pass attributes to the <input> element. 
+		 additionalAttributes="@(new Dictionary<string, object> { ["data-test"] = "username" })" />
+
+
+-------- <InputDate>
+	- @bind-Value="dateTime" // 
+	- Type : InputDateType , the default is Date, to display the date and time make the Type="InputDateType"
+		public enum InputDateType
+		{  
+    			Date,  	/// Lets the user enter a date.  
+    			DateTimeLocal,  /// Lets the user enter both a date and a time.
+    			Month,  /// Lets the user enter a month and a year.
+    			Time,  /// Lets the user enter a time.
+		}
+
+
+-------- <InputNumber> — numeric input
+	- like the InputText Require @bind-Value or Value, ValueChanged, ValueExpression
+	
+
+
+-------- <NavLink href="/home"></NavLink>
+    -- Info
+	- instaed of anchor tag
+	- Uses Blazor’s client-side routing (no full page reload).
+	- Highlights automatically when you’re on /home
+
+   -- Properties
+	- Match: NavLinkMatch (All, Prefix), Match="NavLinkMatch.All"
+		- Match="NavLinkMatch.All"    // Active only if the current URL matches exactly. EX: /about matches only /about.
+		- Match="NavLinkMatch.Prefix" // Active if the URL starts with the link’s href.  EX: /about matches /about/team, /about/history.
+	- ActiveClass : string,  css class Name applied to Navlink when the current route matches the navlink href
+	
+- <InputTextArea> — textarea
+
+- <InputSelect> — dropdown
+
+- <InputCheckbox> — checkbox
+
+- <InputRadio> / <InputRadioGroup> — radio buttons
+
+
+- EditForm: it is a class that inherit from ComponentBase Abstract class which implement IComponent
+    - Properties
+	- Model: object
+	   - Required
+	   - The model object whose properties are bound to form fields
+		- If using this parameter, do not also supply a value for EditContext. Why?
+			EditForm can work either:
+				Model mode → You set Model and Blazor builds the EditContext for you.
+				EditContext mode → You manually create and pass an EditContext.
+			If you set both: Blazor wouldn’t know which one to use (your custom EditContext vs. the auto-generated one).
+                        that would cause runtime exceptions.
+
+	   - EditContext:
+		- Alternative to Model for more advanced scenarios (custom validation, manual field updates).
+		- Blazor automatically creates an internal EditContext from model property (unless you provide one manually).
+		- usage example
+			private EditContext editContext;
+			protected override void OnInitialized()
+			{
+        			user = new User();
+        			editContext = new EditContext(user);
+    			}
+			<EditForm Model="@user"></EditForm>
+			editContext.Validate();         // triggers validation manually
+			editContext.NotifyFieldChanged(...);
+			editContext.MarkAsUnmodified(); // resets modification state
+
+    - Events
+	- OnSubmit: EventCallback<EditContext> ,      -> Always fires when form is submitted
+	- OnValidSubmit: EventCallback<EditContext>   -> fires only when validation is succeed
+	- OnInvalidSubmit: EventCallback<EditContext> -> fires only when validation is failed
+ 	
+   - With Data Annotation
+	- Always add <DataAnnotationsValidator /> inside the form
+
+	- <ValidationSummary />   // Displays all validation messages in one place.
+
+	- <ValidationMessage For="()=>logInDTO.Email"></ValidationMessage> // to display the validation error msg
+	
+	- Use OnValidSubmit for final save logic to avoid saving invalid data.
+ 
+
+  - With Fluent Validation
+  	- <FluentValidationValidator
+	- <ValidationMessage For="()=>logInDTO.Email"></ValidationMessage> // to display the validation error msg
+	- to use manually	
+	    <FluentValidationValidator @ref="fluentValidator" />
+
+	    private FluentValidationValidator fluentValidator;
+	    var isValid = await fluentValidator.ValidateAsync();  // return bool
+
+	- For extra info go to Fluent Validation section
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+
+<< Binding >>
+
+- One way binding
+	@code { string msg = "Ahmed"; }
+	at html <p>@msg</p>  <input type="text" value="@msg" />
+		- if the msg is changed the input value will be changed also not the vice versa
+		-
+- two-way binding: oninput 
+	- you should use @bind-Value or @bind that is a short hand for @bind-Value
+	- @bind-Value
+		- it give you more control over element like  the event--> @Bind-Value:event="oninput"
+	          it tells Blazor to update the variable every time the oninput event fires , the V is UpperCase
+		- by default Blazor uses onchange which updates variable only when the input loses focus or Enter is pressed.
+
+	<InputText type="password" class="form-control" @bind-Value="logInDTO.Password"></InputText>
+		- By default, InputText listens to the onchange event (fires when input loses focus)
+	<input type="text" @bind-value:event="oninput"  @bind-value="@msg" />
+		here we change the event
+	
+---------------------------------------------------------------------------------------------------------------------
+
+<< Passing data between component >>
+
+-- From parent to child
+
+	• At parent component
+	   <ChildComponent msg="hello Ahmed this is my message"></ChildComponent>
+
+	• At child component
+	   [Parameter] // this means msg property value is gotten from route else if from direct parent component as attribute else default value
+ 	   public string msg { get; set; }
+
+	
+	Ex: Child Component (ChildComponent.razor)
+		- Child Component (ChildComponent.razor)
+			<h4>Child Component</h4>
+			<p>Message: @Message</p>
+			@code {
+    				[Parameter] public string Message { get; set; }
+    				[Parameter] public int Number { get; set; }
+				
+				// to make the property required
+				[Parameter, EditorRequired] public string Message { get; set; } = string.Empty;
+			}
+
+		- Parent Component (Parent.razor)
+			<!-- Passing value to child -->
+			<ChildComponent Message="Hello from Parent!" Number="@count" />
+			- If the parent doesn’t pass it, the property uses its default value.
+
+-- From child to parent
+	- at child
+		<h4>Child Component</h4>
+		<input type="text" @bind="childInputData" placeholder="Enter text here..." />	
+		<button class="btn btn-primary mt-2" @onclick="SendDataToParent">Send to Parent</button>
+	
+		private string childInputData = string.Empty;
+		
+		[Parameter]
+    		public EventCallback<string> OnDataSubmit { get; set; }
+			- EventCallback to notify the parent
+			- Represents a callback method that the child can invoke.
+			- <string> means the callback will pass a string value back when invoked
+			  It could also be EventCallback<int> or even EventCallback (no type) if you don’t want to pass data.
+		private async Task SendDataToParent()
+    		{
+        	    // Call the parent's callback with the entered text
+        	    await OnDataSubmit.InvokeAsync(childInputData);
+    		}
+
+	- at parent
+		<h3>Parent Component</h3>
+		<p><strong>Message from child:</strong> @childMessage</p>
+		<ChildComponent OnDataSubmit="HandleChildData" />
+
+		private string childMessage = "No data yet";
+		private void HandleChildData(string data)
+    		{
+        	   childMessage = data; // update parent state when child sends data
+    		}
+		
+
+--- Cascading Parameters
+	- to pass data automatically down a component hierarchy, without manually chaining [Parameter]s through every level.
+	- Blazor uses two parts to make this work:
+
+	  <CascadingValue> – The provider that wraps child components and shares a value.
+	  [CascadingParameter] – The receiver that marks a property in a child component to get the value.
+
+	- Example
+	
+	  - At parent component
+
+	  	<CascadingValue Value="UserName">
+    		   <ChildComponent />
+	  	</CascadingValue>	
+		
+		private string UserName = "Ahmed Mohamed";
+
+	  - At Child Component
+		<h4>Hello, @UserName!</h4>
+		[CascadingParameter] public string UserName { get; set; };
+
+-----------------------------------------------------------------------------------------------------------------------
+
+<< Blazor Component Lifecycle Methods >>
+
+--- Here’s the high-level flow:
+	- Construction
+	- Parameter Setting (SetParametersAsync, OnParametersSet, OnParametersSetAsync)
+	- Initialization (OnInitialized, OnInitializedAsync)
+	- Rendering (BuildRenderTree)
+	- After Render (OnAfterRender, OnAfterRenderAsync)
+	- Disposal (Dispose, DisposeAsync)
+
+
+	- Constructor  note it is not one of cycle
+		- Purpose: initializing fields with default field values only.
+		- Runs before: Blazor sets parameters or DI services, rendering are available .
+		- You should not access [Parameter] properties, NavigationManager, or anything that depends on DI (Dependency Injection) here, because they aren’t ready yet.
+		- the component hasn’t been rendered to the UI.
+		- aviod async work
+		- Dependency Injection works here for services via [Inject] or constructor injection
+		- uou can safely initialize lists, models, and constants here
+
+	- SetParametersAsync
+		- Blazor itself calls it whenever parameters are supplied to the component.
+		- Default implementation → it assigns the incoming parameters to the component’s [Parameter] properties and then calls OnParametersSetAsync.
+		- You usually don’t override this unless you want to completely customize how parameters are set.
+		- Called: Every time parent sends parameters (not just once).
+
+	- OnParametersSet / OnParametersSetAsync 
+		- run after all parameters have been assigned by SetParametersAsync, runs every time parameters are set
+		- If the parent passes parameters ([Parameter]), Blazor assigns them after construction.
+		  That’s why you shouldn’t depend on parameters being available inside the constructor.
+		- You use them when your component needs to react to parameter changes (e.g., recalculate something when a value changes).
+
+	- OnInitialized / OnInitializedAsync  (the real cycle starts after construction):
+		- The constructor runs first before it, called only once after Blazor sets up the component instance.
+		- Blazor sets up the component instance meaning
+			- Blazor creates the component object (instance) Using the constructor
+				- At this point, the component exists in memory but doesn’t yet have values for [Parameter] properties
+			- Blazor sets component  dependencies 
+				- Injects services marked with [Inject]
+			- Blazor assigns [Parameter] values (from parent components)
+
+		- Executed once: when the component is first initialized (before first render).
+		- Best place for fetching data from API
+
+	- OnAfterRender / OnAfterRenderAsync
+		- Called after the component has rendered.
+		- Use it to run JavaScript interop, DOM measurements, or animations.
+		- When you change focus (tabbing from one input to another), the component may cause a state change
+			That state change → causes a re-render → which triggers OnAfterRenderAsync.
+	- ShouldRender
+		- is a method you can override in your component.
+		- It controls whether the component should re-render when something changes (e.g., parameters, state).
+		- 📌 Default behavior : protected override bool ShouldRender() { return true; }
+		- This means Blazor always re-renders the component when it detects changes.
+		- Return false to skip rendering.
+
+	- Dispose / DisposeAsync
+		- Used to clean up resources (unsubscribe events, stop timers, etc.)
+		- Called automatically when the component is removed from the UI.
+------------------------------------------------------------------------------------------------------------------------
+
+ 
+ << navigation >>
+
+    [Inject]
+    NavigationManager NavigationManager { get; set; }  // built in service already registered in IOC
+
+    NavigationManager.NavigateTo("/courses");
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+
+<< IJSRuntime >>
+
+
+IJSRuntime methods
+	- ValueTask<TValue> InvokeAsync<TValue>(string identifier, object?[]? args);
+		- Invokes a JavaScript function that returns no value.
+	
+	- ValueTask<TValue> InvokeAsync<TValue>(string identifier, object?[]? args);
+		- ValueTask<TValue> InvokeAsync<TValue>(string identifier, object?[]? args);
+
+	- ValueTask InvokeVoidAsync(string identifier, object?[]? args);
+  		Calls a method on a referenced JS object/module without a return value.
+		Useful for working with imported JS modules.
+	
+	- ValueTask<TValue> InvokeAsync<TValue>(string identifier, object?[]? args);
+		Invokes a JavaScript function and marshals the return value back to .NET as type TValue.
+
+	- Marshalling = serialization + deserialization between .NET and JavaScript worlds.
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+<< Consuming API >>
+
+- The API must enable cores to accept requests from outside domains
+
+- Create appsettings.json at www root folder if not exist
+	- "NXS": "https://localhost:7189/"
+
+- at program.cs change
+	from --> builder.Services.AddScoped(serviceProvider => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+	to   --> builder.Services.AddScoped(serviceProvider => new HttpClient { BaseAddress = new Uri(builder.Configuration.GetValue<string>("NXS")!)});
+
+
+- HttpClient: class used for sending http requests and receiving http responses
+  - Members
+	- BaseAddress: Uri , The base address for requests. Combine with relative URIs.
+
+	- DefaultRequestHeaders: HttpRequestHeaders , Headers automatically included with every request
+
+	- Timeout: How long to wait before a request times out
+	
+	- GetAsync(string? requestUri): Task<HttpResponseMessage>
+
+	- PostAsJsonAsync(string? requestUri, Tvalue value): Task<HttpResponseMessage> , send a post request to specified URI containing the value serialized as a json in the request body
+	
+	- PutAsJsonAsync(string? requestUri, Tvalue value): Task<HttpResponseMessage> , send a put request to specified URI containing the value serialized as a json in the request body
+
+
+- HttpResponseMessage : It represents the entire HTTP response that you receive from a server after sending a request
+			
+	- StatusCode : HttpStatusCode  --> The HTTP status code (e.g., 200, 404, 500).
+			
+	- IsSuccessStatusCode: bool    --> true if the status code is in the 200–299 range.
+			
+	- Content : HttpContent        --> The body of the response. You can read it as string, JSON, stream,
+		content.ReadFromJsonAsync<T>() // ReadFromJsonAsync is extension method for HttpContent			
+			
+	- RequestMessage: HttpRequestMessage --> The original request that triggered this response.
+
+
+- HttpContent
+	- ReadFromJsonAsync<T>(): Task<T?> , Reads the HTTP content and returns the value that results from deserializing the content
+
+	- ReadAsByteArrayAsync(): Task<byte[]> , used whren the returned data is downloadable file
+	
+	- Headers: HttpContentHeaders
+		- HttpContentHeaders.ContentDisposition  	
+
+- Note: IFormFile and List<IFormFile> are not serializable so if your object has IFormFile variable and you try to send it as json
+	it will fail
+  
+
+- at class
+
+	private readonly HttpClient client;
+	public classConstructor(HttpClient client) { this.client = client; }
+	
+	- get
+		var response = await client.GetAsync($"City/All");
+		var jsonResponse = await response.Content.ReadFromJsonAsync<ApiResponse<List<CityGetDTO>>>();
+		return jsonResponse!.Data ?? [];
+	- post
+		var response = await _client.PostAsJsonAsync("shipment", shipment);
+		
+
+--------------------------------------------------------------------------------------------------------------------------------------------
+
+<<<< MudBlazor >>>>
+
+-- installation steps
+	- Install-Package MudBlazor
+
+-- registration	
+	- builder.Services.AddMudServices();
+
+-- at index (single page)
+
+    <link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet" />
+    <script src="_content/MudBlazor/MudBlazor.min.js"></script>
+
+
+-- at .razor
+	@using MudBlazor
+	    
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+public enum Typo
+{  
+    inherit, h1, h2, h3, h4, h6, subtitle1, subtitle2, body1, button, caption, overline
+}
+
+
+<< MudText >>
+
+- Properties
+   - Typo
+	- DT: it's type is Typo which is an Enum,
+	- Typo.h4 : applies the styles of h4 to the mudText element , applies the predefined typography (font size, weight, line-height)
+	- Default : Typo.body1
+
+  - Align
+	- DT: Align (enum)
+	- Controls the text-align CSS of the text (“start”, “center”, “end”, “justify”, or “inherit”)
+  	- Default Align.Inherit 
+
+  - Color
+	- DT: Color (enum)
+	- Sets the color of the text
+	- Default Color.Inherit
+  - GutterBottom
+	- DT: bool
+	- If set to true, the text gets a bottom margin (some spacing underneath) to separate from next element
+
+  - ChildContent
+	- DT: RenderFragment
+	- 
+
+  - Inline
+	- DT: bool
+	- If true, the component renders as an inline element (not block).
+
+  - Class
+	- DT: string
+	- CSS class(es) that will be appended to the default classes
+
+  - Style
+	- DT: string
+	- Inline CSS styles you want applied
+
+  - Tag
+	- DT: object
+	- 
+
+  - UserAttributes
+	- Dictionary<string, object>
+	- Captures any extra HTML attributes you pass that don’t match known parameters
+	- EX
+	   <MudText Typo="Typo.body1"Color="Color.Info" @attributes="extraAttributes">Hover over me</MudText>
+
+           @code {
+    		private Dictionary<string, object> extraAttributes = new()
+    		{
+        		{ "title", "Extra info via dictionary" },
+        		{ "data-id", "123" },
+        	{ "aria-label", "info text" }
+    	   };
+	    // will be rendered to -> title="Extra info via dictionary" data-id="123" aria-label="info text"
+}
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+<< MudTextField >>
+
+- Properties
+	- ValueChanged: EventCallBack<string>
+		ValueChanged="OnSearch" // OnSearch Method signature must matche (method the take string as parameter)
+		ValueChanged="@(s => OnSearch(s))" // If you want to modify or ignore the value before calling the method,
+		
+	- Immediate
+		- Immediate="false" (default) [ValueChanged fires only when the field loses focus (on blur) or Enter key).]
+		- Immediate="true"  ValueChanged fires on every keystroke — i.e., every time the user types a character.
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+<< MudSelect, MudSelectItem >>
+
+- MudSelect Properies
+  - T
+  - Value="assignPriceListModel.PriceListType"
+  - ValueChanged="OnPriceListTypeValueChanged" // ValueCahnged DT is EventCallBack<T>, which means refers to method that take T as a parameter
+  - Label  // String
+  - Class
+  - 
+
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+
+<< MudProgressCircular >>
+
+<MudProgressCircular Color="Color.Primary" Size="Size.Medium" Indeterminate="true" />
+	- Indeterminate means the progress is unknown.
+		- Example: Loading data from a server — you don’t know if it’ll take 1 second or 10 seconds.
+	
+	- Determinate (when Indeterminate="false") means you know the progress value. In that case, you set Value="intValue" (0–100).
+
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+
+<< MudDialog >>
+
+-- basic structure
+
+<MudDialog @ref="mudDialog">
+   <TitleContent></TitleContent>
+   <DialogContent></DialogContent>
+   <DialogActions></DialogAction>
+</MudDialog>
+
+
+private async Task ConfirmAction()
+{
+    Console.WriteLine("ConfirmAction()");
+    DialogOptions dialogOptions = new DialogOptions()
+    {
+        BackdropClick = false,      // if true clicking outside the dialog closing the dialog
+        MaxWidth = MaxWidth.Small,
+        FullWidth = true,           // the dialog will stretch to 100% width of the screen (within the MaxWidth limit).
+    };
+    await mudDialog.ShowAsync(null, dialogOptions);
+}
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+
+<< Dialog Service >>
+
+private MudMessageBox _mudMessageBox;
+
+private async Task ConfirmAction()
+{
+    Console.WriteLine("ConfirmAction()");
+    DialogOptions dialogOptions = new DialogOptions()
+    {
+        BackdropClick = false,  // allow closing the dialog outside of the dialog
+        FullWidth = true,       // sets the width of the dialog to the width of the screen
+    };
+    var result =  await _mudMessageBox.ShowAsync(dialogOptions);
+    if (result !=null && result.Value)
+    {
+        Console.WriteLine("result = true");
+    }
+    else
+    {
+        Console.WriteLine("result = null");
+    }
+}
+
+
+<MudButton Color="Color.Secondary" OnClick="ConfirmAction">Confirm</MudButton>
+
+<MudMessageBox @ref="_mudMessageBox" Title="Warning" CancelText="Cancel">
+    <MessageContent>Deleting can <b><i>not</i></b> be undone!</MessageContent>
+    <YesButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Error" StartIcon="@Icons.Material.Filled.DeleteForever">Delete!</MudButton>
+    </YesButton>
+</MudMessageBox>
+
+	
+
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+<< MudDrawer >>
+
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+
+<< MudNavMenu >>
+
+<MudNavMenu>
+
+   <MudNavGroup >
+	<MudNavLink></MudNavLink>
+	<MudNavLink></MudNavLink>	
+   </MudNavGroup>
+
+   <MudNavLink></MudNavLink>
+   <MudNavLink></MudNavLink>
+
+</MudNavMenu>
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+<< MudButton >>
+
+ButtonType
+  - ButtonType.Submit // The button will submit a form. 
+  - ButtonType.Button // A regular click occurs.
+  - ButtonType.Reset  // The button resets a form.
+
+Color
+  - Color.Default
+  - Color.Primary
+  - Color.Success
+
+Variant
+  - Variant.Text     // The component has no drop shadow, background or border
+  - Variant.Filled   // filled with a solid color
+  - Variant.Outlined // The component has an outline around the edge.
+
+<MudButton ButtonType="ButtonType.Submit" Color="Color.Success" Variant="Variant.Filled">
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+<< MudAutocomplete >>
+
+properties
+  - T
+      - required , used to specifiy the type of MudAutocomplete 
+      - 
+
+
+<MudAutocomplete T="int"
+   Value="_addShipmentModel.ReceiverCityId"
+   ValueChanged="OnReceiverCitySelected"
+   SearchFunc="ReceiverSearchCities"
+   ToStringFunc="@(id => id == 0 ? string.Empty : (ReceiverCitiesGetDTO?.FirstOrDefault(c => c.Id == id)?.Name ?? string.Empty))"
+   ResetValueOnEmptyText="true"
+   MaxItems="200"
+   DebounceInterval="500"
+   Clearable="true"
+   Label="choose city"
+   Variant="Variant.Outlined"
+   For="@(() => _addShipmentModel.ReceiverCityId)"
+Class="mb-3" />
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+
+<MudSnackbarProvider />
+@inject ISnackbar Snackbar;
+
+Snackbar.Add($"can not find regular expression for {selectedCountryName}", Severity.Error);
+Snackbar.Add($"Operation completed successfully! \n Tracking number: {res.Data.TrackingNumber}", Severity.Success);
+
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+<< MudForm >>
+
+---- properties
+	- Model="verefiyCompanyModel"
+	- @ref = "verefiyCompanyForm"
+
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+<< MudFileUpload >>
+
+---- properties
+	- T="List<IBrowserFile>"
+	- InputClass="file-upload-input"
+	- AppendMultipleFiles  // append file to exited list
+	- 
+-----------------------------------------------------------------------------------------------------------------------
+
+<< intl-tel-input library >>
+
+<< telephone input with country flag + country_calling_code >>
+
+--- at wwwroot
+	css: add the intlTelInput.css file,   review the path of flags image
+	js:  add the intlTelInputWithUtils.min,  initPhoneInput.js you are the one who creates it
+
+
+--- initPhoneInput.js
+window.initPhoneInput = function (id) {
+    const input = document.getElementById(id);
+    if (input) {
+        const originalClass = input.parentElement.className; // store your class
+
+        // loaded from intl-tel-input library
+        window.intlTelInput(input, {
+            initialCountry: "auto",
+            separateDialCode: true, // shows the +XX next to country in dropdown
+            geoIpLookup: function (success, failure) {
+                fetch('https://ipapi.co/json')
+                    .then(res => res.json())
+                    .then(data => success(data.country_code))
+                    .catch(() => success("US"));
+            }
+        });
+        input.parentElement.className += ` ${originalClass}`;
+    }
+}
+
+
+--- PhoneNumberInputComponent
+
+@using Microsoft.JSInterop
+
+<input id="@_id" class="form-control intl-phone-input" @bind="Value" @bind:event="oninput" placeholder="Enter phone number" />
+
+@code {
+
+    [Parameter] public string Value { get; set; }
+    [Parameter] public EventCallback<string> ValueChanged { get; set; }
+
+    private string _id = $"phone_{Guid.NewGuid():N}";
+    private IJSObjectReference _module;
+
+    [Inject] IJSRuntime JS { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JS.InvokeVoidAsync("initPhoneInput", _id);
+        }
+    }
+}
+
+
+--- usage 
+	<PhoneNumberInput @bind-Value="individualUserDTO.Phone"></PhoneNumberInput>
+
+------------------------------------------------------------------------------------------------------------
+
+
+<< Fluent validation >>
+
+- Install-Package FluentValidation
+	- This is the core library that contains the validator base classes (AbstractValidator<T>) and all the validation rules.
+
+- Install-Package Blazored.FluentValidation
+	- This is the Blazor-specific integration that lets <EditForm> work with FluentValidation.
+	- It provides the <FluentValidationValidator /> component, which replaces the default Blazor DataAnnotationsValidator.
+
+
+
+---- Usage
+   
+   - inside the EditForm element
+	- <FluentValidationValidator /> 
+	- You don’t need to tell it which validator to use. It figures it out automatically like this
+	  Look at the form’s model --> <EditForm Model="companyUserDTO" OnValidSubmit="SubmitSignUp">
+	  your model is companyUserDTO so FluentValidationValidator looks up an IValidator<CompanyUserDTO> from DI.
+
+	
+   - in case of you need to manually trigger validation
+ 	- tell  me why i need such a thing like that
+		- Revalidate after updating model programmatically for example --> companyUserDTO.Email = "bad email";
+
+	- usage code	
+		<FluentValidationValidator @ref="fluentValidator" />
+
+		private FluentValidationValidator fluentValidator;
+		var isValid = await fluentValidator.ValidateAsync();  // return bool
+		
+
+- Blazored.FluentValidation runs it automatically
+	• On every field change (OnFieldChanged).
+	• On submit (OnSubmit / OnValidSubmit).
+	• 
+
+
+------------------------------------------------------------------------------------------------------------------------------------
+
+<< Form Design >>
+
+@if (isErrorOccured)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>error: </strong> @errorMsg
+    </div>
+}
+
+@if (isOperationDone)
+{
+    <div class="alert alert-info alert-dismissible fade show" role="alert">
+        <strong>Done: </strong>Operation Success <NavLink href="/login" class="text-dark"> [login] </NavLink>
+    </div>
+}
+
+bool isLoading = false;
+bool isOperationDone = false;
+bool isErrorOccured = false;
+string errorMsg = "";
+
+try
+{
+    isLoading = true;
+    
+    var result = your operation that return bool;
+    if (result)
+    {
+        isOperationDone = true;
+    }
+    else
+    {
+        isErrorOccured = true;
+        errorMsg = "operation failed";
+    }
+}
+
+catch
+{
+    isErrorOccured = true;
+    errorMsg = "operation failed";
+}
+
+finally
+{
+    isLoading = false;
+}
+
+------------------------------------------------------------------------------------------------------------------------------------
+
+
+<< JWT Token >>
+
+
+- Install-Package System.IdentityModel.Tokens.Jwt
+
+
+
+
+--------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+

@@ -1,0 +1,709 @@
+<< the packages >> 
+
+- EF packaes
+	- Install-Package Microsoft.EntityFrameworkCore.SqlServer  // enables Entity Framework (EF) Core to communicate with SQL Server databases. (AT Infrastructure layer)
+	- Install-Package Microsoft.EntityFrameworkCore.Tools      // provide EF Core commands like Add-Migration, Update-Database, and Remove-Migration (At presentation layer)
+
+	- Install-Package Microsoft.EntityFrameworkCore.Proxies	  // for lazy loading (not recommended with Auto mapper)
+
+- identity-package 
+	- Install-Package Microsoft.AspNetCore.Identity.EntityFrameWorkCore // Provides EF Core integration for Identity.
+
+	- Install-Package Microsoft.AspNetCore.Identity  // Provides the core Identity functionality (e.g., user management, authentication, password hashing).
+		- it's included by default in you default project 
+		- you need to install it if you want to register the identity from another layer (for example register it in DI Infrastructure file)
+
+- Auto Mapper
+	- Install-package AutoMapper  --> the 15.0.0 needs a license so use 14.0.0
+	- Install-Package AutoMapper -Version 14.0.0
+
+- JWT
+	- Install-package System.IdentityModel.Tokens.Jwt                // used for Generating new JWT tokens
+	- Install-package Microsoft.AspNetCore.Authentication.JwtBearer  // Adds JWT Bearer authentication middleware to the app to validate the tokens.
+
+
+- at class lib the .net 9 Microsoft.Extensions.DependencyInjection is no longer included in class library
+	- Install-Package Microsoft.Extensions.DependencyInjection
+	
+
+- at class lib .net 10 
+	- the IFormFile need to install package 
+		- install-package Microsoft.AspNetCore.Http
+	- To Use IServiceCollection
+		- Install-Package Microsoft.Extensions.DependencyInjection
+
+	- To has access to method --> IServiceCoolection.Configure<T>(IConfiguration config)
+		- Microsoft.Extensions.Options.ConfigurationExtensions
+
+- LinqKit
+	- install-package LinqKit.core
+	- install-package LinqKit.core -Version 1.2.8  // the one who used before At EMS
+	
+- Fluent validation
+	
+- Install-Package Microsoft.AspNetCore.Http.Abstractions
+
+- Install-Package SendGrid
+
+- Excell package
+	- Install-Package EPPlus -Version 7.6.0
+
+- QR Coder Package
+	- Install-Package QRCoder
+
+- phone number
+	- Install-Package libphonenumber-csharp
+- Swagger
+    - swagger is not supported at dot net 9, to use it you need to follow the following steps
+      - Install-Package Swashbuckle.AspNetCore
+      - at properties/launchSettings.json
+	 - make --> "launchBrowser": true
+	 - add --> "launchUrl": "swagger"
+      
+      - builder.Services.AddSwaggerGen();
+	if (app.Environment.IsDevelopment())
+	{	
+    	   app.UseSwagger(); // Enable Swagger generation
+	   app.UseSwaggerUI();
+	}
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+<< build project using N-tiers API>>
+	
+- presentation layer ECommerce.API or ECommerce.MVC
+	- refers to 
+		- Application (Service) Layer
+		- should refer to infrustructure layer either directly or not (the Layer that has DbContext)
+	
+	- mendatory packages
+		- Install-Package Microsoft.EntityFrameworkCore.Tools -> because the dotnet ef tool relies on the startup(default) project for migrations.
+
+	- setup Packages
+		- Install-Package Swashbuckle.AspNetCore  --> if you use .net 9 or above your project will not support swagger
+
+
+	- Create ApiHandler folder
+		- create ApiResponse class
+		- create ApiValidation class
+ 
+	- Create Middlewares folder
+		- class CustomAuthorizationMiddlewareResultHandler : IAuthorizationMiddlewareResultHandler // to custom the response
+
+	- create Extensions folder
+		- create IServiceCollectionExtension class	
+
+- Application Layer, [Service Layer]
+
+	- refer to 
+		- DataAccessLayer (Infrastructure) layer
+
+	- setUp packages
+		- AutoMapper        --> Install-Package AutoMapper
+		- Fluent Validation --> Install-Package FluentValidation.AspNetCore
+		- JWT Packages 
+			- Install-package System.IdentityModel.Tokens.Jwt                   // used for Generating new JWT tokens
+			- JWT Install-package Microsoft.AspNetCore.Authentication.JwtBearer // Adds JWT Bearer authentication middleware to the app to validate the tokens.
+	- DTOs Folder
+		- Seller folder
+			- SellerDTO
+			- SellerGetDTO
+	
+	- AutoMapper folder
+		- Create MappingProfile class to map from DTOs to Entities and Vice versa
+		- PagedListConverter
+
+	- Services Folder
+		- Create Validations Folder
+			- UserValidationService
+		- Create Entities Folder
+			SellerService	
+		- create AccountService to login and logout AppUser
+	
+	- Constants folder
+		- RoleConst class  	-->   public const string Admin = "Admin";
+		- ClaimConst class 	-->   public const string Role = "role";
+		- StatusCodeConst class -->   public const int Success = 200;
+		- PolicyNameConst class -->   public const string TagsView = "Tags/View";
+
+	- JWT Folder
+		- JwtTokenHelper
+
+	- FluentValidators
+		- ApplicationUserValidator.cs
+
+- Data Access layer , [OffbeatWiki.Infrastructure], [OffbeatWiki.DAL] as class lib
+
+	- setup Packages 
+		- Install-Package Microsoft.EntityFrameworkCore.SqlServer --> for interacting with DB
+		- Install-Package Microsoft.AspNetCore.Identity.EntityFrameWorkCore --> identity beacuse in general you ApplicationDbContext inherit IdentityDbContext
+
+	- Entities Folder:
+		- Create Base Folder
+			- create interface IEntity<TKey>
+			- create interface ITrackedEntity
+			- create class Entity<TKey> : IEntity<TKey> 
+			- create class BaseEntity<TKey> : Entity<TKey>, ITrackedEntity	
+		- create needed entities classes Tag, Supplier, Project, Evidence, ETC. 
+		
+		- create class ApplicationUser: IdentityUser       // IdentityUser inherit from IdentityUser<string>
+		- create class ApplicationUser: IdentityUser<int>  // if you want the id of ApplicationUser will be int
+		- create class ApplicationRole: IdentityRole<int>  // in case of you changed the type of IdentityUser id to int, both Ids must be the same
+	- Data folder
+		- create class ApplicationDbContext that inherits from DbContext class or any class that inherit DbContext
+		- class ApplicationDbContext: DbContext
+		- make class ApplicationDbContext: IdentityDbContext<ApplicationUser>
+		- make class ApplicationDbContext: IdentityDbContext<ApplicationUser,ApplicationRole,int> // in case of you want to change the type of Id
+
+	- Repositories folder
+		- create GenericRepository class
+		- create custom repository folder
+			- create classes you
+ 
+	- UnitOfWorks folder
+		- create UnitOfWork Class
+
+	- Enums folder
+		- SearchType
+		- create DataResource 	   --> for tables of the application
+		- create Permission enum   --> for Add, Edit, View, Delete 
+
+	- Pagination folder
+		- BaseResourceParameters class
+		- PagedList class
+		- PageParam class
+		- PaginationResult
+
+	- Extensions folder
+		- IQueryableExtension.cs
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<< build project using Onion Architecture >>
+
+
+- used to achieve a separation of concerns, and flexibility
+- The main idea behind the Onion architecture is the flow of dependencies,or how the layers interact with each other.
+- The deeper the layer resides inside the Onion, the fewer dependencies it has.
+- Layers are not tightly coupled and have a separation of concerns
+- The outer layers are all allowed to reference the layers that are directly below them in the hierarchy
+
+- We can use lower layers of the Onion architecture to define contracts or interfaces, The outer layers of the architecture implement these interfaces
+
+- limitation at N-tiers that leads to Developement of Onion Architecture
+	- N-Tier Violates the Dependency Inversion Principle (DIP)
+		- The Dependency Inversion Principle (DIP) states that high-level modules should not depend on low-level modules. Instead, both should depend on abstractions (interfaces).
+		- in N-Tier architecture, the Business Logic Layer (Application Layer) directly depends on the Data Access Layer which directly interacts with the Database.
+		- This violates DIP because:
+			- High-Level Modules (Application Layer) depend on Low-Level Modules (DAL).
+				- Your business logic (which should be independent) is tightly coupled to the database technology (EF, SQL Server).
+				- If you switch from Entity Framework to Dapper, you have to rewrite business logic to match the new data access code.
+			- Difficult to Replace the Data Layer
+				- Suppose you want to swap out SQL Server for MongoDB.
+				- Since the Application Layer directly calls DAL methods, you would have to rewrite many business logic methods.
+			- Difficult to Unit Test
+				- Since the Application Layer depends on the DAL, testing business logic requires a real database.
+				- You cannot easily mock the database interactions, making unit testing slow and complex.
+
+- The Onion Architecture is composed of several layers:
+	1. Core.Models
+		- Naming --> ECommerce.Core.Models or ECommerce.Domain.Models
+		- In case of small application you can include it in Domain layer.
+		
+		- References
+			- None		
+		
+		- Installed Package
+			-  for app user --> Install-Package Microsoft.AspNetCore.Identity.EntityFrameWorkCore
+
+		- Create Entities folder
+			- Base Folder --> [ITrackedEntity, IHasName, ETC]
+			- create Entities (Models) like Person, Product and so on
+
+	2. Core or Domain layer [ should remain free of external dependencies like Entity framework package or Identity Package ]
+		- the most common way of naming ECommerce.Core or ECommerce.Domain
+		
+		- References
+			- Domain.Models
+		
+		- Interfaces
+			- Repositories folder
+				- IGenericRepository.cs
+				- IOrderRepository.cs
+			- UnitOfWork folder
+				- IUnitOfWork
+
+		- Common folder 
+			- BaseResourceParameters
+
+	3. Infrastructure Layer or data access layer
+		- Naming --> ECommerce.Infrastructure 
+
+		- References
+			- Core.Domain
+
+		- Installed Packages
+			- Install-Package Microsoft.AspNetCore.Identity
+			- Install-Package Microsoft.EntityFrameworkCore.SqlServer
+		- Data
+			- ApplicationDbContext.cs
+		
+		- Extensions folder
+			- IQueryableExtension
+
+		- Repositories folder
+			- GenericRepository.cs
+			- ProductRepository.cs
+
+		-  UnitOfWorks folder
+			- UnitOfWork.cs
+
+		- DependencyInjection.cs
+
+	4. Application layer or Service Layer or Business logic layer:
+		- Naming ECommerce.BLL or ECommerce.Application
+
+		- References
+			- Domain Layer
+			- Shared Layer
+
+		- Installed Packages
+		    	- Install-Package AutoMapper
+			- Install-package System.IdentityModel.Tokens.Jwt                // used for Generating new JWT tokens
+			- Install-package Microsoft.AspNetCore.Authentication.JwtBearer  // Adds JWT Bearer authentication middleware to the app to validate the tokens.
+
+			
+		- AutoMapper folder
+			- MappingProfiles.cs
+			- PagedListConverter.cs
+			
+		- Constants folder
+			- 
+			- 
+
+		- FluentValidator folder
+	
+		- Pagination Folder
+			- PagedList
+			- PageParam
+			- IPageParam
+			- PaginationResult
+
+		- PageParams folder
+			- EventParam: PageParam, IPageParam
+
+		- Services
+			- GenericService folder
+				- IGenericService.cs
+				- GenericService.cs
+				- IGenericUniqueName
+				- 
+			- TagService
+				- ITagService.cs
+				- TagService.cs
+
+		- DTOs Folder
+		- DependencyInjection.cs
+
+	5. Presentation Layer: 
+		- Naming ECommerce.API or ECommerce.MVC
+		
+		- References
+			- Application Layer (Service Layer, Business Logic Layer) to use Application Layer services
+			- Infrastructure Layer to could register services and this does not violate the Onion principles in addition to
+			  successfully run EF Core commands the default(start up) Layer must reference the layer that has the implementation of DbContext (Infrastructure)
+		
+		- Installed Package		
+			-  default project need --> Install-Package Microsoft.EntityFrameworkCore.Tools
+		
+		- ApiHandler
+			- ApiResponse.cs
+			- ApiValidation.cs
+		
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<< Clean Architexture >>
+
+- Domain Layer
+	- Entities
+
+- Infrastructure Layer
+	- 
+	-
+- Application (Service) Layer
+
+- Core Layer in case of u use CQRS
+	- Handlers
+	- AutoMapper
+
+- Presentation Layer
+	- Controllers
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+---- Base Folder
+	IEntity
+	IHasName
+	ITrackedEntity
+	IBaseEntity<TKey>: IEntity
+	IBaseEntityWithTrackedEntity<TKey>: IBaseEntity<TKey>, ITrackedEntity
+	BaseEntity<TKey> : IBaseEntity<TKey>
+	BaseEntityWithTrackedEntity<Tkey> : BaseEntity<TKey> , IBaseEntityWithTrackedEntity<TKey>
+
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+- inject your  ApplicationContext
+	- At appSetting.Json: it’s a configuration file 
+		"ConnectionStrings": {
+    			"cs": "Server=.;Database=WebApiLab1;Trusted_Connection=True;TrustServerCertificate=True;"
+  		}
+
+	- at program.cs
+		 builder.Services.AddDbContext<ApplicationContext>(option => option.UseSqlServer(builder.Configuration.GetConnectionString("cs")));
+		 // with lazy loading
+		 builder.Services.AddDbContext<ApplicationContext>(option => option.UseLazyLoadingProxies().UseSqlServer(builder.Configuration.GetConnectionString("cs")));
+		
+		// to create new instances of DbContext for parallel operations or scenarios where multiple instances of DbContext are needed.	 
+		builder.Services.AddDbContextFactory<ApplicationContext>(options =>options.UseLazyLoadingProxies()
+			.UseSqlServer(builder.Configuration.GetConnectionString("cs")), ServiceLifetime.Scoped);
+
+
+	- at ApplicationContext
+		        public ApplicationContext(DbContextOptions<ApplicationContext> options) : base(options) { }
+			
+			// NOTE: the default context constructor without options needs onConfiguring() Method,
+			// once you use the parameterized with option you do not need the default one and onConfiguring()
+			// onConfiguring() Method is called each time a new instance of the DbContext is created.
+		
+			protected override void OnModelCreating(ModelBuilder builder) // in case of you inhreit from IdentityDbContext<ApplicationUser> 
+			{							      // Basically the keys of Identity tables are mapped in OnModelCreating method of IdentityDbContext
+    				base.OnModelCreating(builder);
+			}
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<< allow cors >>
+
+- Allows your frontend on different domains, to communicate with your API in case of they are not in the same domain
+- you can limit it
+
+//Define string variable as Cors policy in start class 
+var corsPolicyName = "_myAllowSpecificOrigins";  // a string variable to name your CORS policy
+
+//Register AddCors in ConfigureServices method
+builder.Services.AddCors(options => { 
+		options.AddPolicy(corsPolicyName, builder => {
+	 	builder.AllowAnyOrigin();
+	 	builder.AllowAnyMethod();
+ 		builder.AllowAnyHeader(); 
+}); });
+
+//Add UseCors Middleware in Configure method before authentication and authorization middlewares
+app.UseCors(corsPolicyName);
+---------------------------------------------------------------------------
+
+<< create your service >>
+
+    public class CustomerService
+    {
+        private readonly UnitOfWorks unit;
+        private readonly IMapper mapper;
+        private readonly UserManager<ApplicationUser> userManager;
+        private readonly RoleManager<IdentityRole> roleManager;
+
+        public CustomerService(UnitOfWorks unit, IMapper mapper,
+            UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
+        {
+            this.unit = unit;
+            this.mapper = mapper;
+            this.userManager = userManager;
+            this.roleManager = roleManager;
+        }
+
+        public async Task<bool> addCustomer(CustomerDTO customerDTO)
+        {
+            var appUser = mapper.Map<CustomerDTO, ApplicationUser>(customerDTO);
+            IdentityResult result = await userManager.CreateAsync(appUser, customerDTO.password);
+            if(result.Succeeded)
+            {
+                string CustomerRole = AppRoles.Customer.ToString();
+
+                // check if the role is exist if not, add it
+                if (await roleManager.FindByNameAsync(CustomerRole) == null)
+                    await roleManager.CreateAsync(new IdentityRole() { Name = CustomerRole });
+
+                // assign roles  to created user
+                IdentityResult addRoleToUserRes = await userManager.AddToRoleAsync(appUser, CustomerRole);
+                if(addRoleToUserRes.Succeeded)
+                {
+                    var  customer = mapper.Map<CustomerDTO, Customer>(customerDTO);
+                    customer.UserId = appUser.Id;
+                    unit.CustomerRepository.Insert(customer);
+                    unit.SaveChanges();
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
+// builder.Services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<App_Context>();
+// builder.Services.AddScoped<CustomerService>();
+
+------------------------------------------------------------------------------------------------------------------------
+<< Account Service, Account Controller >>
+
+
+
+---------------------------------------------------------------------------------------------------
+
+<< service example >>
+
+public class GameService
+{
+    private readonly UnitOfWork unit;
+    private readonly IMapper mapper;
+    private readonly LoggingService logginService;
+
+    public GameService(UnitOfWork unit, IMapper mapper, LoggingService loggingService){
+        this.unit = unit;
+        this.mapper = mapper;
+        this.logginService = loggingService;
+    }
+
+    public async Task<bool> addGame(GameDTO gameDTO)
+    {
+        try
+        {
+            var game = mapper.Map<GameDTO, Game>(gameDTO);
+            unit.GameRepository.Insert(game);
+            await unit.SaveChanges();
+            logginService.LogInformation($"Game [{game.Name}] added successfully");
+            return true;
+
+        } catch(Exception ex){
+            logginService.LogError("Error when trying to create game", ex);
+            return false;   
+        }
+    }
+
+    public async Task<bool> editGame(int id, GameDTO gameDTO)
+    {
+        try
+        {
+            var existedGame = await unit.GameRepository.GetById(id);
+            
+            if(existedGame == null)
+                return false;
+
+            mapper.Map(gameDTO, existedGame);
+            unit.GameRepository.Update(existedGame);
+            await unit.SaveChanges();
+            logginService.LogInformation($"Game is updated successfully");
+            return true;
+        }
+        catch (Exception ex)
+        {
+            logginService.LogError("Error when trying to edit game", ex);
+            return false;
+        }
+    }
+    
+    public async Task<List<GameGetDTO>> getAllGames()
+    {
+        var games = await unit.GameRepository.GetAll();
+        var res =  mapper.Map<List<Game>, List<GameGetDTO>>(games);
+        return res;
+    }
+    
+    public async Task<bool> deleteGame(int id)
+    {
+        try
+        {
+            var game = await unit.GameRepository.GetById(id);
+            if(game==null)
+                return false;
+            unit.GameRepository.Delete(game);
+            await unit.SaveChanges();
+            logginService.LogInformation($"Game [{game.Name}] deleted successfully");
+            return true;
+        }
+        catch (Exception ex)
+        {
+            logginService.LogError("Error when trying to delete game", ex);
+            return false;
+        }
+    }
+
+    public async Task<List<GameGetDTO>> getAllGamesOrderByCreatedDate()
+    {
+        Func<IQueryable<Game>, IOrderedQueryable<Game>> orderBy = query => query.OrderByDescending(x => x.CreatedDate);
+
+        var games = await unit.GameRepository.GetAllWithOrder(orderBy);
+        var res = mapper.Map<List<Game>, List<GameGetDTO>>(games);
+        return res;
+    }
+}
+
+
+---------------------------------------------------------------------------------------------------
+
+<< ApiResponse, ApiValidation >>
+
+-  201 created
+-  200 successful request.
+-  202 Accepted: The request has been accepted for processing, but the processing has not been completed.
+-  204 No Content The server successfully processed the request, and is not returning any content.
+-  404 : not found 
+-  401 Unauthorized
+-  400 Bad Request: The server could not understand the request due to invalid syntax. or validation error
+-  403 Forbidden: The client does not have access rights to the content.
+-  500 A generic error message when no more specific message is suitable.
+-  503 Service Unavailable: The server is not ready to handle the request, often due to maintenance or overload.
+-  501 Not Implemented: The server either does not recognize the request method
+
+ public class ApiResponse
+ {
+     public int Status { get; set; }
+     public string? Message { get; set; }
+     public bool? Success { get; set; }
+     public ApiResponse(int status, bool? success = null, string? message = null)
+     {
+         Success = success;
+         Status = status;
+         Message = message ?? GetDefaultMessage(status);
+     }
+     private string? GetDefaultMessage(int status)
+     {
+         return status switch
+         {
+             400 => "A bad request, you have made",
+             401 => "You are not Authorized",
+             404 => "Resource Not found",
+             500 => "Internal Server Error",
+             _ => null
+         };
+     }
+ }
+
+ public class ApiResponse<T> : ApiResponse
+ {
+     public T? Data { get; set; }
+     public ApiResponse(int status, T? data = default, bool? success = null, string? message = null)
+         : base(status, success, message)
+     {
+         Data = data;
+     }
+ }
+
+ public class ApiValidation : ApiResponse
+ {
+    public ApiValidation() : base(StatusCodeConst.BadRequest, false, "ValidationErrors") { }
+    public IEnumerable<string> Errors { get; set; }
+ }
+
+
+-- This code to custom authorization handler in ASP.NET Core that modifies how authorization failures are handled.
+
+public class CustomAuthorizationMiddlewareResultHandler : IAuthorizationMiddlewareResultHandler
+{
+    private readonly AuthorizationMiddlewareResultHandler _defaultHandler = new AuthorizationMiddlewareResultHandler();
+   
+    public async Task HandleAsync(
+       RequestDelegate next,
+       HttpContext context,
+       AuthorizationPolicy policy,
+       PolicyAuthorizationResult authorizeResult)
+    {
+        // If the user is not authorized, customize the response
+        if (authorizeResult.Forbidden || authorizeResult.Challenged)
+        {
+            await context.Response.WriteAsJsonAsync(new ApiResponse(StatusCodes.Status403Forbidden, false, "not authorized"));
+        }
+        else
+        {
+            // Let the default handler process anything else
+            await _defaultHandler.HandleAsync(next, context, policy, authorizeResult);
+        }
+    }
+}
+
+
+
+
+-------------------------------------------------------------------------------------------------------------------------------
+
+<< logger >>
+
+public class LoggingService
+{
+    private readonly string logFilePath;
+    public LoggingService() {
+        var logFilePath = Path.Combine(FileHelper.GetProjectFolderPath(), "logs", "logger.txt");
+        this.logFilePath = logFilePath;
+        Directory.CreateDirectory(Path.GetDirectoryName(logFilePath));  // Ensure the directory exists
+        LogInformation("Application starting..........");
+    }
+
+    public void LogError(string message, Exception ex)
+    {
+        Log("ERROR", $"{message} - {ex.Message}");
+    }
+
+    public void LogInformation(string message)
+    {
+        Log("INFO", message);
+    }
+
+    private void Log(string status, string message)
+    {
+        var logEntry = $"{DateTime.UtcNow:yyyy-MM-dd hh:mm:ss tt} [{status}] {message}";
+        File.AppendAllText(logFilePath, logEntry + Environment.NewLine);
+    }
+
+
+}
+
+at program.cs
+ LoggingService loggingService = new LoggingService();
+ builder.Services.AddSingleton<LoggingService>();
+
+-------------------------------------------------------------------------------------------------------------------------------
+public class CustomAuthorizationMiddlewareResultHandler : IAuthorizationMiddlewareResultHandler
+{
+    private readonly AuthorizationMiddlewareResultHandler _defaultHandler = new AuthorizationMiddlewareResultHandler();
+   
+    public async Task HandleAsync(
+       RequestDelegate next,
+       HttpContext context,
+       AuthorizationPolicy policy,
+       PolicyAuthorizationResult authorizeResult)
+    {
+        // If the user is not authorized, customize the response
+        if (authorizeResult.Forbidden || authorizeResult.Challenged)
+        {
+            context.Response.StatusCode = StatusCodes.Status403Forbidden;
+            await context.Response.WriteAsJsonAsync(new ApiResponse(StatusCodes.Status403Forbidden, false, "not authorized"));
+        }
+        else
+        {
+            // Let the default handler process anything else
+            await _defaultHandler.HandleAsync(next, context, policy, authorizeResult);
+        }
+    }
+
+}
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+ 

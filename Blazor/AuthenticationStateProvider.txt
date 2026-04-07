@@ -1,0 +1,121 @@
+
+
+- install-package Microsoft.AspNetCore.Components.Authorization  --> has CascadingAuthenticationState class
+
+- at App.razor
+	- wrap Router in <CascadingAuthenticationState>
+	- inside <Found>
+		<AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(CustomLayout)">
+    			<NotAuthorized>
+        			<p role="alert">you are not Authorized</p>
+    			</NotAuthorized>
+    			<Authorizing>
+        			<p>Loading authentication status...</p>
+    			</Authorizing>
+		</AuthorizeRouteView>
+
+- Wrapping your <Router> with <CascadingAuthenticationState> basically enables authentication and authorization across your Blazor app.
+
+- <AuthorizeRouteView> : display the matched page with specific route if the user is authorized
+
+- If a page has not  @attribute [Authorize] --> Anyone can access it, authenticated or not.
+ 
+- Flow Summary
+	- User navigates to a URL → Router finds the page.
+	- If page has [Authorize] → AuthorizeRouteView asks AuthenticationStateProvider for the current user.
+	- Provider checks localStorage / cookies / token validity.
+	- If authenticated → page loads.
+	- If not → <NotAuthorized> → we redirect to /login.
+
+
+---- create your own AuthenticationStateProvider 
+
+public class JwtAuthenticationStateProvider : AuthenticationStateProvider
+{
+    private readonly JwtService jwtService;
+
+    public JwtAuthenticationStateProvider(JwtService jwtService)
+    {
+        this.jwtService = jwtService;
+    }
+
+    public override async Task<AuthenticationState> GetAuthenticationStateAsync()
+    {
+        var token = await jwtService.GetTokenAsync();
+
+        if (string.IsNullOrWhiteSpace(token))
+        {
+            // No token → not authenticated
+            return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
+        }
+
+        // Parse token into claims
+        var handler = new JwtSecurityTokenHandler();
+        var jwtToken = handler.ReadJwtToken(token);
+        var identity = new ClaimsIdentity(jwtToken.Claims, "jwtAuth");
+	// 
+        var user = new ClaimsPrincipal(identity);
+        return new AuthenticationState(user);
+    }
+
+    public void NotifyAuthenticationStateChanged()
+    {
+        var authState = GetAuthenticationStateAsync();
+        NotifyAuthenticationStateChanged(authState);
+    }
+}
+
+
+---- at program.cs
+builder.Services.AddScoped<AuthenticationStateProvider, JwtAuthenticationStateProvider>();
+builder.Services.AddAuthorizationCore();
+
+
+---- Usage 
+	- at login, logout
+	 [Inject] AuthenticationStateProvider AuthenticationStateProvider { get; set; }
+	 ((JwtAuthenticationStateProvider)AuthenticationStateProvider).NotifyAuthenticationStateChanged();
+	 
+
+
+--- used Method explaination
+	- public ClaimsIdentity( IEnumerable<Claim> claims, string authenticationType, string nameType, string roleType )
+		- IEnumerable<Claim> : This is the actual list of all claims extracted from the JWT.
+		- string authenticationType : This is just a label that describes what kind of authentication created this identity
+		- string nameType : which claim represents the user’s name
+		- string roleType : which claim represents the user’s roles
+
+---------------------------------------------------------------------------------------------------------
+
+
+HTML
+
+<AuthorizeView>
+	<Authorized>
+		<a href="/WhereTo" class="h-100 w-100 position-absolute start-0 end-0"></a>
+	</Authorized>
+	<NotAuthorized>
+		<a href="/SendShipment" class="h-100 w-100 position-absolute start-0 end-0"></a>
+	</NotAuthorized>
+</AuthorizeView>
+
+-- note: the page could has more than one AuthorizeView view
+
+
+<AuthorizeView Roles="Admin">
+<AuthorizeView Roles="Individual, Company">  // “Individual” or “Company” can see the content inside this
+
+
+C#
+
+
+ var authState  = await this.AuthenticationStateProvider.GetAuthenticationStateAsync();
+ var user = authState.User;
+
+
+
+@attribute [Authorize]
+
+-  @(context?.User.FindFirst(ClaimConst.Role))
+-  
+	 

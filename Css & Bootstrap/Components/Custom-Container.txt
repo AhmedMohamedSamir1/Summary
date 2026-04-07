@@ -1,0 +1,44 @@
+.custom-container {
+    max-width: 1300px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
+/* extra small screen */
+@media (max-width: 576px) { 
+    .custom-container {
+        width: 98%;
+    }
+}
+
+
+/* small screen */
+@media (min-width: 576px) { 
+    .custom-container {
+        width: 94%;
+    }
+}
+
+
+/* Medium  screen */
+@media (min-width: 768px) { 
+    .custom-container {
+        width: 92%;
+    }
+}
+
+/* larger  screen */
+@media (min-width: 992px) {     
+    .custom-container {
+        width: 95%;
+        max-width:100%;
+    }
+}
+
+/* X-Large  screen */
+@media (min-width: 1200px) {  
+    .custom-container {
+        width: 86%;
+    }
+}

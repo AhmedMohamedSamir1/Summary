@@ -1,0 +1,115 @@
+ADO modes :
+	connected mode : 
+		
+		- used with real time application because you want the data to be updated
+		
+		- any changes made to the data by your application or other users/processes are immediately reflected.
+		
+	
+	disconnected mode:	
+		- your application connects to the database, retrieves data into a local dataset or data table [memory], 
+		  and then disconnects from the database.
+		
+		- Once the data is fetched into memory, the connection to the database is closed, 
+		  and your application can work with the data locally (offline)
+		
+		- Disconnected mode is useful when you need to work with data offline or perform complex data manipulation
+		  without directly affecting the database until you're ready to commit changes.
+
+		- When working in disconnected mode, you can make changes to the data in memory, and later you can use a DataAdapter
+		  to reconcile those changes back to the database, changes can be insert, update, delete
+	
+		- The process of reconciling changes back to the database ensures that the changes made locally are reflected 
+		  in the original database, thus maintaining data integrity and consistency between the application and the database
+-----------------------------------------------------------------------------------------------------------------------
+
+<< To add an application configuration file to a C# project >>
+
+1. In Solution Explorer, right-click the project node, and then select Add > New Item.
+2. Expand Installed > Visual C# Items.
+3. In the middle pane, select the Application Configuration File template.
+4. Select the Add button.
+
+-------------------------------------------------------------------------------------------------------------
+
+<< to add connection string at application configuration file >>
+
+<connectionStrings>
+	<add name="ITI" connectionString="Server=.;Database=ITI;Trusted_Connection=True;TrustServerCertificate=True"/>
+</connectionStrings>
+
+name: The name used to identify the connection string.
+connectionString: The actual connection string containing details such as the server, database name, and authentication options.
+
+(. , which represents the local server)
+
+=> con.ConnectionString = ConfigurationManager.ConnectionStrings["ITI"].ToString();
+   ConfigurationManager.ConnectionStrings   // return collection of connection_strings defined in the application's configuration file 
+   to access a specific one of these string connection deal with that collection as dictionary
+
+----------------------------------------------------------------------------------------------------------------------------------
+
+<< disconnected mode >>
+ 
+-- class attributes
+	SqlConnection con;
+   	SqlDataAdapter adapter;
+   	DataTable dt;
+
+-- at constructor 
+   	con = new SqlConnection();
+   	con.ConnectionString = ConfigurationManager.ConnectionStrings["ITI"].ToString();
+   	adapter = new SqlDataAdapter();
+   	dt = new DataTable();
+
+-- to fetch data from table
+	string query = "select C.crs_id , C.Crs_Name , C.Crs_Duration , T.Top_Id from Course C, Topic T where C.Top_Id = T.Top_Id";
+	SqlCommand command = new SqlCommand(query, con);
+	adapter.SelectCommand = command;
+	adapter.Fill(dt); // execute select command and fetch data from database into local data structure such as DataTable , return number of rows added to tbl
+	dataGridView1.DataSource = dt; // binding the datagridview with datatable
+
+- Datatable :
+	- each row has RowState that refer to state of row
+		- fetched  row state : unchanged
+		- inserted row state : added 
+		- deleted  row  state : deleted
+		- updated  row  state : modified
+	
+	- datatable.Rows.Count;
+	- Deleted row information cannot be accessed through the row ->  
+		 foreach (DataRow dr in dt.Rows) {} if dr rowstate is deleted -> (int)dr["Crs_Id"]  XXXXX run time error
+
+	- add row to datatable
+		DataRow row = dt.NewRow(); // row from the same schema(columns, state) of dt table
+		row["crs_id"] = ++lastCrs_id;
+		row["Crs_Name"] = txt_crs_name.Text;
+		row["Crs_Duration"] = txt_crs_duation.Text;
+		row["Top_Id"] = cmb_topics.SelectedValue;
+		dt.Rows.Add(row);
+	
+	- save changes into DB 
+	 	SqlCommand InsertCmd = new SqlCommand("insert into Course values(@crs_id, @crs_name,@crs_duration, @top_id)", con);
+ 		InsertCmd.Parameters.Add("crs_id", SqlDbType.Int, 4, "crs_id");
+ 		InsertCmd.Parameters.Add("crs_name", SqlDbType.NVarChar, 50, "Crs_Name");
+ 		InsertCmd.Parameters.Add("crs_duration", SqlDbType.Int, 4, "Crs_Duration");
+ 		InsertCmd.Parameters.Add("top_id", SqlDbType.Int, 4, "Top_Id");
+
+ 		SqlCommand UpdateCmd = new SqlCommand("update Course set crs_name = @crs_name, Crs_Duration = @crs_duration, Top_Id = @top_id" 
+			+"where crs_id = @crs_id", con);
+ 		UpdateCmd.Parameters.Add("crs_name", SqlDbType.NVarChar, 50, "Crs_Name");
+ 		UpdateCmd.Parameters.Add("crs_duration", SqlDbType.Int, 4, "Crs_Duration");
+ 		UpdateCmd.Parameters.Add("top_id", SqlDbType.Int, 4, "Top_Id");
+ 		UpdateCmd.Parameters.Add("crs_id", SqlDbType.Int, 4, "crs_id");
+
+ 		SqlCommand DeleteCmd = new SqlCommand("delete from Course where crs_id = @crs_id", con);
+ 		DeleteCmd.Parameters.Add("crs_id", SqlDbType.Int, 4, "crs_id");
+		
+		// assign commands into adapter
+ 		adapter.InsertCommand = InsertCmd;
+ 		adapter.UpdateCommand = UpdateCmd;
+ 		adapter.DeleteCommand = DeleteCmd;
+
+ 		adapter.Update(dt);
+		adaptor.Update(dtl)  // based on state of each row the query executed
+

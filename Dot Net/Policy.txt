@@ -1,0 +1,358 @@
+<< AddAuthorization(),  defining a policy, Apply the Policy>>
+
+services.AddAuthorization()
+	- is used to configure (handle) the built-in authorization system.
+	- Allows you to define custom policies that specify the requirements a user must meet to access protected resources.
+	- Policies can include rules based on authentication, claims, roles, or custom requirements.
+	
+	- app.UseAuthentication(); // Ensures user identity is validated
+	- app.UseAuthorization();  // Ensures access control policies are enforced
+
+- defining a policy inside AddAuthorization()
+
+	builder.Services.AddAuthorization(options =>
+	{
+    		options.AddPolicy("PolicyName", policy => policy.RequireAuthenticatedUser());
+
+		options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
+
+		options.AddPolicy("CanEditProjects", policy => policy.RequireClaim("CanEdit", "Projects"));
+	});
+
+- Apply the Policy:
+	[Authorize(Policy = "AdminPolicy")]
+	public IActionResult AdminOnlyEndpoint(){}
+
+---------------------------------------------------------------------------------------------------------------------
+	
+- How Does Policy Work?
+
+- [Authorize(Policy = "TagsViewPolicy")]
+	- When the request hits the action
+	- the authorization middleware ( UseAuthorization() ) checks the if the policy (TagsViewPolicy) defined in the authorization system.
+	- If the policy is defined, the middleware passes the authorization requirement to PermissionHandler (or any other handler you've registered for that policy)
+	  to evaluate whether the user satisfies the policy's requirements.
+	- Since you’ve registered PermissionHandler with the dependency injection container as:	
+		builder.Services.AddScoped<IAuthorizationHandler, PermissionHandler>();
+	  The PermissionHandler is executed to evaluate the policy.
+	
+	
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+public interface IAuthorizationRequirement { }
+
+public interface IAuthorizationHandler
+{
+    Task HandleAsync(AuthorizationHandlerContext context);
+}
+
+public abstract class AuthorizationHandler<TRequirement> : IAuthorizationHandler where TRequirement : IAuthorizationRequirement
+{
+
+	public virtual async Task HandleAsync(AuthorizationHandlerContext context)
+    	{
+        	foreach (var req in context.Requirements.OfType<TRequirement>())
+        	{
+            		await HandleRequirementAsync(context, req).ConfigureAwait(false);
+        	}
+    	}
+
+    	protected abstract Task HandleRequirementAsync(AuthorizationHandlerContext context, TRequirement requirement);
+}
+
+public class PermissionRequirement : IAuthorizationRequirement
+{
+    public Permission Permission { get; set; }
+    public DataResource DataResource { get; set; }
+
+    public PermissionRequirement(DataResource dataResource, Permission permission)
+    {
+        this.DataResource = dataResource;
+        this.Permission = permission;
+    }
+}
+
+
+
+- A user sends a GET request to the GetAll endpoint.
+- The Authorize attribute on the controller action specifies a policy (PolicyNames.TagsView), which will trigger ASP.NET Core's authorization middleware.
+- 
+- 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+we will combine Role-Based Authorization and User-Specific Permissions. Here's a full step-by-step guide to achieving this:
+
+admin: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiQWRtaW4iLCJpZCI6ImVlNDM2MDVmLWVkMGYtNDczMi1hMWM4LWMyNjljZDk2YjcxMCIsImV4cCI6MTczNTI1MDMwOH0.jYRC_Tl3BdfNB16bPqjeOGvb5gcjUIs7rgX3ZBiRcOI
+
+public enum Permission
+{
+     View = 1,
+     Add,
+     Edit,
+     Delete,
+}
+
+public enum Role
+{
+    User = 1,
+    Admin
+}
+
+ public enum DataResource
+ {
+     Projects = 1,
+     Tags,
+     Technology
+ }
+
+
+ public class UserPermission
+ {
+     [Key]
+     public int Id { get; set; }
+
+     [ForeignKey("ApplicationUser")]
+     public string UserId { get; set; }  // Foreign key to the Identity User
+     public Table TableName { get; set; }
+     public Permission Permission { get; set; }
+
+     public virtual ApplicationUser ApplicationUser { get; set; }
+ }
+
+public class ApplicationUser : IdentityUser
+{
+    public virtual ICollection<UserPermission> UserPermissions { get; set; } = new List<UserPermission>();
+}
+
+- at ApplicationContext
+	        public DbSet<UserPermission> UserPermissions { get; set; }
+
+		protected override void OnModelCreating(ModelBuilder builder)
+		{
+    			base.OnModelCreating(builder);
+			// your code
+    			
+
+    			var adminRoleId = Guid.NewGuid().ToString();
+    			var userRoleId = Guid.NewGuid().ToString();
+
+    			builder.Entity<IdentityRole>().HasData(
+        			new IdentityRole { Id = adminRoleId, Name = Role.Admin.ToString(), NormalizedName = Role.Admin.ToString().ToUpper() },
+        			new IdentityRole { Id = userRoleId, Name = Role.User.ToString(), NormalizedName = Role.User.ToString().ToUpper() }
+    			);
+
+		}
+
+options.AddPolicy("AddTag", policy => policy.Requirements.Add(new PermissionRequirement("AddTag")));
+
+- in program.cs mustafa
+	options.AddPolicy("Governments/Edit", policy => policy.RequireAuthenticatedUser()
+		.AddRequirements(new PermissionRequirement(Department.Governments, PermissionType.Edit)));
+
+
+
+
+
+
+
+services.AddAuthorization(options =>
+{
+    // Project-related policies
+    options.AddPolicy("AddProject", policy => policy.RequireRole("admin", "user"));
+    options.AddPolicy("EditProject", policy => policy.RequireRole("admin"));
+    options.AddPolicy("DeleteProject", policy => policy.RequireRole("admin"));
+
+    // Tag-related policies
+    options.AddPolicy("AddTag", policy => policy.RequireRole("admin"));
+    options.AddPolicy("EditTag", policy => policy.RequireRole("admin"));
+    options.AddPolicy("DeleteTag", policy => policy.RequireRole("admin"));
+
+    // Technology-related policies
+    options.AddPolicy("AddTechnology", policy => policy.RequireRole("admin"));
+    options.AddPolicy("EditTechnology", policy => policy.RequireRole("admin"));
+    options.AddPolicy("DeleteTechnology", policy => policy.RequireRole("admin"));
+});
+
+
+------------------------------------------------------------------------------------------------------------------------------------
+
+
+public class UserPermissionService
+{
+    private readonly UnitOfWork unit;
+    private readonly IMapper mapper;
+
+    public UserPermissionService(UnitOfWork unit, IMapper mapper) {
+        this.unit = unit;
+        this.mapper = mapper;
+    }
+
+    public async Task<bool> IsUserHasPermission(string userId, DataResource table, Permission permission)
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(userId))
+                return false;
+
+            var userPermission = await unit.UserPermissionRepository.GetFirst(
+                up => up.UserId == userId && up.TableName == table);
+
+            if (userPermission == null)
+                return false;
+
+            return permission switch
+            {
+                Permission.View => userPermission.View,
+                Permission.Edit => userPermission.Edit,
+                Permission.Delete => userPermission.Delete,
+                Permission.Add => userPermission.Add,
+                _ => false
+            };
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    public async Task<bool> GrantPermissionAsync(AddUserPersmissionDTO userPersmissionDTO)
+    {
+        try
+        {
+            var existingPermission = await unit.UserPermissionRepository.GetFirst(
+                up => up.UserId == userPersmissionDTO.UserId && up.TableName == userPersmissionDTO.TableName);
+
+            // No existing permission, create a new record
+            if (existingPermission == null)
+            {
+                var newUserPermission = mapper.Map<AddUserPersmissionDTO, UserPermission>(userPersmissionDTO);
+                unit.UserPermissionRepository.Add(newUserPermission);
+            }
+
+            // Update existing permissions
+            else
+            {
+                mapper.Map(existingPermission, userPersmissionDTO);
+                unit.UserPermissionRepository.Update(existingPermission);
+            }
+            await unit.SaveChangesAsync();
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+
+    }
+
+    public  bool initializeUserPermissions(string userId)
+    {
+        var resourceTables = Enum.GetValues(typeof(DataResource)).Cast<DataResource>().ToList();
+        foreach (var resourceTable in resourceTables) {
+            unit.UserPermissionRepository.Add(new UserPermission()
+            {
+                UserId = userId,
+                TableName = resourceTable,
+                Add = false,
+                Edit = false,
+                View = true,
+                Delete = false,
+            });
+        }
+        unit.SaveChanges();
+        return true;
+    }
+    
+    public async Task<List<UserPersmissionDTO>> getUserPermissions(string userId){
+    
+        var userPermissions = await unit.UserPermissionRepository.ListAllAsync(sp=> sp.UserId == userId);
+        return mapper.Map<List<UserPersmissionDTO>>(userPermissions); 
+    }
+
+    public async Task<bool> editUserPermissions(string userId, List<UserPersmissionDTO> userPersmissionsList)
+    {
+        try
+        {
+            var existingUserPermissions = await unit.UserPermissionRepository.ListAllAsync(sp => sp.UserId == userId);
+            if(existingUserPermissions == null || existingUserPermissions.Count == 0)
+                return false;
+
+            foreach (var existingPermission in existingUserPermissions)
+            {
+                var correspondingDTO = userPersmissionsList
+                    .FirstOrDefault( up => up.TableName == existingPermission.TableName);
+            
+                mapper.Map(correspondingDTO, existingPermission);
+                unit.UserPermissionRepository.Update(existingPermission);
+
+            }
+            await unit.SaveChangesAsync();
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+}
+
+----------------------------------------------------------------------------
+
+
+ public async Task<List<Claim>?> getUserPermissionsInTheFormOfClaims(string userId)
+ {
+     try
+     {
+         var usersPermissions = await unit.UserPermissionRepository.ListAllAsync(up => up.UserId == userId);
+         List<Claim> claims = new List<Claim>();
+
+         foreach (var userPermission in usersPermissions)
+         {
+             if (userPermission.View)
+                 claims.Add(new Claim("permissions", $"{userPermission.TableName}/{Permission.View.ToString()}"));
+
+             if (userPermission.Add)
+                 claims.Add(new Claim("permissions", $"{userPermission.TableName}/{Permission.Add.ToString()}"));
+
+             if (userPermission.Edit)
+                 claims.Add(new Claim("permissions", $"{userPermission.TableName}/{Permission.Edit.ToString()}"));
+
+             if (userPermission.Delete)
+                 claims.Add(new Claim("permissions", $"{userPermission.TableName}/{Permission.Delete.ToString()}"));
+         }
+
+         return claims;
+     }
+     catch
+     {
+         return null;
+     }
+
+
+ }
+
+

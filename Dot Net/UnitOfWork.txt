@@ -1,0 +1,77 @@
+- placed at Infrastructure layer
+	- Create UnitOfWorks folder 
+	- Create UnitOfWork Class
+
+
+public class UnitOfWork
+{
+    private readonly ApplicationContext context;
+
+    private GenericRepository<ApplicationUser> _appUser;
+     
+   
+    public UnitOfWork(ApplicationContext context)
+    {
+        this.context = context;
+    }
+
+    public GenericRepository<ApplicationUser> AppUserRepository
+    {
+        get { return _appUser ??= new GenericRepository<ApplicationUser>(context); }
+    }
+
+    public void SaveChanges()
+    {
+        context.SaveChanges();
+    }
+
+    public async Task SaveChangesAsync()
+    {
+        await context.SaveChangesAsync();
+    }
+
+    public GenericRepository<TEntity> GetRepository<TEntity>() where TEntity : class
+    {
+        return new GenericRepository<TEntity>(context);
+    }
+
+    public async Task<IDbContextTransaction> BeginTransactionAsync()
+    {
+        return await context.Database.BeginTransactionAsync();
+    }
+
+     // Method to create a new context using the factory for parallel operations
+     public ApplicationContext CreateNewContext()
+     {
+     	return  contextFactory.CreateDbContext();  // Create a new context
+     }
+}
+
+-  at default project program.cs --> builder.Services.AddScoped<UnitOfWork>();
+
+----------------------------------------------------------------------------------------------------
+
+public interface IUnitOfWork<TEntity, TKey> where TEntity: BaseEntity<TKey>
+{
+    IGenericRepository<TEntity, TKey> Repository { get;  }
+    void SaveChanges();
+    Task<int> SaveChangesAsync();
+    Task<IDbContextTransaction> BeginTransactionAsync();
+    void ClearChangeTracker();
+    IEnumerable<EntityEntry> AllEntries();
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

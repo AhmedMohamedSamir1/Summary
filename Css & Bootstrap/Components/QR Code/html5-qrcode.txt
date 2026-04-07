@@ -1,0 +1,5 @@
+The html5-qrcode JavaScript package is a library for integrating QR code and barcode scanning capabilities into web applications
+
+
+        <script src="https://unpkg.com/html5-qrcode"></script>
+

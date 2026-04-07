@@ -1,0 +1,8 @@
+return permission switch
+{
+    Permission.View => userPermission.View,
+    Permission.Edit => userPermission.Edit,
+    Permission.Delete => userPermission.Delete,
+    Permission.Add => userPermission.Add,
+    _ => false
+};

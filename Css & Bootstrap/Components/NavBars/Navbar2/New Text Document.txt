@@ -1,0 +1,50 @@
+<ul class="sidebar">
+      <li onclick="hideSidebar()" class="close-sidebar">
+        <a href="#"><svg xmlns="http://www.w3.org/2000/svg" height="26" viewBox="0 96 960 960" width="26"><path d="m249 849-42-42 231-231-231-231 42-42 231 231 231-231 42 42-231 231 231 231-42 42-231-231-231 231Z"/></svg></a>
+      </li>
+      <li><a href="#">Link 1</a></li>
+      <li><a href="#">Link 2</a></li>
+      <li><a href="#">Link 3</a></li>
+</ul>
+
+
+
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 250px;
+  /* background-color: rgba(255, 255, 255, 0.95); */
+  background-color: bisque;
+  backdrop-filter: blur(12px);
+  box-shadow: -10px 0 10px rgba(0, 0, 0, 0.1);
+  list-style: none;
+  display: none;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding-top: 10px;
+  padding-left: 20px;
+  transition: all 0.3s ease-in-out;
+}
+
+.sidebar li {
+  width: 100%;
+  margin-bottom: 5px;
+}
+
+.sidebar a {
+  width: 100%;
+  font-weight: 600;
+  transition: all .2s ease-in-out;
+  border-radius: 12px;
+}
+
+
+@media (max-width: 400px) {
+  .sidebar {
+    width: 100%;
+  }
+}

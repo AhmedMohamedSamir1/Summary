@@ -1,0 +1,166 @@
+
+<div class="content-wrapper">
+    <section class="content">
+
+	<section class="contentheader">
+	    <ol class="breadcrumb">
+                <li class="active"><i class="fa fa-dashboard"></i>{{'DashBoard' | translate}}</li>
+                <li>{{'WorkFlow' | translate}}</li>
+                <li>{{ 'TransactionsofBranches' | translate }}</li>
+                <li><a routerLink="/BranchTransaction/edit-customer-name">{{'EditCustomerName' | translate}}</a></li>
+            </ol>
+	</section>
+	<fieldset>
+	   ... 
+	</fieldset>
+    </section>
+</div>
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+
+
+<< Box >>
+
+<div class="col-md-4 col-lg-4 col-sm-12">
+   <div class="box box-solid box-primary">
+	<div class="box-header">
+    	   <h3 class="box-title"> {{'RequestId' | translate}}</h3>
+	</div>
+	<div class="box-body">
+	   {{Request_id}}
+        </div>
+   </div>
+</div>
+
+
+------------------------------------------------------------
+
+
+<< Input With label above >>
+
+<div class="col-md-4">
+  <div class="form-group">
+	<label for="product_name">{{'FundingType' | translate}}</label>
+	   <input
+              [attr.disabled]="disabled==true?true:null"
+              formControlName="product_name"
+              [(ngModel)]="funding_data.product_name"
+              type="text" class="form-control" required />
+  </div>
+</div>
+
+
+-------------------------------------------------
+
+
+<!-- رقم إثبات الشخصية -->
+                            		   <div class="col-md-6">
+                              <div class="form-group">
+                                <label for="QID">
+                                  <span *ngIf="submittedCG && f['QID'].errors" class="invalid-feedback">
+                                    <span class="errors" *ngIf="f['QID'].errors?.['required']" data-toggle="tooltip"
+                                      data-placement="top"
+                                      title="{{ 'Enter' | translate }} {{ 'Identityencodednumber' | translate }}">
+                                      *
+                                    </span>
+                                  </span>
+                                  {{ 'Identityencodednumber' | translate }}
+                                </label>
+                                <input [attr.disabled]="disabled==true?true:null"  formControlName="QID" name="QID" [(ngModel)]="CustGuar.QID" type="text"
+                                  class="form-control" [ngClass]="{ 'is-invalid': submittedCG && f['QID'].errors }"
+                                  required />
+                              </div>
+                            </div>
+
+
+------------------------------------------------------
+
+<< Validation *  >>
+
+<label class="form-label"
+	<span *ngIf="EditForm.controls['SecondName'].touched && EditForm.controls['SecondName'].errors">
+        	<span class="errors" *ngIf="EditForm.controls['SecondName'].hasError('required')" data-toggle="tooltip" data-placement="top" title="{{ 'Enter' | translate }} {{ 'Secondname' | translate }}">*</span>
+        </span>
+        {{"Secondname" | translate}}
+</label>
+
+
+--------------------------------------------------------
+
+<< Tabs >>
+
+<section id="fancyTabWidget" class="tabs t-tabs">
+
+   <ul class="nav nav-tabs fancyTabs" role="tablist">
+
+       <li class="tab fancyTab active">
+	   <div class="arrow-down">
+	      <div class="arrow-down-inner"></div>
+           </div>
+	   <a id="tab0" href="#tabBodyFund0" role="tab" aria-controls="tabBodyFund0" aria-selected="true" data-toggle="tab" tabindex="0">
+	     <span class="fa fa-desktop"> &nbsp;</span>
+             <span class="hidden-xs">{{ 'fundings' | translate }}</span>
+           </a>
+           <div class="whiteBlock"></div>
+       </li>     
+   </ul>
+
+   <!--  Tabs  -->
+
+   <div id="myTabContent" class="tab-content fancyTabContent" aria-live="polite">
+	
+	<div class="tab-pane  fade active in" id="tabBodyFund0" role="tabpanel" aria-labelledby="tab0" aria-hidden="false" tabindex="0">
+	    <div>
+		<div class="row">
+                   <div class="col-md-12">
+			<div class="row">
+		   	   ......
+			</div>
+			<div class="row">
+		   	   ......
+			</div>
+		   </div>
+		</div>
+
+	    </div>
+	</div>
+	
+	<div class="tab-pane  fade" id="tabBodyFund1" role="tabpanel" aria-labelledby="tab1" aria-hidden="true" tabindex="1"></div>
+
+   </div>
+
+</section>
+
+
+--------------------------------------------------------------------
+
+<< SweatAlert >>
+
+
+--- Are you sure dialog
+Swal.fire({ icon: 'question', title: this.translate.instant('EditCustomerName'),text: this.translate.instant('ContinueText'),
+        allowEscapeKey: true,    
+        allowOutsideClick: false, 
+        backdrop: true,
+        showCancelButton: true,
+        cancelButtonText: this.translate.instant('Cancel'),
+        confirmButtonText: this.translate.instant('OK'),
+
+})
+
+
+--- info dialog
+
+Swal.fire({
+	icon: 'error',
+        title:this.translate.instant('error'),
+	text: this.translate.instant('OperationFailed'),
+	allowEscapeKey: true,    
+	allowOutsideClick: false, 
+	backdrop: true,
+	confirmButtonText: this.translate.instant('OK'),
+})
+
+
+

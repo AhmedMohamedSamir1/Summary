@@ -1,0 +1,253 @@
+public class ProductTypeController : ControllerBase
+{
+    private readonly IProductTypeService productTypeService;
+    private readonly ProductTypeValidator validator;
+    public ProductTypeController(IProductTypeService productTypeService, ProductTypeValidator validator)
+    {
+        this.productTypeService = productTypeService;
+        this.validator = validator;
+    }
+
+
+    [HttpGet("GetPagedList")]
+    public async Task<IActionResult> GetPagedListAsync([FromQuery] PageParam? searchParam)
+    {
+        var res = await productTypeService.GetPagedListAsync(searchParam);
+        if (res != null)
+            return Ok(new ApiResponse<PaginationResult<ProductTypeGetDTO>>(201,res, true, "Product Type created successfully"));
+        return BadRequest(new ApiResponse<PaginationResult<ProductTypeGetDTO>>(201, res, true, "Product Type created successfully"));
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Add(ProductTypeDTO productTypeDTO)
+    {
+        var validatorResult = await validator.ValidateAsync(productTypeDTO);
+        if (validatorResult.IsValid)
+        {
+            var res = await productTypeService.Add(productTypeDTO);
+            if (res == true)
+            {
+                return Ok("product type created successfully");
+            }
+            else
+            {
+                return BadRequest("error while performing the request");
+            }
+        }
+        else
+        {
+            var errors = validatorResult.Errors.Select(e => e.ErrorMessage);
+            return BadRequest(errors);
+        }
+    }
+
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetById(int id)
+    {
+        var productType = await productTypeService.GetById(id);
+        if (productType != null)
+            return Ok(productType);
+        return BadRequest("failed");
+    }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Edit(int id, ProductTypeDTO productTypeDTO)
+    {
+        validator.SetId(id);
+        var validatorResult = await validator.ValidateAsync(productTypeDTO);
+
+        if (validatorResult.IsValid)
+        {
+            var result = await productTypeService.Update(id, productTypeDTO);
+            if (result)
+            {
+                return Ok("project updated succesfully");
+            }
+            else
+            {
+                return BadRequest("Error while performing the request");
+            }
+        }
+        else
+        {
+            var errors = validatorResult.Errors.Select(e => e.ErrorMessage);
+            return BadRequest(errors);
+        }
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var res = await productTypeService.Delete(id);
+        if (res == true)
+        {
+            return Ok("deleted successfully");
+        }
+        else
+        {
+            return BadRequest("error while performing the request");
+        }
+    }
+
+    [HttpPost("AddAndReturn")]
+    public async Task<IActionResult> AddAndReturn(ProductTypeDTO productTypeDTO)
+    {
+        var ValidatorResult = await validator.ValidateAsync(productTypeDTO);
+        if (ValidatorResult.IsValid)
+        {
+            var res = await productTypeService.AddAndReturn(productTypeDTO);
+            if (res != null)
+            {
+                return Ok(res);
+            }
+            else
+            {
+                return BadRequest("error while performing the request");
+            }
+        }
+        else
+        {
+            var errors = ValidatorResult.Errors.Select(e => e.ErrorMessage);
+            return BadRequest(errors);
+        }
+    }
+
+    [HttpGet("IsNameUnique")]
+    public async Task<IActionResult> IsNameUnique(string name, int? id = null)
+    {
+        var isUnique = await productTypeService.IsNameUnique(name, id);
+        if (isUnique)
+            return Ok("name is unique");                // Validation passed
+        return BadRequest("name is already exists"); // Validation failed
+    }
+}
+
+-----------------------------------------------------------------------------------------------------------
+
+<< Controller without Fluent Validation >>
+
+public class ProductTypeController : ControllerBase
+{
+    private readonly IProductTypeService service;
+
+    public ProductTypeController (IProductTypeService service)
+    {
+        this.service = service;
+    }
+
+    [HttpGet("GetPagedList")]
+    public async Task<IActionResult> GetPagedListAsync([FromQuery] PageParam? pageParam)
+    {
+        var res = await service.GetPagedListAsync(pageParam);
+        if (res != null)
+            return Ok(res);
+        return BadRequest("failed to perform the operation");
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Add(ProductTypeDTO productTypeDTO)
+    {
+        if (ModelState.IsValid)
+        {
+            var IsNameUnique = await service.IsNameUnique(productTypeDTO.Name);
+            if(!IsNameUnique)
+                return BadRequest("Name must be unique");
+
+            var res = await service.Add(productTypeDTO);
+            if (res == true)
+            {
+                return Ok("created successfully");
+            }
+            else
+            {
+                return BadRequest("error while performing the request");
+            }
+        }
+        else
+        {
+            var errors = ModelState.Values.SelectMany(V=>V.Errors).Select(E=>E.ErrorMessage).ToList();
+            return BadRequest(errors);
+        }
+    }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Edit(int id, ProductTypeDTO productTypeDTO)
+    {
+        if (ModelState.IsValid) {
+            var IsNameUnique = await service.IsNameUnique(productTypeDTO.Name, id);
+
+            if (!IsNameUnique)
+                return BadRequest("Name must be unique");
+
+            var res = await service.Update(id, productTypeDTO);
+            if(res)
+                return Ok("product type updated successfully");
+
+            return BadRequest("error while performing the request");
+        }
+        else
+        {
+            var errors = ModelState.Values.SelectMany(V => V.Errors).Select(E => E.ErrorMessage).ToList();
+            return BadRequest(errors);
+        }
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var res = await service.Delete(id);
+        if (res == true)
+        {
+            return Ok("deleted successfully");
+        }
+        else
+        {
+            return BadRequest("error while performing the request");
+        }
+    }
+
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetById(int id)
+    {
+        var res = await service.GetById(id);
+        if (res != null)
+            return Ok(res);
+        return BadRequest("error while performing the request");
+    }
+
+    [HttpPost("AddAndReturn")]
+    public async Task<IActionResult> AddAndReturn(ProductTypeDTO productTypeDTO)
+    {
+        if (ModelState.IsValid)
+        {
+            var IsNameUnique = await service.IsNameUnique(productTypeDTO.Name);
+            if (!IsNameUnique)
+                return BadRequest("Name must be unique");
+
+            var res = await service.AddAndReturn(productTypeDTO);
+            if (res != null)
+            {
+                return Ok(res);
+            }
+            else
+            {
+                return BadRequest("error while performing the request");
+            }
+        }
+        else
+        {
+            var errors = ModelState.Values.SelectMany(V=>V.Errors).Select(e => e.ErrorMessage).ToList();
+            return BadRequest(errors);
+        }
+    }
+
+    [HttpGet("IsNameUnique")]
+    public async Task<IActionResult> IsNameUnique(string name, int? id = null)
+    {
+        var isUnique = await service.IsNameUnique(name, id);
+        if (isUnique)
+            return Ok("name is unique");                
+        return BadRequest("name is already exists"); 
+    }
+}
+

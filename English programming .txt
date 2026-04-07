@@ -1,0 +1,19 @@
+platform independent: مستقلة عن نظام التشغيل
+
+precomputed: 
+
+- backword compitibility
+- The transaction is atomic, which means that either all operations within the transaction are successfully applied to the database, or none of them are 
+
+
+
+
+- The term "platforms" can refer to several different concepts depending on the context
+	
+	- Operating Systems platform: Windows, macOS, Linux
+	- Cloud Platforms: AWS, Azure, Google Cloud.	
+	- Business Platforms
+		- E-commerce Platforms: Amazon,
+		- Payment Platforms: PayPal
+		- Ride-Sharing Platforms: Uber
+

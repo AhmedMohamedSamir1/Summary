@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Responsive Sidebar</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/sidebar.css">
+    <link rel="stylesheet" href="css/css-extension.css">
+</head>
+
+<style>
+
+</style>
+
+<body>
+
+    <!-- Button for mobile -->
+
+    <main class="container-fluid d-flex p-0">
+
+        <!-- ONE sidebar: works as offcanvas on mobile, normal on desktop -->
+        <div class="offcanvas offcanvas-start d-md-block text-bg-light" tabindex="-1" id="a-sidebar">
+            
+            <div class="offcanvas-header d-md-none">
+                <h5 class="offcanvas-title">side bar </h5>
+                <button class="btn-close" data-bs-dismiss="offcanvas"></button>
+            </div>
+
+            <div class="offcanvas-body p-0">
+                <ul class="nav flex-column p-2">
+                    <li class="nav-item"><a href="#" class="nav-link">Dashboard</a></li>
+                    <li class="nav-item"><a href="#" class="nav-link">Profile</a></li>
+                    <li class="nav-item"><a href="#" class="nav-link">Settings</a></li>
+                    <li class="nav-item"><a href="#" class="nav-link">Logout</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="col flex-column page-content">
+        
+        <div class="layout-header d-flex align-items-center text-bg-primary p-10">
+            <button class="btn btn-primary d-md-none me-10 fs-4"  type="button" data-bs-toggle="offcanvas"data-bs-target="#a-sidebar">☰</button>
+            <p class="p-0 m-0">ahmed</p>
+        </div>
+        <div class="bg-danger text-white ">
+            <p>Page content here...</p>
+            <p>Page content here...</p>
+            <p>Page content here...</p>
+            <p>Page content here...</p>
+        </div>
+        </div>
+
+    </main>
+
+    <script src="js/bootstrap.min.js"></script>
+</body>
+</html>

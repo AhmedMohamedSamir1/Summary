@@ -1,0 +1,36 @@
+- i don't like that the card class="grid" so i replace it with hovereffect-card
+
+- include hover-effect.css in your project
+- include julia-effect and any another effect you want
+
+
+
+- julia effect html
+   <div class="d-flex hovereffect-card" style="width: 90%; margin: auto; background-color: blanchedalmond;">
+      <figure class="effect-julia">
+         <img src="images/image47.jpeg" alt="img21"/>
+         <figcaption>
+               <h2>Passionate <span>Julia</span></h2>
+               <div class="content">
+                  <!-- <p>Julia dances in the deep dark</p> -->
+                  <!-- <p>She loves the smell of the ocean</p> -->
+                  <!-- <p>And dives into the morning light</p> -->
+                  <button class="btn btn-success">View</button>
+                  <button class="btn btn-info">details</button>
+               </div>
+               <a href="https://www.google.com">View more</a>
+         </figcaption>			
+      </figure>
+   </div>
+
+
+
+
+
+
+- duke effect html
+
+
+
+
+ 

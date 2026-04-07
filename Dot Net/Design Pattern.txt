@@ -1,0 +1,173 @@
+<< Design patterns types >>
+
+-- Creational
+
+-- Behavioral
+	- Template Method Pattern
+	- Strategy pattern
+
+-------------------------------------------------------
+
+<< Tamplate Method Pattern >>
+
+- Definition : 
+   - defines the skeleton of an algorithm in a base class, but lets derived classes override specific steps without changing 
+     the algorithm's structure
+
+- When to use :
+	You have a fixed algorithm, but some steps could vary
+
+
+structure :
+
+  abstract class BaseClass
+  {
+      public void TemplateMethod()  // The skeleton of the algorithm
+      {
+          Step1();
+          Step2();
+          Step3();
+      }
+
+      protected void Step1() => Console.WriteLine("Step1: Always same");
+      protected abstract Step2(); // Must be implemented by subclass
+      protected void Step3() => Console.WriteLine("Step3: Always same");
+  }
+
+Ex1:
+
+-- at parent
+   public virtual async Task<PaginationResult<TGetDTO>?> GetPagedListAsync(IPageParam? pageParam) // template method
+   {
+       var paginationParam = CreatePaginationParams(pageParam);
+       return await GetPagedListInternalAsync(paginationParam);
+   }
+
+   public virtual BaseResourceParameters<TEntity> CreatePaginationParams(IPageParam? pageParam)
+   {
+      var paginationParam = new BaseResourceParameters<TEntity>
+      {
+          PageNumber = (pageParam!.PageNumber == null || pageParam.PageNumber <= 0) ? 1 : pageParam!.PageNumber,
+          OrderBy = q => q.OrderByDescending(x => x.CreatedAt)
+      };
+      return paginationParam;
+   }
+
+   private async Task<PaginationResult<TGetDTO>?> GetPagedListInternalAsync(BaseResourceParameters<TEntity> paginationParam)
+   {
+      var result = await genericRepository.GetPagedListAsync(paginationParam);
+      var pagedResult = await PagedList<TEntity>.Create(result.Collection, result.EntityTotalCount, paginationParam.PageNumber, paginationParam.PageSize);
+      return mapper.Map<PaginationResult<TGetDTO>>(pagedResult);
+   }
+
+-- at child 
+	- i can override CreatePaginationParams
+
+
+--------------------------------------------------------------------------------
+
+<< Strategy pattern >>
+
+
+- When to Use It
+    - You have multiple related algorithms (e.g., different sorting or payment methods).
+    - You want to avoid using conditional statements (like if or switch) to select behavior.
+
+
+public interface IPaymentStrategy
+{
+    void Pay(decimal amount);
+}
+
+public class CreditCardPayment : IPaymentStrategy
+{
+    public void Pay(decimal amount)
+    {
+        Console.WriteLine($"Paid {amount:C} using Credit Card.");
+    }
+}
+
+public class PayPalPayment : IPaymentStrategy
+{
+    public void Pay(decimal amount)
+    {
+        Console.WriteLine($"Paid {amount:C} using PayPal.");
+    }
+}
+
+public class PaymentContext
+{
+    private IPaymentStrategy _paymentStrategy;
+
+    public PaymentContext(IPaymentStrategy paymentStrategy)
+    {
+        _paymentStrategy = paymentStrategy;
+    }
+
+    public void SetStrategy(IPaymentStrategy paymentStrategy)
+    {
+        _paymentStrategy = paymentStrategy;
+    }
+
+    public void Pay(decimal amount)
+    {
+        _paymentStrategy.Pay(amount);
+    }
+}
+
+
+
+
+
+---------------------------------------------------------------------------
+
+<< Singleton >>
+
+
+- You need exactly one object to coordinate actions across the system.
+
+
+class test
+    {
+        public int x { get; set; }
+        test(int x=0){    this.x = x; } // private constructor
+        static test obj = null;
+
+        public static test gettest()
+        {
+            if(obj == null)
+                obj = new test();
+            return obj;
+        }
+    }
+    
+    test obj = test. gettest()
+
+
+	
+public class Logger
+{
+    private static Logger? _instance;
+    private static readonly object _lock;
+
+    private Logger() {}
+
+    public static Logger Instance
+    {
+        get
+        {
+            lock (_lock)
+            {
+                return _instance ??= new Logger();
+            }
+        }
+    }
+
+    public void Log(string message)
+    {
+        Console.WriteLine($"[LOG]: {message}");
+    }
+}
+
+// Usage
+Logger.Instance.Log("App started");

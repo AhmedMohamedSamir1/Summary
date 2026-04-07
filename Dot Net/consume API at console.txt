@@ -1,0 +1,68 @@
+
+Install-Package Microsoft.AspNet.WebApi.Client
+
+---------------------------------------------------------------------------------------
+
+public class VideoService
+{
+    private readonly HttpClient client;
+    private CancellationTokenSource cancellationTokenSource;
+
+    public VideoService() {
+        
+        cancellationTokenSource = new CancellationTokenSource();
+        client = new HttpClient();
+        client.BaseAddress = new Uri(ServerConfig.Domain);    
+    }
+
+    public async Task< int> getCurrentIndex()
+    {
+        try
+        {
+            HttpResponseMessage response = await client.GetAsync("currentIndex");
+            if (response.IsSuccessStatusCode)
+            {
+                string jsonResponse = await response.Content.ReadAsStringAsync();
+                var result = JsonSerializer.Deserialize<CurrentIndexResponse>(jsonResponse);
+
+                if (result == null)
+                    return -1;
+                return result.index;
+            }
+            return -1;
+        }
+        catch
+        {
+            return -1;
+        } 
+    }
+
+
+    public  async Task CurrentIndexHandler()
+    {        
+        var cancellationToken = cancellationTokenSource.Token;
+   
+        while (!cancellationToken.IsCancellationRequested)
+        {
+            int currentIndex = await getCurrentIndex();
+            Console.WriteLine($"Current Index: {currentIndex}");
+
+            if (currentIndex != -1) {
+                playVideo(currentIndex);
+            }            
+            await Task.Delay(1000);
+        }
+
+       Console.WriteLine("Requests for get current Index is stopped.");
+    }
+
+    public void StopVideoHandler()
+    {
+        cancellationTokenSource?.Cancel();
+    }
+
+    public void playVideo(int index)
+    {
+        Console.WriteLine($"Play video at index {index}");
+    }
+}

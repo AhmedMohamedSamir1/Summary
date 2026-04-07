@@ -1,0 +1,61 @@
+
+- It typically contains the entry point for the application and defines the application's configuration, services, middleware, and overall startup logic.
+
+- The Program.cs file contains the Main method, which is the entry point of the application
+	- It is responsible for bootstrapping (start) the application and calling the Host to start the app
+		- Bootstrapping refers to the process of initializing or starting up an application. In software development, it typically means setting up the necessary
+		  infrastructure or environment before the actual application code runs. It’s like getting everything ready(loading configuration, setting up services,etc)
+		  so that the main logic of your application can operate properly.
+
+	- Host is the engine that runs your application r,
+
+- var builder = WebApplication.CreateBuilder(args);
+	1- initializes a new instance of the WebApplicationBuilder class, which is used to configure the web application
+	
+	2- The builder sets up default configuration from multiple sources like:
+		- appsettings.json (your application's primary settings file).
+		- appsettings.{Environment}.json (environment-specific settings, e.g., for Development, Production).
+		- Environment variables (useful for containerized environments like Docker).
+		- Command-line arguments (passed in args from the terminal or when deploying to a server).
+			- The args parameter allows command-line arguments to be passed to the application at startup, 
+                          which can be used to override configuration settings dynamically.
+	
+	3- creates and configures the host (a runtime environment that manages the application's lifecycle).
+		- Host configuration includes things like
+			- The web server to use (e.g., Kestrel or IIS).
+			- The environment the app is running in (e.g., Development, Production, Staging).
+				- The builder.Environment object provides information about the environment (e.g., Development, Production) the app is running in.
+				- depending on the environment settings. You can set up different behaviors
+			- How logging is configured.
+	
+	4 - initializes the dependency injection container, where you can register services your application depends on.
+	
+	- After CreateBuilder – Next Steps
+		- Register Services
+		- Building the app with builder.Build(), which compiles the configurations.
+		- Defining the middleware pipeline methods.
+		- Running the app with app.Run() to start processing requests.
+ 
+
+var app = builder.Build();
+	- This line builds the WebApplication instance, which represents the configured application
+
+
+app.Environment.IsDevelopment()
+	- This checks if the application is running in the Development environment
+
+
+app.Run();
+	- This starts the application and begins listening for HTTP requests.
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<< IServiceCollection >>
+
+	- IServiceCollection: 
+		- is an interface in ASP.NET Core used for dependency injection (DI) to register services that will be available throughout the application's lifecycle
+----------------------------------------------------------------------------------------------------------------------------------------------------------------	
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------

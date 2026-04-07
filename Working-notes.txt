@@ -1,0 +1,40 @@
+-- master (Core, Micro) the production 
+    <add name="DefaultConnection" connectionString="Data Source=10.10.91.150,1433;Initial Catalog=Core_Micro_Prod;User ID=sa;Password=P@$$123$$@AIM" providerName="System.Data.SqlClient" />
+
+-- testing DB connection string
+   <add name="DefaultConnection" connectionString="Data Source=10.10.92.192;Initial Catalog=MF_Test;User ID=sa;Password=P@ssw0rd" providerName="System.Data.SqlClient" />
+
+
+
+------------------------------------------------
+
+Server of MicroDB =10.10.92.192 
+Password=P@ssw0rd
+
+
+Payments
+   - Aman
+   - Alahly momken
+   - EG Post
+   - Sahl
+   - Fawry
+
+-- NID (National ID card)
+	- GET info about about citizen via his id, 
+
+----------------------------------------------------------
+micro testing app : https://core_system.tamweely.local:5020/#/sign-in
+
+
+the id of funding request: 28310280102541
+
+
+--------------------------------------------
+
+
+9:7
+
+
+Scaffold-DbContext "Server=(localdb)\\mssqllocaldb;Database=MyExistingDb;Trusted_Connection=True;" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models
+
+

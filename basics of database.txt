@@ -1,0 +1,609 @@
+ DB Life Cycle
+1. system analysis   		->  create requirement document
+2. DB design         		->  make ERD
+3. mapping           		->  make DB Schema
+4. DB implementation 		->  DB developer create physical DB  
+5. application programmer
+
+
+
+
+- file based system drawbacks
+ 1. no sharing for data -> each user has a copy of data in the form of separated & isolated files
+ 2. data redundancy     -> dupilcation of data
+ 3. scanning all file to search on specific data
+ 4. no security -> no permission
+ 5. no relationship -> accept invalid data
+ 6. no constrains   -> 
+ 7. database integrity beacuse there is no constrains
+ 8. no data quality -> no data types
+ 9. different file format [delimited file , fixed width file]
+10. manual backup_restore
+
+- DB system:
+	- there are relationship
+	- DB sharing ->  each developer connect to the DB server
+	- security
+	- data quality: DT
+	- constrains for example salary between 2500 3600
+	
+
+DB Users
+- DB Adminstrator       -> configuration of DB like storing , backup
+- System Analyst        -> make requirement documents from user needs
+- DB designer           -> make the diagrams like ERD, Schema
+- DB developer	        -> make the DB 
+- application programer -> intrface 
+
+
+-- when you install sql server on your device it means service is instlled on your device and its name MSSQLSERVER  
+-- sql server is a database engine we can connect to it
+-- Database: A collection of related data
+-- Database Management System (DBMS) : software tool that allows control on database like read write from DB, create DB, add security
+-- DataBase System : application that help in using DB inluding  ( Software + Database )
+
+ 
+----------------------------------------------------------------------------------------------------------------
+<< ERD >>
+
+- convert requirements document into diagrams
+
+- consist of Entities, Attributes, realtionships
+
+- ERD is a metadata [description of data]
+
+- it can be more than 1 relationship between entities if we have more than 1 verbs, each verb has a different meaning
+
+-------------------------------------------------------------------------------------------------------------------------
+<< EERD Diagram >>
+
+- concept of inheritance added to ERD
+
+- if there is two entity has commom attributes we can make a super entity
+
+- super entity constrains
+	completeness constrains              // every row in parent exists in child, if yes (double line) , no (single line)
+		1. total specialization rule    (double line)
+		2. partial specialization rule  (single line)
+	
+	disjointness c onstrains            // the one row if can repeat in more than one child, if no (d) , yes (o) 
+		1. total disjoint (d)  :  discriminator represented by simple attribute 
+		2. overlap        (o)  :  discriminator represented by composite attribute
+----------------------------------------------------------------------------------------------------------------
+<< Entity >>
+
+- Entities are objects or things in the mini-world like EMPLOYEE, DEPARTMENT, PROJECT, STUDENT ,MATCH , ..ETC.
+
+
+- strong [reagular]entity : most of entities are strong, its existence not depend on another entity
+		            like course , student entitis each of then does not depend on the other
+
+- weak entity : its existance based on parent entity, 
+	        like transaction & account if account is deleted , its transactions will be deleted also
+		the primary key of a weak entity is a composite key that includes the primary key of the strong entity and the partial key
+	        
+	       
+
+------------------------------------------------------------------------------------------------------------------------------
+ << Types of Attributes >> 
+ 
+- Attributes are properties used to describe an entity: 
+	- like an EMPLOYEE entity may have the attributes SSN, Address, Gender , BirthDate
+	- the first letter is capital
+
+
+ -- Simple attribute : not calculated , has one value ,  
+ -- Composite attribute : for example ->  Name(FirstName, MiddleName, LastName) in schema each one takes a column
+ -- multivalued attributes: like email , color of a car , represented by double ellipse
+ -- Complex Attributes : composite and multi-valued attributes may be nested -> College_degree(College, Year, Degree, Field)
+ -- key attribute (unique attribute) : each entity must have at least one key attribute
+ -- derived attribute: we can get the age from birthdate , represented by dotted ellipse
+
+notes: attribute on the relationship(diamond) [relationhsip attribute] 
+	- means that attribute value is based on row from entity1 and row form entity2
+      	 like : grade  -> can't be found without course and student
+            : working_hours : can't be found without employee and project 
+	    : hiring date   : between department and instructor
+
+----------------------------------------------------------------------------------------------------------------------------------
+
+<< realtionships >>
+
+- it can be more than 1 relationship between entities if we have more than 1 verbs, each verb has a different meaning
+
+- degree of relationship
+	- unary(self, recursive): relationship between the entity with itself , manager [employee manages another employee] 
+				  if you have 2 entities with the same type and attributes
+	
+	- binary  : relation between two different entities
+	
+	- ternary : relation between more two entities, 
+		    when you have attribute its value based on row from entity1, row form entity2, row from entity3
+ 		    when three entities are involved in a relationship
+
+- relationship types [cardinality]
+	1. one to one 
+	2. one to many
+	3. many to many
+
+- participation constrains
+	total participation   : must , mendatory , always, any weak entity
+	partial participation : may  , might, optional, 
+	employee------[has]====== car
+	the weak entity always total
+-------------------------------------------------------------------------------------------------------------------------------------------
+
+<< key >>
+
+- primary key   : represented by underlined
+- candid key    : any unique and not null column , candid key can be a primary key
+- composite key : combined more than one column as a PK
+
+
+foreign key : primay key in another table , must be same data type 
+
+Table with foreign key called a child table , 
+Table with primary key called a parent table
+
+--------------------------------------------------------------------------------------------------------------------------------------------
+<< mapping >>
+
+-- one ( total participation) to one (total participation):
+      combine two tables into one table with all columns and make primary key any one of them 
+	one of primary keys will be the foreign key at the another , unique constrains on foreign key [dr.hoda amin]
+
+-- one (partial participation) to one (total participation) : 
+   the primary key of the entity that has partial participation will be foreign key at the entity with total participation
+   , unique constrains on foreign key
+
+-- one (partial participation) to one (partial participation) : new table created with two keys any of them is primary and another foreign
+
+-- one to many(total participation) : the primary key of the entity with one participation will be the foreign key at 
+			              the entity with many participation
+
+-- one to many(partial participation): new table created with two keys the many is primary and one is foreign
+
+-- many to many: new entity will be created with the 2 primary keys and these 2 primary keys together is the primay key of the created entity
+
+
+-- maltivalue attributes: new entity will be created with composite primay key [primay_key_of_original_table, value]
+
+--   entity: new entity will be created with composite primary key of related entity and partial key of weak entity
+
+-- attribute that exist on the relationship is placed in the table that has two keys[foreign key , primary key]
+
+-- ternary relationship : new table is created with 3 foreign keys and primary key you have to find it
+
+-- self relationship[1:M(total)]: new column is created is added to in the table
+
+-- foreign key is dotted line , PK is underlined
+
+-------------------------------------------------------------------------------------------------------------------------------------
+
+- ANSI SQL (Structured Query Language): basic library of sql statements for managing relational databases
+
+- microsoft transaction-sql:
+
+  - Data definition language   (DDL) --> CREATE ALTER DROP RENAME TRUNCATE 
+  - Data manipulation language (DML) --> insert, update, delete, merge
+  - Data retrieval command     (DRC) --> select
+  - Data Control Language      (DCL) --> make permissions for database, secure database
+  - Data Query Language        (DQL) --> select statements
+  - Transaction control Lang   (TCL) -->
+
+-------------------------------------------------------------------------------------------------------------------------------------
+
+<< Sql info >>
+
+- to make backup from your database: right click on database + tasks + Backup + click add to choose the path of created backup + name DB file with .back
+
+- to restore database: right click on databases + device radio button + click on ... + add + 
+
+- to enable editing on table structure : goto tools + options + designers + remove check from prevent saving changing that require table
+
+- to be the owner of database -> right click on database + properties + from left select files + at owner write sa
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+<< Data definition language   (DDL) >>
+
+CREATE TABLE dept (
+		deptno int primary key clustered,
+		dname NVARCHAR(20),
+ 		loc NVARCHAR(20) default 'cairo',
+	)
+
+ALTER TABLE dept ADD location int 
+ALTER TABLE dept alter column location NVARCHAR(30)
+ALTER TABLE dept DROP COLUMN location 
+
+DROP TABLE dept;
+
+-------------------------------------------------------------------------------------------------------------------------------------
+
+<< date manipulation language  [DML] >> 
+
+
+
+
+--- example upadate grade to grade+10 of students that live in alex
+    updata std_crs set grade+=10 
+    from student s , std_course sc 
+    where S.std_id = sc.std_id and S.address = 'alex'
+
+
+DELETE FROM departments WHERE department_name = 'Finance';
+
+-------------------------------------------------------------------------------------------------------------------------
+
+<< constrains >>
+
+- data is sorted ascending by primary key on HD
+
+- identity : 
+	- identity      // auto increment start with 1 and increment with 1
+	- identity(5,1) // auto increment start with 5 and increment with 1
+	- once you have identity you could not insert a value by yourself untill you stop the identity , to stop the identity -> 
+		set identity_insert  column_name on
+	- if you stop identity and you want to restart it -> set identity_insert  column_name of
+
+
+-------------------------------------------------------------------------------------------------------------------------
+
+<< select statements distict , order by, >>
+
+
+
+
+
+
+
+select std_Fname+' '+std_Lname as 'full name' 
+from student where fullname like 'a%'   // error as there is no column called full name at student table
+ 
+- the solution to use alias name with where
+   select * from
+    ( select S.St_Fname+' '+S.St_Lname as 'full_name' from Student S) as newTbl
+     where newTbl.[full_name] like 'a%'
+
+ select full_name from
+ ( select S.St_Fname+' '+S.St_Lname as 'full_name' from Student S) as newTbl
+  where newTbl.[full_name] like 'a%'
+
+
+
+select top 10 rows from table
+select  top (10) * from Customers
+SELECT  distinct top 10 city from Customers
+
+what if we need to select max 3 employees with salary [interview question]
+select top 3 user name , salary from employees order by salary desc
+
+
+OFFSET can only be used with ORDER BY clause.
+SELECT city from Customers ORDER BY City OFFSET 2 ROWS;
+
+// note A TOP can not be used in the same query
+-------------------------------------------------------------------------------------------------------------------------
+
+<< EXISTS keyword >>
+
+Q1: display the employee number and name if he has dependents (use exists keyword)
+
+SELECT E.SSN,  E.FName+' '+E.LName as "full name"
+FROM Employee E
+WHERE EXISTS (
+    SELECT D.ESSN
+    FROM Dependent D
+    WHERE D.ESSN = E.SSN
+);
+
+Q2:suppose you have an table customer: cus_id, cName, fNAme, 
+                             order   : order_id, cus_id, orderDate
+Using EXISTS condition with SELECT statement -> fetch the first and last name of the customers who placed at least one order.
+
+SELECT fname, lname  FROM Customers E
+WHERE EXISTS (SELECT * FROM Orders WHERE E.customer_id = Orders.c_id);
+
+
+
+
+----------------------------------------------------------------------------------------------------------------------------
+
+<< subqueries >>
+
+- aggeregate function does not appear in where clause
+
+- select student info that age is older than student average
+   select * from student where student.age > (select avg(student.age) from student) 
+
+- display department data that has the most old student
+  select Department.* 
+  from student , Department
+  where Department.Dept_Id =  Student.Dept_Id
+  and Student.St_Age =(select max(Student.St_Age) from Student)
+
+
+
+---------------------------------------------------------------------------------------------------------------------------
+
+<< union >>
+- union select statements 
+ provided that number of columns should be equal , same column datatype 
+
+1. union all
+ select std_name from employee union all  select ins_name from instructor
+
+2. union     -> get the distinct (unique, order by)
+
+3. intersect -> get the common , distinct (unique, order by)
+
+4. except    -> result set 1 and not exist in result set 2 , distinct (unique, order by)
+
+---------------------------------------------------------------------------------------------------------------------------
+
+<< built in function >>
+
+
+
+
+
+
+
+---------------------------------------------------------------------------------------------------------------
+<< transaction SQL query >>
+
+- top statement
+	select top(2)* from student
+	select top(2) salary from instructor order by salary desc
+	select top(4) with ties * from student order by stdAge; // with ties needs order by
+	- can't get with group by
+
+- newid()  // generate id unique on server level
+	select top(1) * from student order by newid() // get 1 student rondomly from DB
+	userid uniqueidentifier primary key default newid()
+	
+- ranking function
+	- select * , ranking_function over (order by col desc) as RN
+	- select * , Row_num over (order by salary desc ) as RN   // sort desc and make column RS assign sequential
+	- select * , NTILE(3) over (order by salary desc ) as RN		
+	- 
+
+	- select * , dense_rank over (order by salary desc) as DR // sort desc and make column RS with same rank
+	
+	- select (select * , dense_rank over (order by salary desc) as DR from employee ) as newTable
+		where DR<=2
+
+	- select *, Row_number over (partition by did order by salary desc ) as RN
+---------------------------------------------------------------------------------------------------------------
+<< datatypes >>
+
+- nummeric
+  1. bit      --> boolean , 0:1 
+  2. tinyint  --> 1 byte
+  3. smallint --> 2 bytes
+  4. int      --> 4 bytes
+  5. bigint   --> 8 bytes
+
+- decimal DT
+  1. small money -->  4 bytes , .0000    // 4 digits after decimal point
+  2. money       -->  8 bytes , .0000    // 8 digits after decimal point
+  3. real        -->  4 bytes , .0000000 // 7 digits after decimal point
+  4. float	 -->  8 bytes ,          // 15 digits after decimal point
+  5. dec         -->  dec(5,2) , number with 5 digits 2 of them can be a decimal point, 12251 valid , 125.21 valid
+		 -->  dec(percision, scale)
+
+string DT
+ - char(10)       // fixed length  // it reserves the entire 10 bytes even the string takes 3 bytes , support english only
+ - varchar(30)    // variable length string // it reserves based on the written , support english only
+ - nchar(10)      // support all language
+ - nvarchar(30)   // support all language
+ - navarchar(max) // for large data up to 2GB
+ - text		  // up to 8000 Bytes   // exists for backword compatiblity
+ - ntext
+
+DateTime
+  - date           // MM/dd/yyyy
+  - time           // hh:mm:ss.000
+  - time(7)        // hh:mm:ss.0000000
+  - smalldatatime  // MM/dd/yyyy hh:mm:ss 
+  - datatime       // MM/dd/yyyy hh:mm:ss.000
+  - datatime2(7)   // MM/dd/yyyy hh:mm:ss.0000000
+
+binary DT
+  - binary   // encryption for data
+  - image    // 
+
+Others :
+  - XML
+  - SQL_variant
+  - uniqueidentifier
+  - geography [langitude, latidude]
+
+ 
+-------------------------------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------------------------------
+difference between structure and data at database
+
+data:  is the records of table
+structure: the type of columns of the table + restore databases + choose device
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+pl sql / extenstion to sql allowing us to make a loops and if condtions , 
+--------------------------------------------------------------------------------------------------------------------------------
+What is a NoSQL database? non-relational database , mechanism for storage and retrieval of data in the form of models
+
+----------------------------------------------------------------------------------------------------------------------------------
+what's is different between view and table ?
+ 
+- view is a virtual table based on the result-set of an SQL statement.
+- We can not add, update, or delete any data from a view.
+- The view depends on the table.
+- data Aggregated in views.	
+- A view is created with the CREATE VIEW statement. 
+  CREATE VIEW view_name AS
+	SELECT column1, column2, ...
+	FROM table_name
+	WHERE condition;
+
+table : The table is an independent data
+	We can easily add, update, or delete any data from a table.
+	In the table, we can maintain relationships using a primary and foreign key.
+	data can't be Aggregated in table
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+
+stored procedure:
+ - why we use stored procedure : to be able to reuse sql code, instead of writing it every time
+ - syntax:
+    create proc (procedure) procedure_name
+	@parameter_name type 
+	@parameter_name type out
+	As
+	begin
+		select statement , DML
+	End
+
+ 1- it's an optional to take parameters.
+ 2- can have input/output parameters , // input defualt parameter
+ 3- it's an optional to return a value
+ 4 Procedure allows SELECT as well as DML(INSERT/UPDATE/DELETE)
+ 5 you can call function inside stored proc
+ 6 Stored Procedures cannot be used in the SQL statements anywhere in the WHERE/HAVING/SELECT section whereas Function can be.
+
+function: 
+ - Function takes at least one parameter , it's a mendatory
+ - Functions can have only input parameters
+ - Function must return a value 
+ - Function allows only SELECT statement in it.
+ - 
+
+
+
+-------------------------------------------------------------------------------------------------------------------
+<< Normalization >> تطبيع او تسوية
+ - Normalization is the process of breaking a big table into two or more smaller tables so that we can avoid the insert,
+   - update and delete anomalies(الشذوذ) that may occur. 
+   - Through normalization we can achieve consistency, prevent data redundency.
+   - Good for OLTP( Online Transaction Processing) systems.
+   - OLTP systems designed to support online transaction and process query quickly 
+	on the Internet online banking, shopping, or sending text messages
+
+<< De-normalization>>
+ - De-normalization is the reverse process of Normalization 
+ - combining two or more tables into a single table ((Searching for data from one table is quiet faster and easier)
+ - Good for OLAP ( Online Analytical Processing ) systems
+ - OLAP systems designed to allows multiple users to access and change the same data at the same time
+ - OLTP systems are not suitable for decision making.
+
+
+-------------------------------------------------------------------------------------------------------
+
+<< trigger >>
+ - A trigger is a special type of stored procedure that automatically executes when an event occurs in the database 
+ - there is two types of triggers:
+    1. DML trigger :  insert, update, delete
+    2. DDL trigger :  create , drop , alter
+
+-------------------------------------------------------------------------------------------------------
+<< Cursor >>
+	is a database object used to manipulate retreived data 
+ 
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+<< transaction log >>
+ - Every SQL Server database has a transaction log that records all transactions and the database modifications made by each transaction.
+ - is a history of actions executed on database
+ - it's a table used to store transcation occured on database like inset , create , .... etc.
+----------------------------------------------------------------------------------------------------------------------------------------------------------
+<< data pages >>
+
+- basic units of storage in SQL Server.
+-  Each data page has a fixed size of 8 KB and can hold multiple rows of data
+---------------------------------------------------------------------------------------------------------------------------------------------
+<< What is difference between DELETE and TRUNCATE commands , drop ? >>
+
+drop    : remove data and metadate , DDL
+
+delete  : command -> DML
+        : it's is used to remove specific rows from a table based on WHERE condition.
+	: It records all the deleted data rows in the transaction log, DELETE operation executes deletion one-by-one on records
+	: You can restore the data using the COMMIT or ROLLBACK command as The DELETE command is transactional
+	: Its speed is slow as it makes operations in rows and records it in transaction logs
+        : work on child and parent
+	: It activates the triggers on the table and causes them to fire
+
+truncate : command -> DDL
+   	 : The TRUNCATE command is used to delete the complete data from the table, It does not work with the WHERE clause.
+ 	 : It records only the deleted data pages in the transaction log.
+	 : You cannot restore the deleted data after executing this command.
+ 	 : Its speed is fast as it only records data pages in transaction logs.
+	 : work on child tables only
+         : It does not activate the triggers applied on the table.
+	 : reset properties like identity
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+<< What is “CHECK” Constraint >>
+
+The CHECK constraint is used to limit the value range that can be placed in a column.
+
+------------------------------------------------------------------------------------------------------------------------------------------------
+
+What is “BulkCopy” tool? used to copy huge amount of data from tables.
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+What is the difference between Sequence and Identity
+
+identity : it's a table column property which means it's tied to the table , looks like auto number field
+	 : to generate the next identity value, a row has to be inserted into the table
+         : ContactID int identity(1, 1)
+
+sequence : it's a user database object it's not tied to any specific table which means values can be shared by specific tables
+	 : we don’t require adding a row into the table in order to generate the next sequence value. You can use the NEXT VALUE FOR clause 
+		CREATE SEQUENCE sequence_1
+		start with 1
+		increment by 1
+		minvalue 0
+		maxvalue 100
+		cycle;
+---------------------------------------------------------------------------------------------------------------------------------------------------------------
+<< What is the Database Shrink >>
+
+it's a space recovery process by moving data pages from the end of the file to unoccupied space closer to the front of the file.
+When enough free space is created at the end of the file, data pages at end of the file can deallocated and returned to the file system
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Can we join two tables without primary foreign key relation ?
+
+yes, provided (بشرط) the column values involved in the join with the same data type
+
+---------------------------------------------------------------------------------------------------------------------------------------
+
+1.  Can we join two tables without primary foreign key relation ?
+2.  What is the Database Shrink ?
+3.  What is the difference between Sequence and Identity ?
+4.  What is “BulkCopy” tool?
+5.  What is “CHECK” Constraint ?
+6.  What is difference between DELETE and TRUNCATE commands ?
+7.  transaction log ?
+8.  data pages ?
+9.  What's the difference between a primary key and a unique key ?
+10. What's the difference between clustered index , non-clustered index ?
+11. what's Cursor ?
+12. what's trigger ?
+13. What's the difference between Normalization , de-normalization ?
+14. What's the difference between stored procedure and function ?
+15. Data definition language   (DDL) ?
+16. date manipulation language (DML) ?
+17. Data retrieval command (DRC) ?
+18. what's is different between view and table ?
+19. What is a NoSQL database?
+20. what's relationship types
+21. Types of Attributes
+
+---------------------------------------------------------------------------------------------------------------------------------------
+

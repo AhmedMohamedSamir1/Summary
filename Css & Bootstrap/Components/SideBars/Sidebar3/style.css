@@ -1,0 +1,107 @@
+:root{
+  --min-sidebar-width: 55px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+#sidebar {
+  width: 200px;
+  transition: all 0.2s ease-in-out;
+}
+
+/* styles to icon button that opens and closes the sidebar*/
+.sidebar-header .nav-link i.toggle-opening-sidebar {
+  transition: all 0.1s ease-out;
+  cursor: pointer;
+}
+
+/* hover the icon button that opens and closes the sidebar */
+.sidebar-header .nav-link i.toggle-opening-sidebar:hover {
+  background-color: rgba(21, 21, 62, 0.059);
+}
+
+/* hover all a.nav-link except the one inside .sidebar-header  */
+.nav-link:not(.sidebar-header .nav-link):hover {
+  background-color: blanchedalmond;
+}
+
+.collapse-arrow {
+  transition: transform 0.3s ease;
+}
+
+/* when the <a> element opens its target element the collapse arrow will be*/
+a[aria-expanded="true"] .collapse-arrow {
+  transform: rotate(180deg);
+}
+
+@media(max-width: 400px) {
+  #sidebar {
+    position: fixed;
+    width: 100%;
+  }
+}
+
+/* when closing the expanding of sidebar */
+
+/* styles to sidebar when it is closed */
+#sidebar.close{
+  width: var(--min-sidebar-width);
+  padding-inline: 0 !important;
+}
+
+/* when the sidebar is closed the arrow that toggles the sidebar rotates 180  */
+#sidebar.close .nav-link i.toggle-opening-sidebar{
+  margin: 0 !important;
+  font-size: 20px;
+  transform: rotate(180deg);
+}
+
+#sidebar.close span {
+    transition: all 0.2s ease-in-out;
+}
+/* remove every span text at sidebar */
+#sidebar.close span {
+  display: none;
+}
+
+/*remove every collapsable arrow*/
+#sidebar.close a.nav-link i.collapse-arrow{
+  display: none;
+}
+
+
+/* when i close the sidebar the collapsable ul element styles will be */
+#sidebar.close ul.collapse, #sidebar.close ul.collapsing {
+  opacity: 0;
+  transform: translateY(-200px);
+  transition: all .2s ease-in-out;
+  position: absolute;
+  top: 0;
+  left: var(--min-sidebar-width);
+  z-index: 2;
+  background-color: rgb(246 229 183);
+  min-width: 10rem;
+  padding-inline-start: 0 !important;
+  display: block;
+}
+
+/* when i click on the element that toggle collapsable element (ul) that will be shown its styles will be*/
+#sidebar.close a.nav-link[data-bs-toggle="collapse"] ~ ul.collapse.show{
+  opacity: 1;
+  transform: translateY(0);
+}
+
+
+#sidebar.close li a{
+  padding-left: 5px !important;
+  padding-right: 5px !important;
+  justify-content: center;
+}
+
+#sidebar.close li a i{
+  margin-inline-end: 0 !important;
+}

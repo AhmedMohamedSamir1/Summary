@@ -1,0 +1,252 @@
+1. install node and follow the instructions in the file node_js.txt
+
+2. open cmd to install typescript on your machine using this command:
+	npm i -g typescript
+
+
+
+- to ensure that typescript is installed use this command to get the version of typescript -->  tsc -v
+
+
+
+-------------------------------------------------------------------------------------------------------------------------
+
+to run the typescript file
+	1. tsc tsFile.ts
+		- command compiles your TypeScript code into JavaScript, allowing it to be executed by JavaScript engines like Node.js or browsers, 
+	          while performing type checking to catch errors during development.
+
+	2. tsc tsFile.ts -w   // is used to compile a TypeScript file into JavaScript and watch the file for changes
+
+-------------------------------------------------------------------------------------------------------------------------------------
+<< intro >> 
+
+- allowing developers to add types.
+- TypeScript allows specifying the types of data being passed around within the code, and has the ability to report errors when the types don't match.
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<< create project >>
+
+- open CMD and run this command --> npm install typescript --save-dev
+
+- 
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<< define variable >>
+
+-  it is not mandatory to initialize a variable when you declare it.
+
+- primitive DT
+	• let title:string="";
+	• let flag:boolean = false;
+	• let test: boolean|undefined = flase
+	• let emptyValue: null = null;
+	• let notAssigned: undefined = undefined;
+	• let input: HTMLInputElement
+
+- Special Types 
+	- any
+		- let flexible: any = 42;  
+		  flexible = "Now it's a string";
+		- Represents any type of value, similar to JavaScript's dynamic typing. Avoid using this unless necessary.	
+	
+	- unknown: Represents a value whose type is not known until runtime. It is safer than any. 
+
+- Composite Types
+	- Array
+		- let numbers: number[] = [1, 2, 3];
+		- let strings: Array<string> = ["a", "b", "c"]; // using generic syntax
+		- tracks:string[] = []; 	
+		- Tracks:string[]=['sd','pd'];
+
+	- tuple: Represents an array with a fixed number of elements with known types
+		- let tuple: [string, number] = ["Alice", 30];
+	
+- Union Types
+	Allows a variable to have multiple types.
+	let id: number | string;
+
+- let firstName = "Dylan"; // TypeScript will "guess" the type, based on the assigned value 
+
+------------------------------------------------------------
+
+<< number >>
+
+-- casting to number
+	Number(variable)
+	+variable
+	
+
+-------------------------------------------------------------------------------------------------------------------------
+
+<< constant >>
+
+- const with object
+
+   export const RoleConst = {
+    	Admin: "Admin",
+    	User: "User",
+   } as const;
+
+   // without as const -->  values "Admin" and "User" are treated as strings
+   // With as const    -->  values "Admin" and "User" are treated as specific constants, not just general strings.
+
+
+---------------------------------------------------------------------------------------------------------------------------
+
+<< Object >>
+	- An object is a collection of key-value pairs.
+	- const person = {
+  		name: 'Ahmed',
+  		age: 24,
+  		isDeveloper: true
+	 };
+	- let person: { name: string; age: number } = { name: "John", age: 30 };
+	- Optional properties
+		- let car: { model: string; year?: number } = { model: "Toyota" }; // The model property is mandatory, The year property is optional (can be undefined).
+	- Readonly Properties
+		- let point: { readonly x: number; readonly y: number } = { x: 10, y: 20 };
+			- The properties x and y are readonly, meaning they cannot be changed after the point object is created.
+
+	- type Person = {   name: string, age: number, isDeveloper: boolean };
+		- let developer: Person = { age : 45, isDeveloper : true, name: "wael" }
+		- let driver: Person = { age: 33, isDeveloper: false, name: "amr" }
+
+	- Index Signatures
+		- let ScoreBoard1: { [key:string]: number }
+	  		- ScoreBoard1 = { "Arsenal": 8, "Lyon": 5, }
+			- [key: string]: This means that the keys of the dictionary can be any string.
+	  		- console.log(ScoreBoard1["Arsenal"]); // 8
+	
+	- type TeamResult  = { score: number; result: string; };
+	- type ScoreBoard3 = { [team: string]: TeamResult; };
+	- let match3: ScoreBoard3 = {  
+		Arsenal: { score: 5, result: "Win" },
+		Chelsea: { score: 2, result: "Loss" } 
+	  }
+
+	- Object Destructuring
+		const person = { age: 24, job: 'Developer' };
+		const { age, job } = person;
+		console.log(job) // developer
+
+	- Spread Operator:
+	    const person = { age: 1, name: "ahmed" };
+	    const Address = { country: "Egypt", city: "Cairo" }
+	    console.log({...person})  		// {age: 1, name: 'ahmed'}
+	    console.log({...person, ...Address})	// {age: 1, name: 'ahmed', country: 'Egypt', city: 'Cairo'}
+
+	
+
+-----------------------------------------------------------------------------------------------------------------------------------
+
+<< function >>
+
+- function greet(name: string): string {
+	return `Hello, ${name}!`; 
+  }
+
+- const square = (n: number): number => n * n;
+  console.log(square(4)); // Output: 16
+
+- function logMessage(message: string, user?: string): void {} // user is optional param
+
+- function greetWithDefault(name: string, greeting: string = "Hello"): string {}  // greeting is default param
+
+- function sum(...numbers: number[]): number {
+    return numbers.reduce((acc, curr) => acc + curr, 0);
+  }
+  // console.log(sum(1, 2, 3, 4)); // Output: 10
+
+- 
+ 
+-----------------------------------------------------------------------------------------------------------------
+<< class >>
+
+- Members (properties and methods) of the TypeScript class are public by default
+- fields (property)
+- constructor(public name: string, public age: number) {} == constructor(name: string, age: number) { this.name = name; this.age = age; }
+
+class Person {
+    name: string; // Property declaration
+    age: number;
+
+    constructor(name: string, age: number) { // Constructor method
+        this.name = name;
+        this.age = age;
+    }
+
+    greet(): string { // Method
+        return `Hello, my name is ${this.name} and I am ${this.age} years old.`;
+    }
+}
+
+class Animal {
+    protected species: string; // Protected property
+
+    constructor(species: string) {
+        this.species = species;
+    }
+
+    public makeSound(): string {
+        return "Some generic sound";
+    }
+}
+
+class Dog extends Animal // Inherits from Animal
+{ 
+    private name: string; // Private property
+
+    constructor(name: string) {
+        super("Dog"); // Call the parent class constructor
+        this.name = name;
+    }
+
+    public makeSound(): string { // Overriding the method
+        return "Woof! Woof!";
+    }
+}
+
+const dog = new Dog("Buddy");
+console.log(dog.makeSound()); // Output: Woof! Woof!
+
+
+class Rectangle
+{
+	private _width: number;
+    	private _height: number;
+
+    	constructor(width: number, height: number) {
+        	this._width = width;
+        	this._height = height;
+    	}
+
+	get area(): number { // Getter
+        	return this._width * this._height;
+    	}
+
+    	set width(value: number) { // Setter
+        	this._width = value;
+    	}
+}
+
+	
+
+----------------------------------------------------------------------------------
+
+interface Person {
+    name: string; // Required property
+    age: number;  // Required property
+    greet(): string; // Method signature
+}
+
+
+class Employee implements Person {
+    constructor(public name: string, public age: number) {}
+
+    greet(): string {
+        return `Hello, my name is ${this.name} and I am ${this.age} years old.`;
+    }
+}
+

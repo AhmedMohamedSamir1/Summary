@@ -1,0 +1,777 @@
+<< introduction>>
+
+- WPF : windows presentation foundation 
+- WPF : used to make desktop application
+
+- The difference between windows form and WPF
+	- WPF has a better representation for control
+	- WPF: separate between the presentation code and the business logic code
+		- presentation code : written by XAML -> at XAML file
+		- logic code        : written by C#   -> at cs   file
+	- at WPF the controls more stylish , better in resolution
+
+- Microsoft Expression Blend
+	- it's a software tool allows the designer to convert his design into XAML code
+
+- It Previously called Avalon or WinFx
+
+- Features of WPF: 
+	- Data Binding
+	- MVVM Pattern 
+	- MVVM
+
+WPF Architecture main 3 parts 
+  1. presentation framework: consisy of set of DLLs
+	- Controls, Data Binding, Media
+  2. presentation core
+	-  
+  3. milcore
+
+ 
+----------------------------------------------------------------------------------------------------------
+
+<< WPF Default Project >>
+
+- application consists of windows,
+
+
+- WPF default project 
+	- MainWindow.xaml : it's created by default within any WPF project
+	- App.xaml 
+		- it's created by default within any WPF project, 
+		- it determines the start up window of your app (Entry point)
+			- StartupUri="Questions.xaml"
+			- by default it's MainWindow.xaml
+		- 	
+----------------------------------------------------------------------------------------------------------
+
+<< Common Properties >>
+
+- the properties that common with all elements
+	name 
+	vertical alignment
+	horizontal alignment
+	margin
+	padding
+	height
+	width
+	background
+	Content
+	flowDirection : specify the direction of content
+	layoutTransform
+	RenderTransform
+
+------------------------------------------------------------------------------------------------------
+
+<< Window Tag >>
+
+- any window created its root element is <Window></Window>
+- it is a class like any window and inherit from ContentControl class
+
+- Has only one element (Direct child) : why ?
+	- it inherits from ContentControl class that contains a Content property which is from type object (which means hold one element) 
+	  and any element written inside the tag is putted inside content control property so it can not hold more than one element
+
+Properties
+	- WindowState="Maximized"
+	- xmlns=""  	// default namespace, other namespaces need prefix
+	- xmlns:x=""	// need prefix
+	- xmlns:local="clr-namespace:Trivia"
+	- x:Class="Trivia.Questions"  // the class Trivia.Questions is the code behind for the window
+	- Title="Questions" 
+	- Height="1920" 
+	- Width="1080"
+	- WindowStyle="None"
+
+
+--Attached Property
+   <Window.Resources>
+	<L:Employee x:Key="Emp1" Id="11" Name="Ahmed" Salary="195"> </L:Employee>
+   </Window.Resources>
+
+Types of windows
+	Window
+	Navigation
+	Page
+	DialogBox
+
+--------------------------------------------------------------------------------------------------------------
+
+Layout
+
+[Shape, [ContentControl, ItemControl] -> Control, Panel] -> FrameworkElement -> UIElement -> Visual
+
+[ContentControl, ItemControl] inherit from Control
+
+
+- Visual
+  - FrameworkElement
+     - Control
+	- ContentControl
+  	  - ContentControl children classes
+	     - Label
+	     - ButtonBase
+	     - ToolTip
+	     - ScrollViewer
+	     - UserControl
+	     - Window
+	     - Border
+	     - Page
+	     - Headered Content Control
+		- GroupBox
+		- TabItem
+		- Expander
+    
+    - ItemsControl
+	- ListBox
+	- ListView
+	- ComboBox
+
+--------------------------------------------------------------------------------------------------------------
+
+<< Panels >>
+
+StackPanel, WrapPanel, DockPanel, Grid, UniformGrid, Canvas, InkCanvas 
+
+----------------------------------------------------------------------------------------------------
+
+<< StackPanel >>
+
+- Places elements in horizontal or vertical stack
+- Properties
+	- Orientation -> Vertical, Horizontal
+- when the content is bigger than the available space it does not wrapped
+
+ <StackPanel Orientation="Vertical">
+     
+     <StackPanel.Resources>
+         <Style TargetType="Label">
+             <Setter Property="FontSize" Value="22"/>
+             <Setter Property="FontWeight" Value="Bold"/>
+             <Setter Property="Margin" Value="0 10 0 10"></Setter>
+         </Style>
+
+	<Style TargetType="Border">
+    	   <Style.Triggers>
+               <Trigger Property="IsMouseOver" Value="True">
+            	  <Setter Property="Background" Value="Red"/>
+            	  <Setter Property="Cursor" Value="Hand"/>
+               </Trigger>
+    	   </Style.Triggers>
+	</Style>
+     </StackPanel.Resources>
+
+     <Border BorderThickness="2"
+             Cursor="Hand"
+             CornerRadius="10"
+             Padding="0 10 0 10"
+             Margin="0 0 0 15"
+             BorderBrush="#FFE67A5C">
+         <Label Margin="0" Content="Choice1"></Label>
+     </Border>
+     <Border BorderThickness="2"
+             Cursor="Hand"
+             CornerRadius="10"
+             Padding="0 10 0 10"
+             BorderBrush="#FFE67A5C">
+         <Label Margin="0" Content="Choice1"></Label>
+     </Border>
+          
+ </StackPanel>
+
+
+
+- c# Code 
+   - var borders = QChoices.Children.OfType<Border>().ToList();
+----------------------------------------------------------------------------
+
+<< Wrap Panel >>
+
+- places elements in a series of wrapped lines
+- Properties
+	- Orientation
+	- Vertical alignment
+	- Horizontal alignment
+
+----------------------------------------------------------------------------
+
+<< Dock Panel >>
+
+- ALign elements against an entire edge of the container
+
+- by default the Last Child fill the available space --> LastChildFill="True"
+
+- properties
+	- lastChildFill -> true, false
+	
+- Attached Property: property Exists in a class (element) and i want to use it in another element
+	- Must the elements be parent and child?
+
+- children
+	- DockPanel.Dock="Top"
+	- if two children have the same DockPanel.Dock="top" they will be next to each other
+----------------------------------------------------------------------------
+
+<< Grid >>
+
+- Arranges elements in Rows and Columns according to invisible table
+- byDefault
+	- VerticalAlignment="center"
+	- HorizontalAlignment="center"
+- all grid childs exists in column 0 , row 0
+
+- Tags of Grid
+	- <Grid.RowDefinitions>
+		<RowDefinition "Height="100"></RowDefinition>
+		<RowDefinition "Height="auto"></RowDefinition>  // auto make it specified based on content
+		<RowDefinition "Height="*"></RowDefinition>
+		<RowDefinition "Height="0.5*"></RowDefinition>
+	  </Grid.RowDefinitions>
+
+	- <Grid.ColumnDefintions>
+		<ColumnDefinition Width="auto"></ColumnDefinition>
+		<ColumnDefinition Width="100"></ColumnDefinition>
+		<ColumnDefinition Width="*"></ColumnDefinition>
+		<ColumnDefinition Width="2*"></ColumnDefinition>
+	  </Grid.ColumnDefintions>
+
+		
+- Children 
+	- you can determine the place of child by using the attached property Grid.Row="", Grid.Column=""
+	- Grid.Row="0"
+	- Grid.Column="1"  // Attached property
+	- Grid.ColumnSpan="3" // it likes we make the element inside the 3 column
+	- Grid.RowSpan="" 
+
+note: we that we assign element to any row we want using Grid.Row="0"
+
+
+---------------------------------------------------------------------------------------------------------------
+
+<< UniformGrid >>
+	- num of rows equals to num of columns
+	- 
+
+---------------------------------------------------------------------------------------------------------------
+
+<< InkCanvas >>
+
+---------------------------------------------------------------------------------------------------------------
+
+
+<< viewbox >>
+
+- it is a layout container that scales its single child element to fit the available space.
+- It preserves the aspect ratio of the content by default.
+
+---------------------------------------------------------------------------------------------------------------
+
+<< Buttons Tags >>
+
+-- Button
+  - inherit from contentControl
+  - Properties
+	- Width
+	- Height
+	- Background
+	- Click=""
+	- IsDefault="True" // when i press on enter == click on that btn
+	- IsCancel="True"  // when i press on esc  == click on that button
+	- ToolTip="Click on that"
+  - Code	
+	- NextBtn.IsEnabled = false;
+
+- ToggleButton
+
+
+--------------------------------------------------------------------------------------------------------------
+
+<< Label >>
+
+- inherit from Content Control
+
+--------------------------------------------------------------------------------------------------------------
+
+<< TextBlock >>
+
+- A TextBlock has an Inlines property → holds a collection of Inline elements.
+- it has the feature of wrapping that does not exist at label
+- <TextBlock Text="hello" >
+
+
+--------------------------------------------------------------------------------------------------------------
+
+<< TextBox >>
+
+- <TextBox>
+	- one line
+- <RichTextBox>
+	- multi-line
+- <PasswordBox>
+
+--------------------------------------------------------------------------------------------------------------
+<< Scroll Viewer >>
+
+properties
+	- VerticalScrollBarVisibility
+	- HorizontalScrollBarVisibility
+
+--------------------------------------------------------------------------------------------------------------
+
+<< Headered Content Control >>
+
+- have only one element
+
+<GroupBox>
+   <StackPanel>
+	<RadioButton Checked="actionFn">Option1</RadioButton>
+   </StackPanel>
+</GroupBox>
+
+
+<TabControl TabStripPlacement="">
+   <TabItem>
+	<StackPanel></StackPanel>
+   </TabItem>
+</TabControl>
+
+<Expander ExpandDirection="Up" Header>
+	<StackPanel></StackPanel>
+</Expander>
+
+--------------------------------------------------------------------------------------------------------------
+
+<< border >>
+
+<Border
+    BorderThickness="2"
+    BorderBrush="#FFE67A5C"
+    CornerRadius="10"
+    Background="#FF181A05"
+    Width="250"
+    Padding="10">
+    <Label Content="start"
+        FontSize="55"
+        FontWeight="Black"
+        HorizontalAlignment="Center"
+        VerticalAlignment="Center"
+        Foreground="red"
+   />
+</Border>
+
+
+- BorderBrush --> borderColor
+- Yes, Border in WPF can only have one direct child element because it inherits from the Decorator class,
+  which is designed to "decorate" a single child element.
+------------------------------------------------------------------------------------------------------------------------
+
+<< Image >>
+
+<Image Source="img12.jpg"></Image>
+
+
+-----------------------------------------------------------------------------------------
+<< WPF other properies >>
+
+- Cursor="Hand"
+
+---------------------------------------------------------------------
+
+<< ListBox >>
+
+- inherit from ItemControl
+
+<ListBox >
+  <ListBoxItem>Item1</ListBoxItem>
+</ListBox>
+
+
+- properties
+	- ItemsSource="{x: static Fonts.SystemFontFamilies}"
+
+lstBoxName.ItemSource = LstOfEmployees
+
+-----------------------------------------------------------------------------------------
+
+<< ComboBox >>
+
+- inherit from ItemControl
+
+<ComboBox>
+   <ComboBoxItem>Item1</<ComboBoxItem>
+   <ComboBoxItem>Item2</<ComboBoxItem>
+<ComboBox>
+
+
+-----------------------------------------------------------------------------------------
+
+<< ListView>>
+
+- inherit from ItemControl
+- similar to listbox in representation
+
+<ListView>
+   <ListViewItem>Item1<ListViewItem>
+<ListView>
+-----------------------------------------------------------------------------------------
+
+
+<< navigation to form >>
+
+var form = new Questions(); // define object from form, 
+form.Show();
+this.Hide();
+this.Close();
+
+-----------------------------------------------------------------------
+
+
+<< Types of Properties >>
+
+-- Simple   property --> name ="lbl1"
+-- Attached Property --> property of element that can be used inside another element
+-- Complex Property 
+	EX1: 
+	   <Button.ToolTip>
+		<StackPanel> 
+		   <label> hello</label>
+		</StackPanel>
+	    </Button.ToolTip>
+
+	Ex2:
+	   <Window.Background>
+		<ImageBrush ImageSource=""></ImageBrush>
+	   </Window.Background>
+---------------------------------------------------------------------------------------------------------------
+
+<< to change the default startup form (window) in a WPF application >>
+
+1. Open App.xaml
+2. StartupUri="MainWindow.xaml"
+
+-----------------------------------------------------------------------------------------------------------------
+
+<< Binding >>
+
+- one way
+	- from source --> destination (target)
+	<Slider Name="sld1" Minimum="9" Maximum="34" Value="12" Width="100">
+	<Label FontSize="{Binding ElementName=sld1, Path=Value}" >hello world</Label>
+- twoWayBinding
+	<TextBox Text="{Binding ElementName=text2,Path=Text,Mode=OneWay}" x:Name="text1" Width="200" Height="50" Margin="15" ></TextBox>
+	<TextBox Text="{Binding ElementName=text1,Path=Text,Mode=OneWay}" x:Name="text2" Width="200" Height="50" Margin="15" ></TextBox>
+	OR
+	<TextBox Text="{Binding ElementName=text1,Path=Text,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" x:Name="text2"></TextBox>
+
+- one way to source
+	- when target is changed it is reflected in source
+
+
+
+-- binding from object created at Window Element
+
+  <Window.Resources>
+      <l:Employee x:Key="emp1" Id="10" Name="Hamda" Salary="20" Image="img12.jpg"></l:Employee>
+  </Window.Resources>
+
+
+  <StackPanel DataContext="{StaticResource ResourceKey=emp1}">
+      <Border BorderThickness="5" CornerRadius="15">
+            <Image Source="{Binding Image}" Width="100" Height="100"></Image>
+      </Border>
+      <TextBlock Text="{Binding Id}" Width="100"></TextBlock>
+      <TextBlock Text="{Binding Name}" Width="100"></TextBlock>
+      <TextBlock Text="{Binding Salary}" Width="100"></TextBlock>
+  </StackPanel>
+
+
+-- binding from list
+
+<StackPanel DataContext="{Binding ElementName=lst,Path=SelectedItem}">
+    <Border BorderThickness="5" CornerRadius="15">
+        <Image Source="{Binding Image}" Width="100" Height="100"></Image>
+    </Border>
+    <TextBlock Text="{Binding Id}" Width="100"></TextBlock>
+    <TextBlock Text="{Binding Name}" Width="100"></TextBlock>
+    <TextBlock Text="{Binding Salary}" Width="100"></TextBlock>
+    
+</StackPanel>
+
+-----------------------------------------------------------------------------------------------------------------
+
+<< LinearGradientBrush, RadialGradientBrush >>
+
+
+
+--- LinearGradientBrush
+
+  - Properties
+    - StartPoint="0,0" 
+    - EndPoint="1,1" 
+
+  <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+     <GradientStop Color"Teal" Offset="0.15"></GradientStop>
+     <GradientStop Color"SkyBlue" Offset="0.25"></GradientStop>
+     <GradientStop Color"Gray" Offset="0.5"></GradientStop>
+     <GradientStop Color"LightGray" Offset="0.75"></GradientStop>
+  </LinearGradientBrush>
+
+--- RadialGradientBrush
+
+    - Properties
+	- RadiusX="0.75"  // 0.5 by default
+	- RadiusY="0.5"
+	- GradientOrigin: determint the first color in the gradient starts byDefault it is (0.5, 0.5)
+
+    <RadialGradientBrush>
+       <GradientStop Color"Teal" Offset="0.15"></GradientStop>
+       <GradientStop Color"SkyBlue" Offset="0.25"></GradientStop>
+    </RadialGradientBrush>
+
+-----------------------------------------------------------------------------------------------------------------
+
+<< Resources, Style >>
+
+-- you can make resources on the Window level for example
+
+<Window.Resource>
+
+  <LinearGradientBrush StartPoint="0,0" EndPoint="1,1" x:>
+     <GradientStop Color"Teal" Offset="0.15"></GradientStop>
+     <GradientStop Color"SkyBlue" Offset="0.25"></GradientStop>
+     <GradientStop Color"Gray" Offset="0.5"></GradientStop>
+     <GradientStop Color"LightGray" Offset="0.75"></GradientStop>
+  </LinearGradientBrush>
+
+  <Style x:Key="BtnStyle">
+       <Setter Property="Control.Width" value="200"></Setter>
+       <Setter Property="Control.Height" value="100"></Setter>
+  </Style>
+
+  <Style x:Key="BtnStyle" TargetType="Button">
+       <Setter Property="Width" value="200"></Setter>
+       <Setter Property="Height" value="100"></Setter>
+  </Style>
+
+</WindowResource>
+
+<button>
+   Background="{StaticResource ResourceKey=btnBg}"
+</button>
+
+<Button Style="{StaticResource ResourceKey=BtnStyle}">
+
+
+-- you can make resource on element level like button, StackPanel
+	- <StackPanel.Resources>
+
+
+-- On Application Level
+	- at App.Xaml
+		<Application.Resources>	
+		</Application.Resource>
+
+-----------------------------------------------------------------------------------------------------------------
+
+<< ResourceDictionary >>
+
+- Create ResourceDictionary with Name --> Style1.xaml
+	<Style x:Key="BtnStyle" TargetType="Button">
+	   <Setter Property="Width" value="200"></Setter>
+           <Setter Property="Height" value="100"></Setter>
+	</Style>
+
+	<LinearGradientBrush StartPoint="0,0" EndPoint="1,1" x:>
+           <GradientStop Color"Teal" Offset="0.15"></GradientStop>
+           <GradientStop Color"SkyBlue" Offset="0.25"></GradientStop>
+           <GradientStop Color"Gray" Offset="0.5"></GradientStop>
+           <GradientStop Color"LightGray" Offset="0.75"></GradientStop>
+  	</LinearGradientBrush>
+
+- at App.xaml -> Application.Resource
+	- <ResourceDictionary Source="Style1.xaml"></ResourceDictionary>
+
+- if you have more than 1 ResourceDictionary file use ResourceDictionary.MergedDictionaries
+	- at App.xaml
+  	   <ResourceDictionary>
+		<ResourceDictionary.MergedDictionaries>
+			<ResourceDictionary Source="Style1.xaml"></ResourceDictionary>	
+		</ResourceDictionary.MergedDictionaries>
+  	   </ResourceDictionary>
+
+-----------------------------------------------------------------------------------------------------------------
+
+<< Triggers >>
+
+written inside the style tag
+
+
+<Style TargetType="Label">
+   <Style.Triggers>
+	<Trigger Property="IsMouseOver" Value="True">
+	   <Setter Property="FontSize" Value="Bold"></Setter>
+	   <Setter Property="Foreground" Value="Red"></Setter>
+	</Trigger>
+	
+   </Style.Triggers>
+</Style>
+
+
+- trigger could not affect inline properties
+
+
+--- MultiTrigger
+
+<Style TargetType="TextBox">
+   <Style.Triggers>
+	<MultiTrigger>
+	   
+	   <MultiTrigger.Conditions>
+		<Condition Property="IsFocused" Value="True"></Condition>
+		<Condition Property="IsMouseOver" Value="True"></Condition>	   
+	   </MultiTriggers.Conditions>
+	
+	   <MultiTriggers.Setters>
+		<Setter Property="FontWeight" Value="Bold"></Setter>
+           </MultiTriggers.Setters>
+	</MultiTrigger>
+   </Style.Triggers>
+</Style>
+
+-----------------------------------------------------------------------------------------------------------------
+
+<< Shapes >>
+
+
+-- Rectangle
+<Rectangle>
+   Stroke="Black"
+   Fill="LightPink"
+</Rectangle>
+
+
+
+<Ellipse></Ellipse>
+
+<Line>
+<PolyLine>
+
+-----------------------------------------------------------------------------------------------------------------
+
+<< RenderTransformOrigin >>
+
+RenderTransformOrigin="0.5, 0.5"
+
+<Rectangle.RenderTransform> </Rectangle.RenderTransform>
+
+-----------------------------------------------------------------------------------------------------------------
+
+<< Animation >>
+
+
+- TimeLine
+	- AnimateTimeLine
+	   - DoubleAnimationBase
+	   	- DoubleAnimation
+	   	- DoubleAnimationUsingKeyFrames
+		- DoubleAnimationUsingPath 
+	   - ColorAnimationBase
+	   - StringAnimationBase
+
+-- in c#
+  - create object from animation and you determine the type of Animation based on the value type i want to change
+  - specify the config of the animation
+  - assign animation to element
+
+- EX:
+   DoubleAnimation animation1 = new DoubleAnimation();
+   animation1.From=50;
+   animation1.To=this.Width;
+   animation1.Duration = TimeSpan.FromSeconds(10);
+   animation1.AutoReverse = true;
+   animation1.RepeatBehavior = RepeatBehavior.Forever;
+
+   rectangleName.BeginAnimation(WidthProperty, animation1); // BeginAnimation(DependencyProperty, AnimateTimeLine)
+   rectangleName.BeginAnimation(HeightProperty, animation1)
+
+-----------------------------------------------------------------------------------------------------------------
+
+<< Animation at Xaml using StoryBoard >>
+
+- 
+
+<Grid.Triggers>
+    <EventTrigger RoutedEvent="Grid.Loaded">
+        <BeginStoryboard>
+            <Storyboard>
+                <DoubleAnimation
+                   Storyboard.TargetName="MyRect"
+                   Storyboard.TargetProperty="Opacity"
+                   From="0" To="1"
+                   Duration="0:0:1"
+                   AutoReverse="True"
+                RepeatBehavior="Forever" />
+            </Storyboard>
+        </BeginStoryboard>
+    </EventTrigger>
+</Grid.Triggers>
+
+
+EventTrigger RoutedEvent="Grid.Loaded" //  tells WPF which event should trigger the action
+Duration="0:0:1"		// Duration="hours:minutes:seconds"
+
+-----------------------------------------------------------------------------------------------------------------
+
+<< Frame >>
+
+
+-----------------------------------------------------------------------------------------------------------------
+
+
+<< App.xaml >>
+
+
+-- Dependency Injection
+  - Installation 
+	- Install-Package Microsoft.Extensions.DependencyInjection
+
+At App.Xaml.cs
+
+public partial class App : Application
+{
+    public static IServiceProvider ServiceProvider { get; set; }
+
+    public App()
+    {
+        var services = new ServiceCollection();
+        services.AddSingleton<MainWindow>();
+        services.AddSingleton<HomePage>();
+        services.AddTransient<QuestionsPage>();
+        ServiceProvider = services.BuildServiceProvider();
+    }
+    protected override void OnStartup(StartupEventArgs e)
+    {
+        var window = ServiceProvider.GetRequiredService<MainWindow>();
+        window?.Show(); // you need the remove StartupUri="MainWindow.xaml" from App.xaml
+        base.OnStartup(e);
+    }
+
+    public static void Navigate(Type pageType)
+    {
+        var window = ServiceProvider.GetRequiredService<MainWindow>();
+        var page = ServiceProvider.GetRequiredService(pageType);
+        window.NavigationFrame.Navigate(page);
+    }
+}
+
+- Close the application
+	- App.Current.Shutdown();
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,82 @@
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+- use the fire
+
+- Swal.fire({...}) function that returns a Promise
+	- the invoked method fire takes an object its attributes
+		icon: 'success' , icon: 'error'	, icon: "info", icon: "question" , icon:"warning"
+		title: "Do you want to save the changes?"
+		text: "Something went wrong!",
+		timer: 1500,
+		position: "top-end",  // There’s no 'center-center'
+		
+		showConfirmButton: "false",  // this attribute is true by default
+		confirmButtonText: "Save"
+		confirmButtonColor: '#3085d6',
+
+		showCancelButton: true,
+		showDenyButton: true,
+		denyButtonText: 'Don't save'
+		
+
+.then((result) => {...})
+	
+
+	result.isConfirmed  // true if the user clicked the "Save" button
+	result.isDenied	    // true if the user clicked the "Don't save" button.
+	result.isDismissed  // if the user clicked the "Cancel" button or closed the alert in some other way
+
+
+- Swal.fire("Saved!", "", "success");
+	    title   text ,   icon
+
+-------------------------------------------------------------------------------------------------------------------------------
+
+example
+
+Swal.fire({
+  title: "Do you want to save the changes?",
+  showDenyButton: true,
+  showCancelButton: true,
+  confirmButtonText: "Save",
+  denyButtonText: `Don't save`
+}).then((result) => {
+  /* Read more about isConfirmed, isDenied below */
+  if (result.isConfirmed) {
+    Swal.fire("Saved!", "", "success");
+  } else if (result.isDenied) {
+    Swal.fire("Changes are not saved", "", "info");
+  }
+});
+
+
+--------------------------------------------------------------------------
+
+<< method>>
+
+    function showAlert(
+        icon = 'info',
+        title = null,
+        text = null,
+        showCancelButton = false,
+        position = "center",
+        showDenyButton= false,
+        denyButtonText = null,
+        confirmButtonColor = '#3085d6',
+        cancelButtonColor = '#d33',
+    ) {
+         return Swal.fire({
+            icon: icon,
+            title,
+            text : text,
+            showCancelButton,
+            position: position,
+            showDenyButton,
+            denyButtonText,
+            confirmButtonColor,
+            cancelButtonColor,
+        });
+    }
+
+------------------------------------------------------------------------------
+

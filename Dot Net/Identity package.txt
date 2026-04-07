@@ -1,0 +1,909 @@
+<< Identity User >>
+
+public class IdentityUser<TKey> where TKey : IEquatable<TKey>
+	public IdentityUser() { }
+	public IdentityUser(string userName) : this(){
+        	UserName = userName;
+    	}
+	
+	[PersonalData]  // Applying this attribute indicates that the property should be treated with special care
+    	public virtual TKey Id { get; set; } = default!;
+
+	[ProtectedPersonalData] used to indicate that a property contains personal data that should be protected and handled with special care
+	public virtual string? UserName { get; set; }
+
+	public virtual string? NormalizedUserName { get; set; }
+
+	[ProtectedPersonalData]
+    	public virtual string? Email { get; set; }
+
+	[PersonalData]
+    	public virtual bool EmailConfirmed { get; set; }
+
+	public virtual string? PasswordHash { get; set; }
+
+	public virtual string? SecurityStamp { get; set; }
+	- When a user changes their password, the SecurityStamp is updated. This ensures that any old authentication tokens (which were valid before the password change) become invalid.
+	- If external login providers (like Google or Facebook) are removed or changed, the SecurityStamp is updated to ensure that old tokens from those providers are no longer valid.
+	- Role Changes: If the user’s roles or permissions change, the SecurityStamp may be updated to ensure that any tokens reflecting old roles or permissions are invalidated.
+	
+
+	public virtual string? ConcurrencyStamp { get; set; } = Guid.NewGuid().ToString();
+	- The ConcurrencyStamp is initialized with a new GUID value when a user entity is created. This ensures that each new entity has a unique concurrency stamp.
+	- Whenever the user entity is updated and saved to the database, the ConcurrencyStamp is typically updated to a new value. This change indicates that the entity has been modified
+	- When updating the entity, Entity Framework Core checks the ConcurrencyStamp to ensure that the entity hasn’t been changed by another process since it was last read
+
+	public virtual string? PhoneNumber { get; set; }
+
+	[PersonalData]
+    	public virtual bool PhoneNumberConfirmed { get; set; }	
+	
+	[PersonalData]
+    	public virtual bool TwoFactorEnabled { get; set; }
+	- is used to determine if a user has two-factor authentication enabled
+
+	public virtual DateTimeOffset? LockoutEnd { get; set; }
+	- property is used to track the end of a lockout period for a user account. When a user exceeds the allowed number of failed login attempts
+
+	public virtual int AccessFailedCount { get; set; }
+	- Gets or sets the number of failed login attempts for the current user.
+
+
+
+
+
+public class IdentityUser : IdentityUser<string>
+{
+    
+    public IdentityUser()
+    {
+        Id = Guid.NewGuid().ToString();
+        SecurityStamp = Guid.NewGuid().ToString();
+    }
+ 
+    public IdentityUser(string userName) : this()
+    {
+        UserName = userName;
+    }
+}
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+<< user claims >>
+User Claims: used to store additional information about a specific user, in the form of key-value pair, 
+	     can include things like email addresses, names, roles permissions, or any other piece of information
+
+public class IdentityUserClaim<TKey> where TKey : IEquatable<TKey>
+	public virtual int Id { get; set; } = default!;
+	public virtual TKey UserId { get; set; } = default!;
+
+	public virtual string? ClaimType { get; set; }  // This property holds the key part of the claim.
+	public virtual string? ClaimValue { get; set; }
+
+	// Converts the entity into a Claim instance.
+	public virtual Claim ToClaim()
+    	{
+        	return new Claim(ClaimType!, ClaimValue!);
+    	}
+
+	public virtual void InitializeFromClaim(Claim claim)
+    	{
+        	ClaimType = claim.Type;
+        	ClaimValue = claim.Value;
+    	}
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+<< IdentityRole >>
+
+public class IdentityRole<TKey> where TKey : IEquatable<TKey>
+{
+
+    public IdentityRole() { }
+ 
+    public IdentityRole(string roleName) : this()
+    {
+        Name = roleName;
+    }
+ 
+    // Gets or sets the primary key for this role.
+    public virtual TKey Id { get; set; } = default!;
+ 
+   
+    // Gets or sets the name for this role.
+    public virtual string? Name { get; set; }
+ 
+    // Gets or sets the normalized name for this role.
+    public virtual string? NormalizedName { get; set; }
+ 
+
+    // A random value that should change whenever a role is persisted to the store
+    public virtual string? ConcurrencyStamp { get; set; } = Guid.NewGuid().ToString();
+ 
+    // Returns the name of the role.
+    public override string ToString()
+    {
+        return Name ?? string.Empty;
+    }
+}
+
+public class IdentityRole : IdentityRole<string>
+{
+    public IdentityRole()
+    {
+        Id = Guid.NewGuid().ToString();
+    }
+
+    public IdentityRole(string roleName) : this()
+    {
+        Name = roleName;
+    }
+}
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+<< IdentityUserLogin class >>
+
+- This class is used to represent a user’s login information when they authenticate using an external provider, such as Facebook, Google,
+  Twitter, or any other OAuth or OpenID Connect provider.
+
+public class IdentityUserLogin<TKey> where TKey : IEquatable<TKey>
+{
+    // Represents the name of the external login provider (e.g., "Facebook", "Google").
+    public virtual string LoginProvider { get; set; } = default!;
+
+    //This key is used to identify the user in the context of the external provider and to link it to the local user account.
+    public virtual string ProviderKey { get; set; } = default!;
+ 
+    //  Represents a user-friendly name for the external login provider (e.g., "Sign in with Facebook"
+    public virtual string? ProviderDisplayName { get; set; }
+ 
+    // Gets or sets the primary key of the user associated with this login.
+    public virtual TKey UserId { get; set; } = default!;
+}
+
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+<< IdentityUserToken >>
+
+public class IdentityUserToken<TKey> where TKey : IEquatable<TKey>
+{
+    /// Gets or sets the primary key of the user that the token belongs to.
+    public virtual TKey UserId { get; set; } = default!;
+ 
+    // Gets or sets the LoginProvider this token is from.
+    public virtual string LoginProvider { get; set; } = default!;
+ 
+    // Gets or sets the name of the token.
+    public virtual string Name { get; set; } = default!;
+ 
+    // Gets or sets the token value.
+    [ProtectedPersonalData]
+    public virtual string? Value { get; set; }
+}
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<< IdentityUserContext >>
+
+public abstract class IdentityUserContext<TUser, TKey, TUserClaim, TUserLogin, TUserToken> : DbContext
+    where TUser : IdentityUser<TKey>
+    where TKey : IEquatable<TKey>
+    where TUserClaim : IdentityUserClaim<TKey>
+    where TUserLogin : IdentityUserLogin<TKey>
+    where TUserToken : IdentityUserToken<TKey>
+{
+
+	public IdentityUserContext(DbContextOptions options) : base(options) { }
+	protected IdentityUserContext() { }
+	public virtual DbSet<TUser> Users { get; set; } = default!;
+	public virtual DbSet<TUserClaim> UserClaims { get; set; } = default!;
+	public virtual DbSet<TUserLogin> UserLogins { get; set; } = default!;
+	public virtual DbSet<TUserToken> UserTokens { get; set; } = default!;
+}
+
+
+public abstract class IdentityDbContext<TUser, TRole, TKey, TUserClaim, TUserRole, TUserLogin, TRoleClaim, TUserToken> : IdentityUserContext<TUser, TKey, TUserClaim, TUserLogin, TUserToken>
+    where TUser : IdentityUser<TKey>
+    where TRole : IdentityRole<TKey>
+    where TKey : IEquatable<TKey>
+    where TUserClaim : IdentityUserClaim<TKey>
+    where TUserRole : IdentityUserRole<TKey>
+    where TUserLogin : IdentityUserLogin<TKey>
+    where TRoleClaim : IdentityRoleClaim<TKey>
+    where TUserToken : IdentityUserToken<TKey>
+{
+	public IdentityDbContext(DbContextOptions options) : base(options) { }
+	protected IdentityDbContext() { }
+	public virtual DbSet<TUserRole> UserRoles { get; set; } = default!;
+	public virtual DbSet<TRole> Roles { get; set; } = default!;
+	public virtual DbSet<TRoleClaim> RoleClaims { get; set; } = default!;
+
+	protected override void OnModelCreating(ModelBuilder builder)
+    	{
+        	base.OnModelCreating(builder);
+    	}
+}
+
+public class IdentityDbContext<TUser, TRole, TKey> : IdentityDbContext<TUser, TRole, TKey, IdentityUserClaim<TKey>, IdentityUserRole<TKey>, IdentityUserLogin<TKey>, 
+	IdentityRoleClaim<TKey>, IdentityUserToken<TKey>>
+    where TUser : IdentityUser<TKey>
+    where TRole : IdentityRole<TKey>
+    where TKey : IEquatable<TKey>
+
+{
+    public IdentityDbContext(DbContextOptions options) : base(options) { }
+    protected IdentityDbContext() { }
+}
+
+
+
+
+public class IdentityDbContext<TUser> : IdentityDbContext<TUser, IdentityRole, string> where TUser : IdentityUser
+{
+    public IdentityDbContext(DbContextOptions options) : base(options) { }
+    protected IdentityDbContext() { }
+}
+
+
+public class IdentityDbContext : IdentityDbContext<IdentityUser, IdentityRole, string>
+{
+    public IdentityDbContext(DbContextOptions options) : base(options) { }
+    protected IdentityDbContext() { }
+}
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<< package installation >>
+
+- Install-Package Microsoft.AspNetCore.Identity.EntityFrameWorkCore
+- Install-Package Microsoft.AspNetCore.Identity
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<< usage >>
+
+public class ApplicationUser: IdentityUser {}
+
+public class ApplicationContext: IdentityDbContext<ApplicationUser> {}
+
+- at ApplicationContext
+	- at protected override void OnModelCreating(ModelBuilder modelBuilder)
+		- base.OnModelCreating(modelBuilder);  // the constraints (Keys, relationships, ETC) of IdentityDbContext are mapped in OnModelCreating
+		- code ....				
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<< register service setting >>
+
+at program.cs
+  - builder.Services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<ApplicationContext>();  // with no option
+
+ - the default validation for usernames includes a constraint that only allows characters and digits. to customize it
+	builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+	{
+    		// Customize Identity options here
+    		options.User.AllowedUserNameCharacters = null; // Allow all characters in username
+
+	}).AddEntityFrameworkStores<ApplicationContext>()
+	 .AddDefaultTokenProviders(); // ✅ Required for token generation like email confirmation
+
+
+- enusre that you    	
+	app.UseAuthentication(); // Enable authentication
+        app.UseAuthorization(); // Enable authorization
+ 
+
+- Identity options
+	- options.User.AllowedUserNameCharacters = null; // Allow all characters in username
+	- options.User.RequireUniqueEmail = true; // Ensure emails are unique
+ 	- options.User.AllowedUserNameCharacters = "";
+	- options.SignIn.RequireConfirmedEmail = true;  
+	- options.SignIn.RequireConfirmedPhoneNumber = false;
+
+	- options.Password.RequireDigit = true;
+	- options.Password.RequireLowercase = true;
+	- options.Password.RequireUppercase = true;
+	- options.Password.RequireNonAlphanumeric = true;
+	- options.Password.RequiredLength = 12;
+	- options.Password.RequiredUniqueChars = 3;
+
+
+- UserName is required and can't be null in AspNetUsers, the only solution you can do is to insert its value in background with email for example
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+at controller
+
+   	private readonly UserManager<ApplicationUser> userManager;      // to create [register] users
+        private readonly SignInManager<ApplicationUser> signInManager;  // to login user
+        private readonly RoleManager<IdentityRole> roleManager;         // to add roles to users
+
+-----------------------------------------------------------------------------------------------------
+
+<< identity Methods >>
+
+- UserManager<ApplicationUser> userManager methods
+	
+	- CreateAsync(appUser, user.Password);    // create new user at DB at Asp.netUser
+		- return type is IdentityResult object , its properties
+			- Succeeded:bool -->  Indicates whether the operation was successful.
+			- Errors: IEnumerable<IdentityError>  --> Provides a list of errors that occurred during the identity operation.
+				- IdentityError object attributes
+					- Code: string like PasswordRequiresNonAlphanumeric
+					- Description:string  like 
+ 		- this hash password of the user
+		- to not hash the password user CreateAsync(appUser) 
+	
+	- AddToRoleAsync()
+		- Parameters
+			- instance of your user class that inherits from IdentityUser (ApplicationUser)
+			- role (string): The name of the role you want to assign to the user.
+		
+		- returns a Task<IdentityResult>, which represents the result of the operation.
+	
+	- FindByEmailAsync()
+		- Parameters
+			- email (string): The email address of the user you want to find.
+		
+		- Return Value
+			- Task<ApplicationUser>: Represents the asynchronous operation
+				- If a user with the specified email exists, it returns the corresponding ApplicationUser object.
+				- If no user is found, it returns null
+	- FindByNameAsync()
+		- Parameters
+			- userName (string): The username of the user you want to find.	
+
+		- Return Value
+			- Task<ApplicationUser>: Represents the asynchronous operation
+				- If a user with the specified email exists, it returns the corresponding ApplicationUser object.
+				- If no user is found, it returns null
+	- CheckPasswordAsync() 
+		- Parameters
+			- user (ApplicationUser): The user whose password you want to verify. This is an instance of your user class, which inherits from IdentityUser
+			- password (string): The plain-text password that you want to check against the user's stored password hash.
+		- Return Type: Returns a Task<bool>, where the boolean indicates whether the password verification was successful.
+
+	- GetUserAsync()
+		- Parameters
+			- principal: ClaimsPrincipal --> user principal
+		
+		- return type: Task<ApplicationUser>
+
+	- GetRolesAsync()
+		- Parameters
+			- user (ApplicationUser): user that you want to get his roles, This is an instance of your user class, which inherits from IdentityUse
+		- Return Type:
+			- Task<IList<string>> 
+	
+	- GetUsersInRoleAsync()
+		- Parameters
+			- string Role
+		- Return Type:
+			- get all user that have the given role
+
+	- GenerateEmailConfirmationTokenAsync()
+		- Parameters
+			- user (ApplicationUser):
+		- Return Type:
+			- Task<string>
+
+	- ConfirmEmailAsync()
+		- Parameters
+			- user (ApplicationUser): user that you want to get his roles, This is an instance of your user class, which inherits from IdentityUse
+			- token: string
+		
+		- Return type:
+			- IdentityResult object , its properties
+				- Succeeded:bool
+				- Errors: IEnumerable<IdentityError>
+	
+	- IsEmailConfirmedAsync()
+		- parameters
+			- user (ApplicationUser)
+		
+		- return type
+			- bool
+
+	- GeneratePasswordResetTokenAsync()
+		- parameters
+			- user (ApplicationUser)
+		- return type
+			- Task<string>
+
+	- ResetPasswordAsync(ApplicationUser user, string token, string newPassword)
+		- parameters
+			
+		- return type
+			- Task<IdentityResult>
+
+- RoleManager<IdentityRole> roleManager methods
+	
+	- FindByNameAsync(StringRoleName)
+		- return null if not exist
+		- Returns the IdentityRole object that matches the provided name, its properies
+			- Id: string
+			- Name: string 
+			- ConcurrencyStamp: string --> It is a unique value that changes whenever the role is updated 
+			- Claims : A collection of claims associated with the role. Claims provide additional information about the role and can be used for fine-grained authorization
+	
+	- CreateAsync()
+		- is used to create a new role in the application
+		- Parameters
+			- role (IdentityRole) : EX: new IdentityRole("Admin")
+			
+		- return Task<IdentityResult>, which represents the result of the role creation operation.
+		
+- SignInManager<ApplicationUser> signInManager methods
+	
+	- SignInAsync()
+		- Parameters
+			- user (ApplicationUser): The user that you want to sign in. This is typically an instance of your user class that inherits from IdentityUser. 
+	 		- isPersistent (bool): A flag indicating whether the authentication session should be persisted across browser sessions (if the user selects "Remember Me").
+			- authenticationMethod (string): (Optional) A string representing the method of authentication (e.g., "Password", "External"). 
+			  This is primarily used for logging purposes. 
+	  	
+		- Returns a Task representing the asynchronous operation.
+	
+	- SignOutAsync
+		- Purpose: Logs the currently signed-in user out of the application.
+		- Parameters: None.
+		- Return Type: Task, representing the asynchronous operation.
+		- Behavior: This method clears the authentication cookies or tokens associated with the user's session, effectively logging the user out and ending their session 
+		  across any open browser sessions.
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<< claims >>
+
+- contains info about authenticated user
+- each claim cosisit of type, value
+
+- syntax: 
+	Claim claim = new Claim(ClaimTypes.NameIdentifier, user.Id),
+	Claim claim = new Claim((ClaimTypes.Name, user.Id),
+	Claim claim = new Claim((ClaimTypes.Role, "Admin"),
+
+- claims can be stored in either cookies or tokens,
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<< How to access ApplicationUserRoles >>
+
+public class ApplicationUser : IdentityUser, IBaseEntityWithTrackedEntity<string>
+{
+   public ICollection<ApplicationUserRole> ApplicationUserRoles { get; set; }
+}
+
+public class ApplicationRole : IdentityRole
+{
+    public ICollection<ApplicationUserRole> ApplicationUserRoles { get; set; }
+}
+
+public class ApplicationUserRole : IdentityUserRole<string>
+{
+    public ApplicationUser User { get; set; }
+    public ApplicationRole Role { get; set; }
+}
+
+public class ApplicationDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, string,
+                    IdentityUserClaim<string>, ApplicationUserRole,IdentityUserLogin<string>, IdentityRoleClaim<string>,
+                    IdentityUserToken<string>>
+{
+
+
+	protected override void OnModelCreating(ModelBuilder builder)
+	{
+    		base.OnModelCreating(builder);
+
+    		builder.Entity<ApplicationUser>()
+        	  .HasMany(AU=>AU.ApplicationUserRoles)
+        	  .WithOne(UR=>UR.User)
+        	  .HasForeignKey(UR=>UR.UserId).IsRequired();
+
+    		builder.Entity<ApplicationRole>()
+        	  .HasMany(AR=>AR.ApplicationUserRoles)
+        	  .WithOne(UR=> UR.Role)
+        	  .HasForeignKey(UR => UR.RoleId).IsRequired();
+
+    		// why i need to make on base.OnModelCreating(builder);
+    		// Identity’s defaults are configured first.
+    		// Your fluent API code overrides and refines those relationships.
+	}
+}
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+<< login proccess >>
+
+- Using Cookies for Authentication
+	- The user enters their username and password in a login form and submits the request to the server.
+	- If they are invalid, the server responds with an error (e.g., 401 Unauthorized).
+	- Once the credentials are valid, the server creates a ClaimsIdentity object for the user. This contains various claims such as Id, Name, Role
+			var claims = new List<Claim>
+			{
+    				new Claim(ClaimTypes.NameIdentifier, user.Id),
+    				new Claim(ClaimTypes.Name, user.UserName),
+    				new Claim(ClaimTypes.Role, "Admin") // Example claim
+			};
+			var identity = new ClaimsIdentity(claims, "Password");
+
+	- The ClaimsIdentity is used to create a ClaimsPrincipal, which represents the current user.
+	- The server then creates an authentication cookie containing the claims and sends it back to the client (browser)
+	- The cookie is placed in the response header and is sent back to the user's browser. The browser stores this cookie.
+	- The browser automatically stores the authentication cookie in the client's cookie store, which is associated with the application's domain.
+	- For subsequent requests, the browser automatically includes the authentication cookie in the request headers.
+	- Upon receiving the request with the authentication cookie, the server reads the cookie, extracts the claims, and reconstructs the ClaimsPrincipal object.	
+		- var user = HttpContext.User;  //  HttpContext.User type is ClaimsPrincipal
+		- var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+	- After the ClaimsPrincipal is reconstructed, the server can use the claims to authorize the user and determine what actions they are allowed to perform.
+	- note: this way is Limited to browsers	
+
+
+- Using Tokens (JWT) for Authentication
+	- The user enters their username and password in a login form and submits the request to the server.
+	- The server validates the user credentials
+	- If the credentials are valid, the server creates a list of claims:		
+	- The server generates a JWT token containing the user's claims and send it to the client's browser and will be stored in the local storage
+	- The client includes the JWT in the Authorization header of each request, EX:  Authorization: Bearer <jwt_token_string>
+	- The server uses the secret key to validate the token. If valid, the server extracts the claims from the token and reconstructs the ClaimsPrincipal object.
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<< ClaimsPrincipal object >>
+
+- after user credentials is validated we mentioned at the above section that ClaimsPrincipal is created to access it 
+
+- In ASP.NET Core, HttpContext.User and the User property in a controller both refer to the same ClaimsPrincipal object, which represents the currently 
+  authenticated user.
+
+
+syntax: 
+	- string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+	- bool isAdmin =  User.IsInRole("Admin");
+	- var userIdFromHttpContext = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+	
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+<< register and send confirmation email , confirm email >>
+
+-- service code
+
+public async Task<bool> Register(UserDTO userDTO)
+{
+    var transaction = await unit.BeginTransactionAsync();
+
+    var appUser = mapper.Map<UserDTO, ApplicationUser>(userDTO);
+    IdentityResult result = await userManager.CreateAsync(appUser, userDTO.Password); // create user
+
+    if (result.Succeeded == false) {
+        return false;
+    }
+
+    string UserRole = Role.User.ToString();
+    if (await roleManager.FindByNameAsync(UserRole) == null)
+    {
+        var identityResult = await roleManager.CreateAsync(new IdentityRole() { Name = UserRole });
+        if (identityResult.Succeeded == false)
+        {
+            await transaction.RollbackAsync();
+            return false;
+        }
+    }
+    var res = await userManager.AddToRoleAsync(appUser, UserRole);
+    if (!res.Succeeded) {
+        await transaction.RollbackAsync();
+        return false;
+    }
+
+    var sendConfirmationEmailResult = await sendConfirmationEmailAsync(appUser);
+    
+    if(!sendConfirmationEmailResult){
+        await transaction.RollbackAsync();
+        return false; 
+    }
+    await transaction.CommitAsync();
+    return true;
+}
+
+// send confirmation Email
+
+ public async Task<bool> SendConfirmationEmailAsync(ApplicationUser appUser)
+ {
+     try
+     {
+         var token = await userManager.GenerateEmailConfirmationTokenAsync(appUser);
+         if (token == null) {
+             return false;
+         }
+         var domain = context.HttpContext!.Request.Scheme + "://" + context.HttpContext!.Request.Host.Value;
+         
+         var confirmationLink = $"{domain}/api/user/confirmemail?userId={appUser.Id}&token={Uri.EscapeDataString(token)}";
+         
+         var subject = "[Wiki] : Confirm Your Email Address";
+
+         var message =
+         $"<p>You have been registered to offbeat wikipedia platform.</p>" +
+         $"Please confirm your email by clicking this link: <a target='_blank' href='{confirmationLink}'>clicking here</a>.";
+
+         var fromMail = "ahmedmohamedmvp@gmail.com";  // applicationEmail
+         var pass = "tcuwqywyuemfayuo";               // create App password at your email setting and use it here
+
+         var client = new SmtpClient("smtp.gmail.com", 587)
+         {
+             EnableSsl = true,
+             Credentials = new NetworkCredential(fromMail, pass)
+         };
+
+         var mailMessage = new MailMessage(fromMail, appUser.Email!, subject, message)
+         {
+             IsBodyHtml = true  // Set to true if the message contains HTML content
+         };
+
+         await client.SendMailAsync(mailMessage);
+         return true;
+     }
+     catch
+     {
+         return false;
+     }
+ }
+
+
+
+public async Task <bool> ConfirmEmailAsync(string userId, string token)
+{
+    var user = await userManager.FindByIdAsync(userId);
+    if (user == null)
+    {
+        return false;
+    }
+    
+    var result = await userManager.ConfirmEmailAsync(user, token);
+    if (result.Succeeded) { 
+        return true;
+    }   
+    return false;
+}
+
+-- controller code
+
+[HttpPost]
+public async Task<IActionResult> Register(UserDTO userDTO)
+{
+    var result =  await applicationUserValidator.ValidateAsync(userDTO);
+    if (result.IsValid)
+    {
+        var res = await userService.Register(userDTO);
+        if (res)
+        {   
+            return Ok(new ApiResponse(200, true, "user registered successfully"));
+        }
+        else
+        {
+            return BadRequest(new ApiResponse(500, false, "server error"));
+        }
+    }
+    else
+    {
+        var errors = result.Errors.Select(e=>e.ErrorMessage);
+        return BadRequest(new ApiValidation() { Errors = errors });
+    }
+}
+
+
+[HttpGet("confirmEmail")]
+public async Task<IActionResult> ConfirmEmail(string userId, string token)
+{
+    if (userId == null || token == null)
+    {
+        return BadRequest(new ApiResponse(500, false, "error during email confirmation"));
+    }
+    
+    var res = await userService.ConfirmEmailAsync(userId, token);
+    if (res)
+    {
+        var loginURL = configuration["loginForm"];  // "http://localhost:4200/login"
+        return Redirect(loginURL!);  
+    }
+    else
+    {
+        return BadRequest(new ApiResponse(500, false, "error during email confirmation"));
+    }
+}
+
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<< login service, login controller using JWT>>
+
+
+public class LogInDTO
+{
+    public string Email { get; set; }
+    public string Password { get; set; }
+}
+
+
+public class LoginResultDTO
+{
+    public bool Result { get; set; }
+    public int Code { get; set; }
+    public bool? IsEmailConfirmed { get; set; }
+    public string? Token { get; set; }
+    public string? Message { get; set; }
+
+    public LoginResultDTO(bool result, int code, string? message, bool? IsEmailConfirmed = null, string ? token=null ) { 
+        
+        Result = result;
+        this.Code = code;
+        this.IsEmailConfirmed = IsEmailConfirmed;
+        this.Message = message?? GetDefaultMessage(code);
+        this.Token = token;
+    }
+
+    private string? GetDefaultMessage(int code)
+    {
+        return code switch
+        {
+            400 => "A bad request, you have made",
+            401 => "You are not Authorized",
+            404 => "Resource Not found",
+            500 => "Internal Server Error",
+            _ => null
+        };
+    }
+}
+
+
+
+public async Task<LoginResultDTO> Login(LogInDTO userLogInDTO)
+{
+    var appUser = await userManager.FindByEmailAsync(userLogInDTO.Email);
+
+    if (appUser == null)
+        return new LoginResultDTO(false, StatusCodeConst.BadRequest, "wrong email or password");
+    
+    // Ensure email is confirmed before login
+    if (!appUser.EmailConfirmed)
+        return new LoginResultDTO (false, StatusCodeConst.BadRequest,"Email is not confirmed",false);
+    
+
+    var res = await userManager.CheckPasswordAsync(appUser, userLogInDTO.Password);
+    if (!res)
+        return new LoginResultDTO(false, StatusCodeConst.BadRequest, "wrong email or password");
+    
+    var role = (await userManager.GetRolesAsync(appUser)).FirstOrDefault();
+
+    List<Claim> claims = new List<Claim>()
+    {
+        new( ClaimConst.Role, role! ),
+        new( ClaimConst.Id,appUser.Id ),
+    };
+
+    JwtTokenHelper.GenerateToken(claims);
+    var token = JwtTokenHelper.GenerateToken(claims);
+    return new LoginResultDTO(true, StatusCodeConst.Success, "login successfully", true,token);
+}
+
+
+[HttpPost("login")]
+public async Task<IActionResult> Login(LogInDTO userLogInDTO)
+{
+    var result   = await userService.Login(userLogInDTO);
+    return Ok(result);
+}
+
+
+------------------------------------------------------------------------------------------------------------------------
+
+<< send reset email, reset password >>
+
+
+public class SendEmailDTO
+{
+    public string Email { get; set; }
+}
+
+public class ResetPasswordDTO
+{
+    public string UserId { get; set; }
+    public string Token { get; set; }
+    public string NewPassword { get; set; }
+    public string ConfirmPassword { get; set; }
+}
+
+
+public async Task<bool> SendEmailToResetPassword(SendEmailDTO sendEmailDTO)
+{
+    try
+    {
+        var user = await userManager.FindByEmailAsync(sendEmailDTO.Email);
+        if (user == null)
+            return false;
+
+        var token = await userManager.GeneratePasswordResetTokenAsync(user);
+
+        var AngularDomain = this.configure["AngularDomain"];  // "http://localhost:4200"
+
+        var resetLink = $"{AngularDomain}/resetPass?userId={user.Id}&token={Uri.EscapeDataString(token)}";
+        var subject = "[Offbeat.Wiki]: Password Reset Request";
+        var message = $"Please reset your password by clicking the following link: <a href='{resetLink}'>Reset Password</a>";
+
+        var fromMail = "ahmedmohamedmvp@gmail.com";  // applicationEmail
+        var pass = "tcuwqywyuemfayuo";               // create App password at your email setting and use it here
+
+        var client = new SmtpClient("smtp.gmail.com", 587)
+        {
+            EnableSsl = true,
+            Credentials = new NetworkCredential(fromMail, pass)
+        };
+
+        var mailMessage = new MailMessage(fromMail, sendEmailDTO.Email, subject, message)
+        {
+            IsBodyHtml = true // Email body contains HTML content
+        };
+        await client.SendMailAsync(mailMessage);  // Send the email
+        return true;
+    }
+    catch
+    {
+        return false;
+    }
+}
+
+
+public async Task<bool> ResetPasswordAsync(ResetPasswordDTO resetPasswordDTO)
+{
+    try
+    {   
+        var user = await userManager.FindByIdAsync(resetPasswordDTO.UserId);
+        if (user == null) return false;
+
+        var result = await userManager.ResetPasswordAsync(user, resetPasswordDTO.Token, resetPasswordDTO.NewPassword);
+        if (result.Succeeded)
+        {
+            return true;
+        }
+        return false;
+    }
+    catch
+    {
+        return false;
+    }
+}
+
+[HttpPost("sendResetEmail")]
+public async Task<IActionResult> SendResetEmail([FromBody] SendEmailDTO sendEmailDTO)
+{    
+    var result = await this.userService.sendEmailToResetPassword(sendEmailDTO);
+    if (result)
+    {
+        return Ok (new ApiResponse(200, true, "password reset email is sent successfully"));
+    }
+    return BadRequest(new ApiResponse(400, false, "password reset email is failed"));
+}
+
+
+[HttpPost("resetPassword")]
+public async Task<IActionResult> ResetPassword([FromBody]ResetPasswordDTO resetPasswordDTO )
+{
+    var ValidatorResult = await this.resetPasswordValidator.ValidateAsync(resetPasswordDTO);
+    if (ValidatorResult.IsValid) {
+
+        var result = await userService.ResetPasswordAsync(resetPasswordDTO);
+        if (result)  
+            return Ok(new ApiResponse(200, true, "Password reset is done successfully"));
+        return BadRequest(new ApiResponse(400, false, "Password reset failed"));
+    }
+    else
+    {
+        var errors = ValidatorResult.Errors.Select(e => e.ErrorMessage);
+        return BadRequest(new ApiValidation() { Errors = errors });
+    }
+}
+--------------------------------------------------------------------------------------------------------------------------------------------------------

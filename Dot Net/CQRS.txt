@@ -1,0 +1,4 @@
+- stands for: CQRS stands for Command and Query Responsibility Segregation
+- It is a design pattern that separates read operations (queries) from write operations (commands).
+	Command = modifies state (e.g., CreateOrder, UpdateCustomer)
+	Query = retrieves data (e.g., GetOrdersByCustomer)

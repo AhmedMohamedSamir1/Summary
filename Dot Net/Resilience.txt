@@ -1,0 +1,56 @@
+var retryPolicy = Policy.Handle<HttpRequestException>().OrResult<HttpResponseMessage>(r => !r.IsSuccessStatusCode)
+.WaitAndRetryAsync(
+    retryCount: 3,
+    sleepDurationProvider: retryAttempt => TimeSpan.FromSeconds(2),
+    onRetry: (outcome, timespan, retryAttempt, context) =>
+    {
+        Status.Text = $"Retry {retryAttempt} after {timespan.TotalSeconds} seconds due to: {outcome.Exception?.Message ?? outcome.Result.StatusCode.ToString()}";
+    });
+
+
+
+
+
+
+---- Code Explaination 
+
+- var retryPolicy = Policy
+   - var retryPolicy — declares a variable of type AsyncPolicy<HttpResponseMessage> (from Polly).
+   - Policy — Polly’s static class where you create resilience policies like Retry, Circuit Breaker, Timeout, etc.
+
+- .Handle<HttpRequestException>()
+   - .Handle<TException>() — tells Polly which exceptions should trigger the policy.
+   - Here it means: if any HttpRequestException occurs (e.g., network issues, DNS failures), Polly should activate the retry.
+
+- OrResult<HttpResponseMessage>(r => !r.IsSuccessStatusCode)
+   - .OrResult<TResult>(Func<TResult, bool> predicate) — adds another trigger condition, for when a result (not an exception) meets some criteria.
+   - Here it means: If the HTTP response is not successful (i.e., 200-299), the policy will consider it a failure and retry.
+	r => !r.IsSuccessStatusCode is a lambda function:
+		r → the HTTP response object
+		r.IsSuccessStatusCode → true if status is 200-299
+		!r.IsSuccessStatusCode → true if failed (like 404, 500, etc.)
+
+- .WaitAndRetryAsync(
+   - .WaitAndRetryAsync() — creates an asynchronous retry policy that:
+	- waits a given time before each retry
+	- and retries a specified number of times.
+
+- retryCount: 3,
+   - retryCount: 3 — the policy will allow up to 3 retries after an initial failure before finally giving up and throwing the last error.
+
+- sleepDurationProvider: retryAttempt => TimeSpan.FromSeconds(2),
+   - sleepDurationProvider — a function that calculates the delay between retries.
+   - retryAttempt is the current retry number (1-based).
+   - TimeSpan.FromSeconds(2) returns a constant 2 seconds delay before each retry.
+
+
+- onRetry: (outcome, timespan, retryAttempt, context) =>
+   - onRetry — callback that runs before each retry attempt.
+   - It receives:
+	- outcome — either:
+	   - an Exception (if it failed with an exception)
+	   - or a Result (like an HTTP 500)
+
+	- timespan — the wait duration before the next retry.
+	- retryAttempt — the current retry attempt number (1-based).
+	- context — optional extra data you can pass through policy execution.

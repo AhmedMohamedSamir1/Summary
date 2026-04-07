@@ -1,0 +1,421 @@
+<< dom >>
+DOM: stands for document object model
+Java script can manipulate the document object by adding , modifying and deleting elements 
+document object : is the owner of all other objects in your web page 
+		  The document object represents your web page.
+
+--------------------------------------------------------------------------------------------------------
+
+<< Find element>>
+
+document.getElementById("string ID");   // get the element with specific unique id
+document.querySelector("selector");	// get first element match the selector
+
+document.getElementsByTagName("div"); // return collection of elements
+
+document.getElementsByName("test");   // return collection of elements
+
+document.getElementsByClassName("myClass"); // get collection elements that have class="myClass" 
+
+document.querySelectorAll("selector")   // return collection(nodeList) of element
+
+
+
+document.title
+document.body
+document.links  // return collections of links, links that have href attributes
+
+document.images // return collections of images
+document.images[0].alt =  "error loading"
+document.images[0].src = "url"
+
+document.forms  // return collections of forms
+document.forms[0].one  // one is input name
+document.forms.length
+document.forms["myForm"] //myForms the name of form
+
+document.anchors.length // anchor is <a> </a> without href
+
+-------------------------------------------------------------------------------------
+
+<< elements content => using innerHTML, textContent, innerText >>
+
+- innerHTML // the content between element tag 
+	<div id="myDiv">hello ahmed from <span>div</span></div> 
+	console.log(document.getElementById("myDiv").innerHTML); // hello ahmed from <span>div</span>
+
+- textContent // return the text content with spaces
+	<div id="myDiv">
+		hello ahmed from 
+		<span>div</span>
+	</div> 
+	console.log(document.getElementById("myDiv").textContent); //the output will be ->
+	\n 
+		hello ahmed from
+		div
+
+-  inner text
+    <div id="myDiv">
+        <div id = 'firstDiv'>hello from div1</div>
+        <div id = 'secondDiv'>hello from div2</div>
+    </div> 
+	console.log(document.getElementById("myDiv").innerText);
+	hello from div1
+	hello from div2
+-------------------------------------------------------------------------------------------------------
+
+<< manipulation elements atrributes directly >>
+element.attribute         // get the attribute if exists else return undefined
+element.attribute = value // create attribute else update it
+
+<div class="parent myDiv" id="aaa"></div>
+let D = document.querySelector('.parent');
+
+D.tagName	// DIV  (upperCase)
+D.nodeName      // DIV  (upperCase)
+D.localName     // div
+
+D.id 		// aaa
+D.id = "divID" 	     // div id will be overriden to divID
+D.className           // parent myDiv
+D.className = "test"; // div class will be overriden to test
+
+-------------------------------------------------------------------------------------------------------
+<< manipulation elements attributes >>
+	1. getAttribute("attribute_name")
+ 	2. setAttribute("attribute_name","attribute_value")
+	3. hasAttribute("attribute_name")
+	4. removeAttribute("attribute_name")
+	5. hasAttributes()
+	6. attributes,
+	7. createAttribute("attribute_name") // return Attr
+	8. setAttributeNode(Attr)
+
+	
+1- element.getattribute("attribute_name")
+	let myLink = document.querySelector(".link");
+	myLink.getAttribute("class");
+	myLink.getAttribute("href");
+
+2- element.setAttribute("attribute_name","attribute_value")
+	myLink.setAttribute("href", "https://facebook.com");
+	myLink.setAttribute("title", "facebook");
+
+
+<div class="parent test" id="aaa" name="mydiv">
+
+3- element.hasAttribute("attribute_name"); // return true or false
+	document.getElementByTagName('p').hasAttribute('attribute_name');
+
+4- element.removeAttribute("attribute_name");
+	
+5- element.hasAttributes()  // return true or false
+
+6- element.attributes
+	document.querySelector('.test').attributes; // get list of element attributes
+	console.log(D.attributes[0]);		    // class="parent test" 
+	console.log(D.attributes[0].nodeValue);     // parent test	
+
+7- document.createAttribute('attribute_name'); // return Attr
+
+8. element.setAttributeNode(Attr); // it creates empty attribute that will be changed later, it requires number 7
+	let  element = document.createElement('div');
+	let att = document.createAttribute('name');
+	element.setAttributeNode(att);
+-------------------------------------------------------------------------------------------------------------------
+
+<< manipulation elements >>
+	1. createElement()
+	2. appendChild()
+	3. append()
+	4. prepend()
+	5. before()
+	6. after()
+	7. remove()
+	8. createTextNode()
+ 	9. createComment() 
+       10. insertBefore(element, destination)
+>>
+ 
+ 
+1. document.createElement()
+	let  element = document.createElement('div');
+	document.body.appendChild(element);
+
+2. element1.appendChild(element2)         // add child element at the end of parent element	
+	- return appended element
+
+3. element.append(element1,element2,...)  // add children elements at the end of parent element
+	- element.append("my text");	  // it works
+	- return undefined
+
+4. element.prepend(element1,element2,...) // add children elements at the first of parent element
+
+5. element.before(element1,element2,...)  // add children elements before element
+
+6. element.after(element1,element2,...)  // add children elements after element
+
+7. element.remove();		   	// remove the element
+	
+8. document.createTextNode("text you want");
+        let text = document.createTextNode("hello from div"); // text is an object
+	element.appendChild(text);
+
+9. document.createComment("text you want");
+
+10. let p = document.querySelector("div p");
+    	document.body.insertBefore(p,document.querySelector(".main"));
+-----------------------------------------------------------------------------------------------------------------------
+
+<< manipulation elements 
+	1. children
+	2. firstElementChild
+	3. lastElementChild 
+	4. childNodes
+	5. firstChild
+	6. lastChild
+	7. nextElementSibling
+	8. previousElementSibling
+	9. parentElement
+	10.nextSibling
+	11.previousSibling
+>>
+
+let  element = document.getElementById('myDiv');
+
+1. element.children           // return element children only in the form of list
+2. element.firstElementChild  // return the first element child
+3. element.lastElementChild   // return the last element child
+
+4. element.childNodes          // return element children spaces, text and comments in the form of list [not good for me]
+5. element.firstChild          // return the first child whether it a space , text, element or comment
+6. element.lastChild	       // return the last child whether it a space , text, element or comment
+
+7. element.nextElementSibling	     // return the next sibling element of element
+8. element.previousElementSibling    // return the previous sibling element of element
+9. element.parentElement	     // get the parent of the element
+
+10. nextSibling			    // return the next sibling node of element
+11. previousSibling		    // return the previous sibling node of element
+
+element means : div or p etc....
+node    means : (element, text, comment )
+
+--------------------------------------------------------------------------------------------------------------------------
+<< manipulation elements
+	1. contains
+	2. clone 
+>>
+
+1. element1.contains(element2)
+	<div id="myDiv">
+            <div id="div1">hello from div1</div>
+        </div> 
+
+	var D = document.getElementById('myDiv');
+	var D1 = document.getElementById('div1');
+	console.log(D.contains(D1)); -> true
+
+
+2. element.clone(true) 		// return copy of the element with its attributes and content [includes all child elements and content]
+	
+	- cloneNode()= cloneNode(false)  // copy the element with its attribute only without its content
+	- cloneNode(true);   	         // copy the element with its attributes and content
+
+	let element = document.getElementById('mainP');
+	var cpyElement = element.cloneNode(true);
+
+------------------------------------------------------------------------------------------------------------------------------------------------
+
+<< manipulation elements => classList >>
+<div id="myDiv" class="zero hero spider">hello from div1</div>
+
+let D = document.getElementById('myDiv');
+console.log(D.classList); // ['zero', 'hero', 'spider']
+console.log(D.classList.value); // zero hero spider
+console.log(D.classList.contains('zero'));// true
+console.log(D.classList.contains('zeroo'));// false
+console.log(D.classList.item(0));	//zero
+console.log(D.classList.item(1));   // hero
+console.log(D.classList.item(2));	// spider
+console.log(D.classList[0]);		//zero
+console.log(D.classList.length);    // 3
+D.classList.add('div3');
+console.log(D.classList); // ['zero', 'hero', 'spider', 'div3']
+D.classList.remove('hero') // remove class if exists
+D.classList.toggle('div3')      // if class newDiv exists remove it, if it doesn’t exist add it 
+
+----------------------------------------------------------------------------------------------------------
+<< events >>
+
+1. add event at html element
+	    <button onclick="display()">click here</button>
+
+2. add event at js file using attach function
+    	<button id="my-btn">click here</button>
+    	let  myBtn = document.getElementById('my-btn');
+    	myBtn.onclick = function(){ console.log('hello ahmed');}
+
+    	<p id = 'mainP'>hello from p</p>
+    	let myP = document.getElementById("mainP");
+    	function one(){ console.log('message from onClick event ');}
+    	myP.onclick = one;   // the ordinary event when you click on paragraph message from onClick event will be printed in console
+
+3. add event at js file using add event listener 
+    <p id = 'mainP'>hello from p</p>
+    let myP = document.getElementById("mainP");
+    myP.addEventListener("click", function(){console.log('message from addEventListener click 11');});
+
+     // event listener allows you to execute more than one function at one envent
+     myP.addEventListener("click", function(){console.log('message from addEventListener click 22');});
+     the output on click on the paragraph : message from addEventListener click 11
+				   	    message from addEventListener click 22
+
+4. very important note: 
+       - when event fired it sends an event object as a parameter to the function that will be executed, 
+	 this object represent info about element that fire the event 
+
+	<p id = 'mainP'>hello from p</p>
+	myP.addEventListener("click", test);
+	function test(e){
+    		console.log(e.target);     // <p id = 'mainP'>hello from p</p>
+    		console.log("test says hello");
+	}
+	// <button onclick="test(event)">click here</button> //event is a keyword that represent event object sent to the function
+
+5. remove event listener
+	 myP.removeEventListener("click", test); 
+	// you may have more than action method in one event, here the method test will not be executed when click is occured
+
+ 
+6. the submit of form refreshes the page so to prevent this behavior
+	myBtn.onclick = function(event){ event.preventDefault(); }
+	
+7. the behaviour of event is :
+	- when event of element is fired, the engine of js will ask the element parent if it has the same event if true it will fire also its event then 
+ 	  go to it parent of parent and ask if it has the same event if true it will fire it and so on until reach the body, this proccess called propagation
+	- to stop propagation
+	  myBtn.onclick = function(event){ event.stopPropagation(); }
+
+- simulated events
+	window.onload = function(){ document.links[0].click(); }
+
+common events:
+ - onclick
+ - oncontextmenu // when you right click
+ - onmouseenter
+ - onmouseleave
+ 
+window events
+ - window.onload
+ - window.onscroll
+ - window.onresize
+
+form events
+ - onfocus   // focus on input
+ - onblur    // get out from input field
+ - onsubmit  //
+ - oninput   // write on input
+
+
+
+
+
+-------------------------------------------------------------------------------------------------------------------------------
+
+<< Element style >>
+
+inline style Syntax : element.style.property = 'value';
+	myDiv.style.backGroundColor = '#00f';
+	myDiv.style.padding = '10px';
+	myDiv.style.cssText = "color:red; font-weight: bold; opacity: 0.6";
+	myDiv.style.removeProperty("color");
+	myDiv.style.setProperty("font-size", "30px", "important");
+
+extrnal style:
+	document.styleSheets[0].rules[0].style.removeProperty("color"); // styleSheet[0] -> the first css file , rules[0] -> the first selector in css file
+	document.styleSheets[0].rules[0].style.setProperty("font-size", "30px", "important");
+----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<< localStorage object >>
+
+- stored in browser storage
+- 
+
+// set 
+	window.localStorage.setItem("color","red");
+	localStorage.fontSize="30px";
+	localStorage["fontWeight"]="bold";
+
+// get
+	console.log(window.localStorage.getItem("color","red"));
+	console.log(localStorage.fontSize);
+	console.log(localStorage['fontWeight']);
+
+// key
+	console.log(localStorage.key(0)); // red
+	console.log(localStorage.key(1)); // 30px
+
+// localStorage length
+	console.log(localStorage.length);
+
+// removeItem
+	localStorage.removeItem('fontWeight');
+
+// clear 
+	localStorage.clear();
+
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<< sessionStorage object>>
+
+- like localStorage but the difference is -> the session ends when you close your page
+- if you move to another page in the same tab you are still ni the same session
+
+set , get , key , length , removeItem , clear 
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<< media >>
+
+var audio = document.getElementById("audio-test");
+
+function playAudio() { audio.play(); }  // 
+function pauseAudio(){ audio.pause(); }
+function stopAudio() { audio.load(); }
+function muteAudio() { audio.muted = !audio.muted; }
+
+----------------------------------------------------------------------------------------------------------------------------
+
+<< geolaction >>
+
+navigator.geolocation.getCurrentPosition(allowLocation, rejectLocation);
+
+function allowLocation(position){
+    
+    console.log(position.coords.latitude);
+    console.log(position.coords.longitude);
+    console.log("success");
+}
+
+function rejectLocation(error){
+    
+    console.log(error.message);
+    console.log("fail");
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

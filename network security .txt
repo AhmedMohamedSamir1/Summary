@@ -1,0 +1,221 @@
+- any security goals must cover 3 main concepts 
+ 	1. confendtiality : data must be enctypted before sending from device A to device B and device B will have the key to decrypt the data
+ 	2. integrity      : data must be protected from any manipulation while it's sent from source to destination
+ 	3. availability   : keep the data avaialable to the user that has access on it, server is busy which means server can't handle multiple requests
+			    
+
+- Network traffic or data traffic is the amount of data moving across a network at a given point of time
+
+- Risk Assessment factors : 
+	- Assets :   refer to important devices ,  data , reputation , or anything expose to harm in organization 
+	- Vulnerabilities : The presence of weak point that can be exploited by attacker to affect on assets
+	- Thread: action exploits the existing vulnerability and tries to make harm to the assets 
+	- impact: the result of harm occured due to meeting thread with Vulnerability
+	- RISK = Vulnerability * Thread * impact
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-Attackers terminologies (types)
+	- black hats : (offensive) known as crackers
+	
+	- white hats : known as ethical attacker, security analyst 
+		       attack system to find out the waek points , 
+		       using them for defensive purpose , 
+
+	- gray hats  : who work for both offensive and defensive 
+
+what does malicious hacker do ?
+	1. reconnaissance : gather information about target organization as much as possible by search on internet
+	2. Scanning   : hacker scans the network with specific information gathered during reconnaissance
+			like scanning for operating system , open ports 
+			
+	3. Gaining access : the hacker succedded in hack your system and could expliot your system and launch any attack he want
+	4. maintaining access : attacker harden the system from other hackers 
+	5. covering tracks    : hacker try to extend his misuse of the system without being detected.
+
+
+<< attacks >>
+
+attack : is any attemp to destroy , alert, steal or gain unauthorized access to your data , 
+attack types:
+
+   - passive attack: attemps to take information from the system and doesn't affect any system resources and its operation like
+	using cookies , spyware 
+   
+   - active attack : change system resources or affect their usual operations like using worms , virus
+   
+   - social engineering: 
+   
+   - phishing attack : the hacker create website that looks exactly to popular website 
+   
+   - insider attack  : 
+   
+   - Hijacking attack: a hacker takes over a session between you and another individual and disconnects the other individual from the
+		     communication, You still believe that you are talking to the original party and may send private
+		     information to the hacker by accident.
+   
+   - SPOOF ATTACK : the hacker modifies the source address of the packets he or she is sending 
+   
+   - BUFFER OVERFLOW ATTACK: A buffer overflow attack is when the attacker sends more data to an application than is expected.
+	 		     A buffer overflow attack usually results in the attacker gaining administrative access 
+   
+  - password attack : An attacker tries to crack the passwords stored in a network account database 
+		       types of password attacks-> dictionary attack, brute force attack, hybrid attack 
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+- first step of network security : is to divide the one network into parts and 3 important parts are
+	- external public network : the internet , we consider it the source of all risks
+	- internal private network : the part that i want to protect 
+	- demilitarized zone [DMZ]: where organization severs that need to access the internet
+ 
+- divided network is important but is not enough so we need to increase the layers of defense
+- defense in depth : means used more layers to secure the network
+
+
+- if i have a network and its devices connected to same switch which has one single broadcast domain , traffic can cross easily between them and may allow attcker to
+  access data illegally and this is a security problem , one of the solution is to divide the network to virtual lans , it's like switch is divded internally to more than switch
+  and each virual lan could be exist on more than switch , devices that has the same traffic similarity or communicate repeatedly with each other will be on the same lan
+  , each virtual lan consider separated lan , so vlans connects and communicates with each other using inter-vlan-routing
+  inter-vlan-routing : give us a chance to check the traffic 
+
+- once attcaker gather info about his target it's an important step to specify the type of attack he will use
+- if attacker uses attck that Targets unix vulnerabilities and the target uses microsoft server then the attatck will be not effective, 
+  so attacker will perform negative attack (scouting) before attacking to gather the greatest amount of info and determine vulnerabilities about his target 
+   to perform an effective attack
+
+- One of the methods used in negative attack is port scanning 
+- port scanning allowing info to attacker like
+	- provide operting system fingerprinting of target that help him to determing the suitable attack to the target
+        - can scan 65,535 ports and check if one of these ports is opened by mistake , if one opened the attacker will target it and convert the negative attack to positive attack
+- as a security adminstrator : i will have a permission to make port scannin and discover the vulnerabilities like open ports and close it by firewall berfore attacker exploit it
+- there is port scanning softwares that are helpful in port scanning like NMAP and ZENAP
+
+
+- sniffing : - attcker try to read traffic on the network to get info about network , reading data only is passive attack ,
+               if attacker try to change the data called active attack 
+	     - as a security adminstrator i have a permission to sniff on make the network to make load analysis, indentidy traffic type, encryption algorithms 
+             - software sniffing tools that help in sniffing operation : TCPDUMP , wireshark
+
+- firewall : secure the internal network from any attcks by filtering(check) the input and output traffic
+             - firewall can be software on the device -> host based firewall
+             - firewall can be a hardware box to filter the traffic at the network level -> network based firewall
+             - if the attack is countered before reach the firewall is called -> early neagtion [ high level security ]
+	     - if the attack is countered by network based firewall -> negation -> very good security level
+	     - if the attack enter private network -> low security [alert] 
+
+
+- firewall filtering techniques :
+	- packet filtering : 
+	    - use ACL(access control list) to filter the traffic , ACL is a criteria(rules) by which we determine the allowed and not-allowed IP addresses, port numbers, and protocols
+	      firewall check packets and compare its info with ACL criteria
+	    - its limitation , it depends on the rules assigned, which may be contradicted
+
+	- stateful inspection : any device sends request packet outside the network to any server it will store info [srcIP, desIP, Dport,...] about it in state table 
+		                when the server sends a response the firewall will check if the traffic matches with the info stored in state table
+	
+	- proxy firewall : - since there is still a danger cause of the ip address of the internal network device is known outside so it may be expoited
+			   - firewall uses a nat technique to potect the ip address of network and use another IP address to communicate with internet
+
+
+- the firewall is important to protect the network but 
+  - It may be hacked , by peer to peer aplication like BitTorrent application 
+  - Restrictive configuration to needed type of traffic which violates the concept of availability 
+ 
+
+- bedide security different means there are another means used by companies like 
+  - IDS (Intrusion detection system) to monitor the network , make analysis in traffic to detect any atack or any possible attack liek sniffing and port scanning and send alert
+  - IPS (intrusion prevention system) : more advanced of IDS detect any atack or any possible attack like sniffing and port scanning and send alert and prevent it	
+ 
+alerts type : 
+ 1. true  positive  alert  -> true alert , actual attack
+ 2. false positive alert   -> false alert, no attack 
+ 3. true  negative  alert  -> no alert   , no attack
+ 4. false negative alert   -> no alert   , actual attack 
+ alert can be sent to scurity adminstrator by email , sms ,
+
+ISP , IPD monitoring methods : 
+	- signature based detevtion : examine the traffic , depend on database consists of signatures of known attack ,
+	  ids examin the traffic by comparing it signature based and if there is matching IDS send ALERT , 
+	  vendor of IDS can recognize new types of signature attack on signature database, update signatures continuously
+	  what if there is a new attack signature appeared
+	- Anamoly detection : learn the normal traffic signature , by making IDS in learning mode to learn the normal traffic shape and traffic flow of the network
+		              so IPS can detect the attackes
+
+- IPS , IDS can be existed in two levels
+  1. host based IDS/IPS
+  2. network based  IDS/IPS
+
+
+---------------------------------------------------
+<< wireless network >>
+
+- wireless network : data sent openly in this network which make it expose to snaffing by attckers and know sensitive data 
+  so we must ensure that data sent is encrypted
+- encryption: convert data into sypher text
+- decryption: convert data into plain text
+
+Encyption methods :
+WEP  (wired equivalant privacy) protocol : the main target of this protocol is to provide encryption to data which is equivalant to wired system 
+					 : it use RC4 encryption algorithm , key : 104bits
+				         : vulnerabilities-> depend on static key , length of the key 
+					 : removed on 2003
+
+WPA1 (wifi protected access) protocol   : more secure than WEP
+ 			                : it uses RC4 encryption algorithm , PSK(Pre-Shared Key) (changeable-key) , ensure data integrity using TKIP protocol 
+
+WPA2(wired equivalant access) protocol  : strongest level 
+					: it use AES encryption algorithm, ensure data integrity using CCMP protocol
+
+wireless threads and attacks like:
+  Eavesdropping (sniffing) : attacker sniff on the network , solution is encryt the data 
+  Spoofing (masquerading)  : attack try to convince  access point that he allowed to enter the network , solution -> using high authentication protocols
+  Denial of service        : prevent authorized users from using the network or any wireless service , solution -> add IDS on your network	 
+  Rogue access point       : no password , no encyption 
+
+--------------------------------------------------------------------------------------------------
+
+   
+   
+   
+user based threads / attcks
+ - social engineering
+ - brute force attacks
+ - malewares types:
+    - spyware :software monitor user activities,  
+    - cookies : 	 
+    - trojan horse : 	
+    - virus : attacked with executable file [ device level ]
+    - worm  : like virus but it moves from device to device    [network level]
+ - distributed denial of service 
+--------------------------------------------------------------------------------------
+
+
+virus total
+have i been pwned
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

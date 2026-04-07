@@ -1,0 +1,428 @@
+<< Stepper >>
+
+
+------------------------------------------------------------------------------------------------------------------------------------
+
+<< MudGrid >>
+
+<MudGrid>
+  <MudItem>
+  </MudItem>
+</MudGrid>
+
+-- Example
+<MudGrid Class="py-3">
+    <MudItem xs="12" sm="4" Class="pt-2">
+        <MudDatePicker Label="Pick-up Date" @bind-Date="PickUpDate" DateFormat="MM/dd/yyyy" ReadOnly="@_readOnly" />
+    </MudItem>
+
+     <MudItem xs="12" sm="4" Class="pt-2">
+        <MudTimePicker Label="From" AmPm="true" @bind-Time="StartTimeSpan" ReadOnly="@_readOnly" />
+     </MudItem>
+
+    <MudItem xs="12" sm="4" Class="pt-2">
+        <MudTimePicker Label="To" AmPm="true" @bind-Time="EndTimeSpan" ReadOnly="@_readOnly" />
+    </MudItem>
+</MudGrid>
+
+------------------------------------------------------------------------------------------------------------------------------------
+
+
+<< Buttons >>
+
+-- MudIconButton
+	- <MudIconButton Color="Color.Error" Icon="@Icons.Material.Filled.Delete" OnClick="async () => await DeleteDocument(fileName)" />
+	
+
+-- MudButton
+	<MudButton Color="Color.Success" Variant="Variant.Filled" OnClick="HandleYesClick" Disabled="IsAddingShipmentLoading"
+        	StartIcon="@Icons.Material.Filled.Add">@(!IsAddingShipmentLoading ? "Yes" : "Working...")
+       	</MudButton>
+
+------------------------------------------------------------------------------------------------------------------------------------
+
+<< MudFileUpload >>
+
+    - T: Type , T is IBrowserFile for single file or IReadOnlyList<IBrowserFile> for multiple files
+    - AppendMultipleFiles  // allow multiple files
+    - For="()=>_addShipmentModel.Files"
+    - @bind-Files="verifyCompanyModel.Files"
+    - 
+    -
+
+
+- at your DTO or model
+	[Required(ErrorMessage ="this field is required")]
+	public IReadOnlyList<IBrowserFile> Files { get; set; }
+
+
+- at your C#
+
+   private MudFileUpload<IReadOnlyList<IBrowserFile>>? _fileUpload;
+
+   private Task OpenFilePickerAsync() // if you want to open file picker dialog manually is opend when 
+   {
+     return _fileUpload?.OpenFilePickerAsync() ?? Task.CompletedTask;
+   }   
+
+   private  Task ClearAsync() // if you have a button clear that used to clear all files
+   {
+     // VerfiyCompanyForm.Validate();
+     return _fileUpload?.ClearAsync() ?? Task.CompletedTask;
+   }
+
+    private Task RemoveFileAsync(IBrowserFile file)
+    {
+        var files = _addShipmentModel.Files?.ToList() ?? new List<IBrowserFile>();
+        files.Remove(file);
+        _addShipmentModel.Files = files;
+        if (_addShipmentModel!.Files == null || _addShipmentModel.Files.Count == 0)
+        {
+            // VerfiyCompanyForm.Validate();
+            return _fileUpload?.ClearAsync() ?? Task.CompletedTask;
+        }
+        // StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+
+
+- at your html
+
+        <MudFileUpload InputClass="file-upload-input"
+            T="IReadOnlyList<IBrowserFile>"
+            For="()=>verifyCompanyModel.Files"
+            AppendMultipleFiles
+            @bind-Files="verifyCompanyModel.Files"
+            @ref="_fileUpload"
+        >
+            <ActivatorContent >
+                <MudPaper Outlined="true" Class="@_dragClass" Style="padding: 1rem;" >
+                    @if (verifyCompanyModel.Files == null || !verifyCompanyModel.Files.Any())
+                    {
+                        <MudText Typo="Typo.h6">click to add files</MudText>
+                    }
+                    @if (verifyCompanyModel.Files?.Any() == true)
+                    {
+                        @foreach (var file in verifyCompanyModel.Files)
+                        {
+                            <MudChip T="string"
+                            Color="Color.Dark"
+                            Text="@file.Name"
+                            OnClose="@(() =>  RemoveFileAsync(file))" />
+                        }
+                    }
+                </MudPaper>
+            </ActivatorContent>
+        </MudFileUpload>
+
+	<MudToolBar Gutters="@false" Class="relative d-flex justify-end gap-4">
+    		<MudButton Color="Color.Primary" OnClick="@OpenFilePickerAsync" Variant="Variant.Filled">Open file picker</MudButton>
+
+    		<MudButton Color="Color.Error" Disabled="@(verifyCompanyModel.Files is null || !verifyCompanyModel.Files.Any())"
+		   OnClick="@ClearAsync" Variant="Variant.Filled">Clear </MudButton>
+	</MudToolBar>
+
+
+
+
+public async Task<bool> AddPriceList(PriceListModel priceListModel)
+{
+    var client = httpClientFactory.CreateClient("api");
+
+    using var content = new MultipartFormDataContent();
+    var streamContent = new StreamContent(priceListModel.File.OpenReadStream(long.MaxValue));
+    streamContent.Headers.ContentType = new MediaTypeHeaderValue(priceListModel.File.ContentType);
+    content.Add(streamContent, nameof(priceListModel.File), priceListModel.File.Name);
+
+    content.Add(new StringContent(priceListModel.Name), nameof(priceListModel.Name));
+
+    bool isImport = priceListModel.PriceListType == PriceListType.Import;
+    content.Add(new StringContent(isImport.ToString().ToLower()), nameof(PriceListDTO.IsImport));
+
+
+    // ✅ 3. Post to the correct endpoint
+    string URL = priceListModel.IsDefault? "PriceList/AddDefaultPriceListRate": "PriceList/AddPriceListRate";
+    var response = await client.PostAsync(URL, content);
+
+    if (!response.IsSuccessStatusCode)
+        return false;
+
+    var jsonResponse = await response.Content.ReadFromJsonAsync<ApiResponse>();
+    return jsonResponse?.Success ?? false;
+}
+
+
+        public async Task<bool> UploadCompanyFilesAndVerify(VerifyCompanyModel verifyCompanyModel)
+        {
+            var client = httpClientFactory.CreateClient("api");
+
+            using var content = new MultipartFormDataContent();
+
+            // Add files
+            if (verifyCompanyModel.Files != null && verifyCompanyModel.Files.Any())
+            {
+                foreach (var file in verifyCompanyModel.Files)
+                {
+                    var streamContent = new StreamContent(file.OpenReadStream(long.MaxValue));
+                    streamContent.Headers.ContentType = new MediaTypeHeaderValue(file.ContentType); // need using System.Net.Http.Headers;
+
+                    content.Add(streamContent, "CompanyFiles", file.Name);
+                }
+            }
+
+            // Post to endpoint
+            var response = await client.PostAsync(
+                $"ApplicationUser/UploadCompanyFilesAndVerify/{verifyCompanyModel.CompanyUserId}",
+                content);
+
+            // Handle response
+            if (!response.IsSuccessStatusCode)
+                return false;
+
+            var apiResponse = await response.Content.ReadFromJsonAsync<ApiResponse<bool>>();
+            return (bool)apiResponse?.Success!;
+        }
+
+
+
+
+------------------------------------------------------------------------------------------------------------------------------------
+
+<< MudToolBar >>
+
+- row container used
+
+--- Properties
+	- Gutters: bool ,
+	- Dense: bool   ,
+	- Style: string ,
+	- Tag: object   ,
+	- Class: string , 
+
+
+
+- Example
+
+	<MudToolBar Gutters="@false" Class="relative d-flex justify-end gap-4">
+    		<MudButton Color="Color.Primary" Variant="Variant.Filled">Open file picker</MudButton>
+
+    		<MudButton Color="Color.Error" Variant="Variant.Filled">Clear </MudButton>
+	</MudToolBar>
+
+------------------------------------------------------------------------------------------------------------------------------------
+
+<< MudStack >>
+
+--- Properties
+	- Row:bool , false is the default
+	
+
+------------------------------------------------------------------------------------------------------------------------------------
+
+<< MudTable >>
+
+	- Items: IEnumerable<T>
+
+	- Dense: bool , default is false
+		- Default = false (normal padding)
+		- Dense = true (less padding )
+
+	- Loading: bool, defaults to false, display loading animation until Server Date executes
+	- 
+
+- Structure
+	<MudTable Items=""
+		<HeaderContent>
+			<MudTh></MudTh>
+		</HeaderContent>
+		<RowTemplate>
+			<MudTd></MudTd>
+		</RowTemplate>
+	</MudTable>
+
+--- Example
+
+<MudTable Items="_addShipmentModel.Parcels" Dense="true">
+    <HeaderContent>
+        <MudTh>Length (cm)</MudTh>
+        <MudTh>Width (cm)</MudTh>
+        <MudTh>Action</MudTh>
+    </HeaderContent>
+    <RowTemplate Context="parcel">
+        <MudTd><MudNumericField @bind-Value="parcel.LengthCm" For="@(() => parcel.LengthCm)" /></MudTd>
+        <MudTd><MudNumericField @bind-Value="parcel.WidthCm" For="@(() => parcel.WidthCm)" /></MudTd>
+        <MudTd><MudButton Color="Color.Error" OnClick="() => RemoveParcel(parcel)">Remove</MudButton></MudTd>
+    </RowTemplate>
+</MudTable>
+
+
+    private void AddParcel()
+    {
+        _addShipmentModel.Parcels.Add(new ParcelDTO());
+    }
+    
+    private void RemoveParcel(ParcelDTO parcel)
+    {
+        _addShipmentModel.Parcels.Remove(parcel);
+    }
+-----------------------------------------------------------------------------------------------------------------------
+
+
+    #region uploading shipment document code
+
+    private const string DefaultDragClass = "relative rounded-lg border-2 border-dashed pa-4 mt-4 mud-width-full mud-height-full";
+    private string _dragClass = DefaultDragClass;
+    private void ClearDragClass() => _dragClass = DefaultDragClass;
+    private void SetDragClass() => _dragClass = $"{DefaultDragClass} mud-border-primary";
+    private MudFileUpload<IReadOnlyList<IBrowserFile>>? _fileUpload;
+    
+
+    private Task RemoveFileAsync(IBrowserFile file)
+    {
+        var files = _addShipmentModel.Files?.ToList() ?? new List<IBrowserFile>();
+        files.Remove(file);
+        _addShipmentModel.Files = files;
+        if (_addShipmentModel!.Files == null || _addShipmentModel.Files.Count == 0)
+        {
+            // VerfiyCompanyForm.Validate();
+            return _fileUpload?.ClearAsync() ?? Task.CompletedTask;
+        }
+        // StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+    private Task OpenFilePickerAsync()
+    {
+      return _fileUpload?.OpenFilePickerAsync() ?? Task.CompletedTask;
+    } 
+
+    private  Task ClearAsync() {
+     // VerfiyCompanyForm.Validate();
+     return _fileUpload?.ClearAsync() ?? Task.CompletedTask;
+   }
+
+
+
+    #endregion
+
+------------------------------------------------------------------------------------------------------------------------------------
+
+
+<< MudMessageBox>>
+
+
+<MudDialogProvider />
+	- must be included at your page whether it is included at layout or your page
+
+
+
+<MudMessageBox @ref="_deleteShipmentMsgBox" Title="Confirm Delete" CancelText="Cancel">
+    <MessageContent>Do you wan to proceed</MessageContent>
+    <YesButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Error" StartIcon="@Icons.Material.Filled.DeleteForever" Class="ms-2">Delete!</MudButton>
+    </YesButton>
+</MudMessageBox>
+<MudButton Variant="Variant.Filled" Color="Color.Dark" OnClick="DeleteDocument">Delete</MudButton>
+
+
+
+--- c# code
+
+private MudMessageBox _deleteShipmentMsgBox;
+
+public async Task DeleteDocument()
+{
+    DialogOptions dialogOptions = new DialogOptions()
+    {
+        BackdropClick = false,  // allow closing the dialog outside of the dialog
+        FullWidth = true,
+    };
+    var result =  await _deleteShipmentMsgBox.ShowAsync(dialogOptions);
+    if (result !=null && result.Value)
+    {
+        Console.WriteLine("result = true");
+	await this.ConfirmDeletingDocument(fileName);
+    }
+    else
+    {
+        Console.WriteLine("result = null");
+    }        
+}
+
+
+public async Task ConfirmDeletingDocument(string docName)
+{
+    try{
+        await this.ShipmentService.RemoveShipmentDocs(_shipment.Id, docName);
+
+        Snackbar.Add("Deleted", Severity.Success);
+
+    }catch{
+        Snackbar.Add("Failed", Severity.Error);
+    }
+}
+
+----------------------------------------------------------------------------------------------------------------------------
+
+<< MudDialog >>
+
+
+MudDialog mudDialog;
+bool IsAddingShipmentLoading  = false
+private async Task ConfirmAction()
+{
+    DialogOptions dialogOptions = new DialogOptions()
+    {
+        BackdropClick = false,      // if true clicking outside the dialog closing the dialog
+        MaxWidth = MaxWidth.Small,
+        FullWidth = true,           // the dialog will stretch to 100% width of the screen (within the MaxWidth limit).
+    };
+    await mudDialog.ShowAsync(null, dialogOptions);
+}
+
+private async Task HandleYesClick()
+{
+	if (IsAddingShipmentLoading) return; // Prevent multiple clicks
+ 	IsAddingShipmentLoading = true;
+	// code ....
+	IsAddingShipmentLoading = false;
+	await mudDialog.CloseAsync();
+}
+
+private async Task CancelDialog()
+{
+    if (!IsAddingShipmentLoading) // Only allow cancel if not processing
+    {
+        Console.WriteLine("User cancelled");
+        await mudDialog.CloseAsync();
+    }
+}
+
+
+
+	<MudDialog @ref="mudDialog">
+    	   <TitleContent> <MudText Typo="Typo.h4">Adding Shipment</MudText></TitleContent>
+    		<DialogContent>
+        	 @if (IsAddingShipmentLoading)
+        	 {
+            	    <div class="d-flex align-items-center justify-center p-4">
+                   	 <MudProgressCircular Color="Color.Primary" Size="Size.Medium" Indeterminate="true" />
+                   	 <span class="ms-3">Processing...</span>
+            	    </div>
+        	 }
+        	 else
+        	 {
+            	    <p>Are you sure you want to proceed?</p>
+        	 }
+    	   	</DialogContent>
+
+    	   <DialogActions>
+
+        	<MudButton OnClick="CancelDialog" Disabled="IsAddingShipmentLoading">Cancel</MudButton>
+        	<MudButton Color="Color.Success" Variant="Variant.Filled" OnClick="HandleYesClick" Disabled="IsAddingShipmentLoading"
+        		StartIcon="@Icons.Material.Filled.Add">@(!IsAddingShipmentLoading ? "Yes" : "Working...")
+       		</MudButton>
+
+    	   </DialogActions>
+	</MudDialog>

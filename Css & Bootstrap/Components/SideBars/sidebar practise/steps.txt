@@ -1,0 +1,151 @@
+the structure of sidebar
+    aside-> ul -> li -> a -> icon, span, rotating arrow for collapsing [opt]
+
+    aside
+        class="min-vh-100 p-3 ng-light" id="sidebar"
+
+    ul
+        class="nav flex-column" // nav -> display:flex; flex-wrap: wrap; list-style: none;
+
+    li
+        class="nav-item" // nav-item -> display: inline-block;
+
+    a
+        class="nav-link"   // "nav-link" -> display: block;
+    
+
+-- let's get started
+
+
+<aside class="bg-light min-vh-100 p-3" id="sidebar">
+    ...
+    ...
+</aside>
+    - default sidebar styles
+        #sidebar {
+            width: 200px;
+            transition: all 0.2s ease-in-out;
+        }
+
+<ul class="nav flex-column">
+    ....
+</ul>
+
+
+--- the first li --> sidebar-header
+<li class="nav-item sidebar-header">
+    <a class="nav-link d-flex align-items-center" href="#">
+        <span class="fw-bold fs-5 sidebar-title">Offbeat</span>
+        <i class="fa-solid fa-angles-left p-1 ms-auto toggle-opening-sidebar" id="toggle-sidebar-btn"></i>
+    </a>
+</li>
+
+    - i: the icon button that close the sidebar
+        - ms-auto: to make the i at the farthest end
+        - toggle-opening-sidebar : to distinguish the i 
+            - its css code
+                .sidebar-header .nav-link i.toggle-opening-sidebar {
+                    transition: all 0.1s ease-out;
+                    cursor: pointer;
+                }
+                .sidebar-header .nav-link i.toggle-opening-sidebar:hover {
+                    background-color: rgba(21, 21, 62, 0.059);
+                }
+
+
+<hr class="m-0 mb-2"> separator between sidebar header and rest of items
+
+5. li with collapsable menu
+    li class="nav-item mb-2 position-relative">
+        <a class="nav-link d-flex align-items-center" data-bs-toggle="collapse" href="#homeSubmenu" role="button" aria-expanded="false" aria-controls="homeSubmenu">
+          <i class="fa-solid fa-house me-2"></i>
+          <span>Home</span>
+          <i class="fa-solid fa-chevron-down collapse-arrow ms-auto"></i>
+        </a>
+        <ul class="collapse list-unstyled ps-3" id="homeSubmenu" data-bs-parent="#sidebar">
+          <li class="nav-item"><a class="nav-link" href="#">Home 1</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Home 2</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Home 3</a></li>
+        </ul>
+    </li>
+
+    - the icon that used to collapse the ul menu
+    - <i class="fa-solid fa-chevron-down collapse-arrow ms-auto"></i>
+        .collapse-arrow {
+            transition: transform 0.3s ease;
+        }
+    - when the <a> element opens its target element the collapse arrow will be
+        a[aria-expanded="true"] .collapse-arrow {
+            transform: rotate(180deg);
+        }
+    - hover all a.nav-link except the one inside .sidebar-header 
+        .nav-link:not(.sidebar-header .nav-link):hover {
+            background-color: blanchedalmond;
+        }
+
+
+-- css code when sidebar is closed
+:root{
+  --min-sidebar-width: 55px;
+}
+
+/* when closing the expanding of sidebar */
+
+/* styles to sidebar when it is closed */
+#sidebar.close{
+  width: var(--min-sidebar-width);
+  padding-inline: 0 !important;
+}
+
+/* when the sidebar is closed the arrow that toggles the sidebar rotates 180  */
+#sidebar.close .nav-link i.toggle-opening-sidebar{
+  margin: 0 !important;
+  font-size: 20px;
+  transform: rotate(180deg);
+}
+
+#sidebar.close span {
+    transition: all 0.2s ease-in-out;
+}
+/* remove every span text at sidebar */
+#sidebar.close span {
+  display: none;
+}
+
+/*remove every collapsable arrow*/
+#sidebar.close a.nav-link i.collapse-arrow{
+  display: none;
+}
+
+
+/* when i close the sidebar the collapsable ul element styles will be */
+#sidebar.close ul.collapse, #sidebar.close ul.collapsing {
+  opacity: 0;
+  transform: translateY(-200px);
+  transition: all .2s ease-in-out;
+  position: absolute;
+  top: 0;
+  left: var(--min-sidebar-width);
+  z-index: 2;
+  background-color: rgb(246 229 183);
+  min-width: 10rem;
+  padding-inline-start: 0 !important;
+  display: block;
+}
+
+/* when i click on the element that toggle collapsable element (ul) that will be shown its styles will be*/
+#sidebar.close a.nav-link[data-bs-toggle="collapse"] ~ ul.collapse.show{
+  opacity: 1;
+  transform: translateY(0);
+}
+
+
+#sidebar.close li a{
+  padding-left: 5px !important;
+  padding-right: 5px !important;
+  justify-content: center;
+}
+
+#sidebar.close li a i{
+  margin-inline-end: 0 !important;
+}

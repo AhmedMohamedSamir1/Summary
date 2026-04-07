@@ -1,0 +1,103 @@
+<div class="contact my-3" data-aos="fade-down">
+            <h1 class="text-center">Contact Us</h1>
+            
+            <section class="row d-flex mw-100 m-0">
+                <form class="col-12 col-md-7 col-lg-8 bg-light p-4">
+                    <div class="row w-100">
+                        <div class="form-group col-12 mb-3">
+                            <label class="form-label">Full Name</label>
+                            <input class="form-control" type="text" placeholder="Enter full name">
+                            <span class="text-danger small ms-2">Full name is required</span>
+                        </div>
+
+                        <div class="form-group col-12 mb-3">
+                            <label class="form-label">Email Address</label>
+                            <input class="form-control" type="email" placeholder="Enter email address">
+                            <span class="text-danger small ms-2">Email is required</span>
+                        </div>
+
+                        <div class="form-group col-12 mb-5">
+                            <label class="form-label">Message</label>
+                            <textarea class="form-control" rows="5" style="resize: none;" placeholder="Enter your message"></textarea>
+                            <span class="text-danger small ms-2">Message is required</span>
+                        </div>
+
+                        <button type="submit" class="btn col-12 col-md-4 m-auto fs-5" style="background-color:grey; color:white">Submit</button>
+                    </div>
+                </form>
+
+                <div class="col-12 col-md-5 col-lg-4 p-4"style="background-color:aliceblue">
+                    <h3>Let's get in touch</h3>
+                    <p class="mb-5"> We're open for any suggestion or just to have a chat</p>
+
+                    
+            
+                    <div class="contact-item">
+                        <div class="contact-item-icon"><i class="bi bi-geo-alt-fill"></i></div>
+                        <div class="contact-item-text">
+                            <p><span>Address:</span> 32 Nehro St., 36 9th Floor Heliopolis, Cairo, Egypt</p>
+                        </div>
+                    </div>
+
+                    <div class="contact-item">
+                        <div class="contact-item-icon"><i class="bi bi-geo-alt-fill"></i></div>
+                        <div class="contact-item-text">
+                            <p><span>Phone:</span> <a href="tel:+201000045494">+20 100 004 5494</a></p>
+                        </div>
+                    </div>
+
+                    <div class="contact-item">
+                        <div class="contact-item-icon"><i class="bi bi-envelope-fill"></i></div>
+                        <div class="contact-item-text">
+                            <p><span>Email:</span><a href="mailto:info@khourystand.net"> info@khourystand.net</a></p>
+                        </div>
+                    </div>
+
+
+                </div>
+            </section>
+        </div>
+
+-------------------------------------------------------------------------------------------------------
+
+<< css code >>
+
+.contact-item {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 1.5rem; /* mb-4 */
+    cursor: pointer;
+}
+
+.contact-item .contact-item-icon {
+    min-width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid;
+    border-color: darkslategrey;
+    border-radius: 50%;
+    flex-shrink: 0; 
+}
+
+.contact-item .contact-item-icon i {
+    font-size: 1.5rem;
+    margin-inline-end: 0; 
+    text-align: center;
+}
+
+.contact-item .contact-item-text {
+    padding-left: 0.75rem; /* ps-2 or pl-3 */
+    padding-inline-start: 0.75rem
+}
+
+.contact-item .contact-item-text p {
+    margin-bottom: 0;
+}
+
+.contact-item .contact-item-text p a {
+    text-decoration:none;
+    color:inherit;
+}

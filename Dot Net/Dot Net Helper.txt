@@ -1,0 +1,436 @@
+
+at .net 9
+
+- Microsoft have dropped support for Swagger UI package Swashbuckle in .NET 9. 
+- microsoft claim that there is not longer support for issues
+- to use the swagger :
+	- at default layer
+		- Install-Package Swashbuckle.AspNetCore
+	- at program.cs
+		- app.UseSwaggerUI(option => option.SwaggerEndpoint("/openapi/v1.json", "swagger demo"));
+
+	- swagger/index.html
+
+	 
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<< attributes >>
+
+[Route("api/[controller]")]  --> the base route for all actions in this controller is --> http://localhost:5232/api/ControllerName 
+
+
+[HttpGet]		-->  api/controllerName
+[HttpGet("{id}")]       -->  api/controllerName/5
+[HttpPost]		-->  api/controllerName
+[HttpPost("Add")]       -->  api/controllerName/Add
+[HttpPut("{id}")]       -->  api/controllerName/5
+[HttpDelete("{id}")]    -->  api/controllerName/5
+
+
+[Authorize]  // This ensures that only authenticated users can access this part whether it's a controller or a method
+	-  The UseAuthentication() middleware is triggered. It checks for the Authorization: Bearer <token> header in the HTTP request.
+	-  The token is validated using the TokenValidationParameters configured in the AddJwtBearer option
+	-  If the token is valid, a ClaimsPrincipal is created and attached to the HttpContext.User.
+	-  The [Authorize] attribute checks whether the user has been authenticated and meets the necessary authorization requirements (e.g., roles or policies).
+	-  If everything checks out, the request proceeds, and the controller method is executed.
+
+[Authorize(Roles = "Admin")] // this attribute ensures that only Authenticated users with the Admin role can access
+
+[Authorize(Roles = "Admin,Company")] Admin OR Company
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<< status codes >>
+
+201 created
+200 successful request.
+
+
+401 : Unauthorized
+404 : not found
+
+
+500 A generic error message when no more specific message is suitable.
+501 Not Implemented: The server either does not recognize the request method
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+<< serializing >>
+
+- if you inherit from collection type --> PagedList<T>: List<T>
+	- the .NET JSON serializer treats PagedList<T> as a List<T> and ignores any additional properties (CurrentPage, TotalPages, etc.).
+	- it only serializes the list items because PagedList<T> inherits from a collection.
+
+- if you inherit from standard class  --> ApiResponse<T>: ApiResponse
+	- json serializer will serialze the all properties [current, parent]
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<< binding parameter >>
+
+[FromBody]: To bind data from the body of an HTTP request, There can only be one [FromBody] per action 
+	    usually formatted in JSON or XML.	    
+	    AssignGameToLocation([FromBody] GameLocationDTO gameLocationDTO)
+	
+[FromForm]: To bind data from form fields in the HTTP request body
+	    AssignGameToLocation([FromForm] GameLocationDTO gameLocationDTO)
+            note: when a form is submitted with the HTTP method set to POST, the form fields are included in the request body
+
+[FromQuery] : Binds the parameter to a value in the query string of the URL.
+[FromQuery(Name = "Supplier.UserName")]
+
+[FromRoute]: Binds the parameter to a value in the route data (URL path).
+
+
+[FromHeader]: Binds the parameter to a value in the HTTP headers
+
+[FromServices]: Binds the parameter to a service resolved from the dependency injection container.
+
+
+-------------------------------------------------------------------------------------------------------
+
+<< ModelState >>
+
+- 
+
+- ModelState.Remove("Categories");
+	remove a specific fields from the ModelStateDictionary before ModelState.IsValid is checked.
+
+----------------------------------------------------------------------------------------------------------------
+
+
+
+<< register services >>
+
+- This registers the TagService class itself as a Scoped service.
+
+- builder.Services.AddScoped<TagService>();
+	- When you inject TagService into a controller or service, the DI container will provide an instance of TagService.
+	- Use this when you only need to inject the concrete TagService class directly (not an interface).
+
+- builder.Services.AddScoped<ITagService, TagService>();
+	- This registers the TagService class as the implementation of the ITagService interface with a Scoped lifetime.
+	- When you inject ITagService, the DI container will resolve it to an instance of TagService.
+
+- builder.Services.AddScoped<GenericRepo<>>();
+	- When injecting GenericRepo<T>, the DI container will provide a new instance of GenericRepo<T> for each request.
+
+- typeof(T)
+	- builder.Services.AddScoped(typeof(IRepository<>), typeof(GenericRepository<>));
+	- This pattern is typically used in generic service registrations, where you don’t need to provide an explicit concrete type, 
+	  but the system will resolve it dynamically or with reflection.
+		
+
+- When you have two different concrete classes that implement the same interface (in your case, ITagService),
+	- Named or Typed Resolutions (via Factory or Keyed Pattern)
+		builder.Services.AddScoped<TagServiceA>();  // Register TagServiceA
+		builder.Services.AddScoped<TagServiceB>();  // Register TagServiceB
+		builder.Services.AddScoped<ITagService>(provider =>
+		{
+    			// Here you decide which implementation to use.
+    			var useTagServiceA = true;
+    			if (useTagServiceA)
+        		   return provider.GetRequiredService<TagServiceA>();
+    			else
+        		   return provider.GetRequiredService<TagServiceB>();
+		});
+
+		- public MyController(ITagService tagService)
+    		  {
+        		_tagService = tagService; // Depending on the condition, either TagServiceA or TagServiceB is injected
+    		  }
+
+	-  Using IEnumerable<T> to Inject All Implementations
+		- builder.Services.AddScoped<ITagService, TagServiceA>();
+		- builder.Services.AddScoped<ITagService, TagServiceB>();
+		  public MyController(IEnumerable<ITagService> tagServices)
+    		  {
+        		_tagServices = tagServices; // Both TagServiceA and TagServiceB are injected
+    		  }
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+<< HttpContext>>
+
+- It encapsulates all the information about the current HTTP request and response.
+
+- Request
+	- Request consists of -->   method, URL, headers, body, cookies
+		1. method: // "GET", POST, PUT, DELETE
+		2. URL:  
+		   - Protocol      (http://, https://)
+		   - Host 	   (example.com)
+		   - Path          (/api/products)
+		   - Query string  ?id=123&category=books
+
+		3. Headers
+		   - Content-Type: Specifies the media type of the request body (e.g., application/json).
+		   - Authorization: Includes credentials for authentication (e.g., Bearer token, Basic auth).
+		   - Accept: Indicates what response format the client expects (e.g., application/json, application/xml).
+ 
+		4. Body (Payload)
+		    - Contains the data sent to the server
+		    - Formats:
+			- JSON: { "name": "John", "age": 30 }
+			- XML: <Person><Name>John</Name><Age>30</Age></Person>
+
+		5. Cookies
+		   - include user-specific information that the server can use to identify or authenticate the user.
+
+	- HttpContext.Request.Method;  	     	 // "GET", POST, PUT, DELETE
+	- HttpContext.Request.Path;    	     	 // "/home/index"
+	- HttpContext.Request.Query	     	 // "?id=123"
+	- HttpContext.Request.Query["id"];   	 // "123" (if URL is /home/index?id=123)
+	- Request.QueryString.HasValue           // return bool
+	- HttpContext.Request.RouteValues["id"]; // "123"
+	- HttpContext.Request.Host.Value;	 //  "localhost:5001"
+	- HttpContext.Request.Scheme; 	     	 // "http" or "https"	
+	
+	- Request.Headers["Referer"].ToString(); // get the current URL
+	- HttpContext.Request.GetEncodedUrl();   // to get the full URL --> http://localhost:5028/usher/getUSerById/5
+
+	- HttpContext.Request.Protocol
+	- HttpContext.Request.Form["username"]; // e.g., "JohnDoe" , Contains form data submitted in a POST request.
+		
+	- HttpContext.Request.Form.Files["fileInput"];
+		- Form.Files property is used to retrieve files uploaded through the form
+		- these are instances of IFormFile
+		- IFormFile.Name
+
+	- HttpContext.Request.Form.Count;   // gives you the number of fields in the form 
+	- HttpContext.Request.Form.Values   // 
+
+- Response 
+	- response consists of : - Status Code, 
+		1. Status Code
+			- 2xx (Success): The request was successful
+				- 200 OK: Request succeeded.
+				- 201 Created: Resource created.
+
+			- 4xx (Client Errors): Issues with the request.
+				- 400 Bad Request: Invalid request data.
+				- 401 Unauthorized: Authentication required.
+				- 404 Not Found: Resource not found.
+
+			- 5xx (Server Errors): Issues on the server.
+				- 503 Service Unavailable: Server overloaded or down.
+				- 500 Internal Server Error: General server error.
+		
+		2. Headers: Provide metadata about the response.
+			Content-Type: The media type of the response body (e.g., application/json).
+			Content-Length: The size of the response body in bytes.
+			Cache-Control: Caching policies (e.g., no-cache, max-age=3600).
+			Location: Specifies a redirect location for 3xx status codes.
+		
+		3. Body 
+			- Contains the data returned to the client.
+			- Formats: JSON, XML, HTML (Web page content for browser responses) , (Binary data: For files, images )
+		
+		4. Cookies: Optional data to store on the client for later use.
+
+	- code
+		- HttpContext.Response.StatusCode   // 404
+		- HttpContext.Response.ContentType  // "application/json"
+		- context.Response.Redirect(newUrl);
+
+- User
+	- HttpContext.User.Identity.Name;  	//  Gets the username of the user is authenticated
+	- HttpContext.User.IsInRole("Admin"); 	//  it's check if the Authenticated user has role "Admin"
+	- 
+- Session
+	- HttpContext.Session.SetString("SessionKey", "SessionValue");
+	- HttpContext.Session.GetString("SessionKey");  // Output: "SessionValue"
+	- HttpContext.Session.SetInt32("numOfEmp", 54);
+	- HttpContext.Session.GetInt32("numOfEmp"); // 54
+	-
+- Cookie
+	- HttpContext.Request.Cookies["MyCookie"];
+	- HttpContext.Response.Cookies.Delete("MyCookie"); // This removes the MyCookie cookie from the user's browser.
+	- HttpContext.Response.Cookies.Append("MyCookie", "cookieValue", new CookieOptions{ Expires = DateTimeOffset.UtcNow.AddDays(1)});
+ 
+- Connection
+	- HttpContext.Connection.RemoteIpAddress;   // Output: Client's IP address
+	- HttpContext.Connection.LocalPort;  // Output: 80 or 443 (based on HTTP or HTTPS)
+
+
+--- inject context
+	builder.Services.AddHttpContextAccessor()
+
+	- at constructor	
+		private readonly IHttpContextAccessor context;
+
+	- at method
+		context.HttpContext.Request.Host.Value;
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+<< Controller >>
+
+- controller is a class with properties
+	- User
+		- its type is ClaimsPrincipal
+		- represent the currently authenticated user making the request.
+		- this property is a part of the base ControllerBase
+		- It contains information about the currently authenticated user, including their identity and any associated claims
+		- Methods
+			- string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+			- string userId = User.FindFirst("id")!.Value;
+			- string userEmail = User.FindFirst(ClaimTypes.Email)?.Value;
+			- bool isAdmin = User.IsInRole("Admin");
+			- string userName = context.User.Identity.Name
+			- bool IsUserAuthenticated = User.Identity.IsAuthenticated	
+			- 
+			- 
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<< Model Binding >>
+
+- ASP.NET Core uses a specific order to search for data to bind to action parameters If you want to bind from a specific source:
+1. Route Data: Values specified in the route URL (e.g., {id} in api/controller/5)
+2. Query String: Key-value pairs in the query string (e.g., ?name=John).
+3. Form Data: If the request is a POST, PUT, or PATCH, form data (from a submitted HTML form) is checked.
+4. Request Body in case of	 (but only for complex types : If it's a complex type and the request method is POST, PUT, or PATCH, the framework will look into the request body.
+5. Header
+6. Cookies
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+<< ModelState validation story >>
+
+
+
+- Model validation is automatically triggered during this model binding process based on the data annotations (like [Required], [Range], etc.) on your model properties.
+  After model binding and validation, the result is stored in ModelState.
+
+- By default, ASP.NET Core performs model binding and model validation before executing controller actions. Here's how it works:
+- Here's how it works: 
+   - Model Binding: ASP.NET Core takes incoming HTTP request data (e.g., JSON payload, form data) and attempts to bind it to your action method parameters or model objects.
+   - Model Validation: After binding, ASP.NET Core automatically validates the model based on data annotations (like [Required], [StringLength], etc.) applied to your model properties.
+   - Automatic 400 Response will be oocured If the model validation fails (i.e., ModelState.IsValid is false), ASP.NET Core automatically short-circuits the request
+     pipeline and returns a 400 Bad Request response with details about the validation errors. This behavior is managed by the ModelStateInvalidFilter.
+
+  -  if you disable ModelStateInvalidFilter, validation fails, ModelState.IsValid will be false, but ASP.NET Core won't automatically return a 400 Bad Request. 
+     Instead, the action proceeds, and you can handle the validation result yourself, such as by returning a custom error message.
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<< remote validation >>
+
+[Remote("Action", "Controller", ErrorMessage = "wrong pass", AdditionalFields="param1,param2")]
+[Remote(action: "IsTagNameUnique", controller: "Validation", ErrorMessage = "Tag name must be unique.")]
+
+
+	- Param1, param2 are names of properties
+	- The path will be ->  /Controller/Action?FieldName=value&param1=value1&param2=value2
+	- [HttpGet("IsTagNameUnique")]  // Matches the Remote attribute action
+
+- remote validation in ASP.NET Core APIs doesn't work the same way as in MVC
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<< IServiceCollection, IServiceProvider >>
+
+- Let's clarify the relationship between IServiceCollection and IServiceProvider in .NET Dependency Injection (DI) -
+  they're both core parts of the DI system, but they serve different roles.
+
+--- IServiceCollection 
+	- Used to register services (setup phase)
+--- IServiceProvider, 
+	- Used to resolve/get services (runtime phase), the factory that provides the actual service instances
+
+- ✅ Step-by-step Example
+  
+  var services = new ServiceCollection();
+  services.AddTransient<IMyService, MyService>();
+  var ServiceProvider = services.BuildServiceProvider();         // Build the service provider
+  var myService = ServiceProvider.GetService<IMyService>();      // Resolve a service
+  var window = ServiceProvider.GetRequiredService<MainWindow>();
+
+
+
+-- Visual Summary
+
+IServiceCollection
+     ↓ .AddTransient, .AddScoped, etc.
+     ↓
+.BuildServiceProvider()
+     ↓
+IServiceProvider
+     ↓
+.GetService<T>() or .GetRequiredService<T>()
+
+
+-------------------------------------------------------------------------------------------
+
+<< IConfiguration >>
+
+- IConfiguration:  
+	- using Microsoft.Extensions.Configuration;
+	- is an interface in ASP.NET Core that is used to represent the application's configuration settings 
+	- It provides a way to access key-value pairs from various configuration sources, such as appsettings.json
+	- Accessing Configuration Values
+		 {
+			"ConnectionStrings": {
+  				"cs": "Server=.;Database=Sadia;Trusted_Connection=True;TrustServerCertificate=True;"
+			}
+		  }
+			- configuration["ConnectionStrings:cs"]; // this accesses the cs key inside the ConnectionStrings
+			- Configuration.GetSection("ConnectionStrings")["cs"]  // the shorthand for this Configuration.getConnectionString("cs")
+		  
+		- binding vlaues
+		  {
+  		    "Logging": {
+    			"LogLevel": {
+      			   "Default": "Information",
+      			   "Microsoft": "Warning"
+    			 }
+
+		  	}
+		  }
+		   public class LogLevel {
+    			public string Default { get; set; }
+    			public string Microsoft { get; set; }
+		   }		
+		   public class Logging
+		   {
+    			public LogLevel LogLevel { get; set; }
+		   }
+	
+		   - Logging _loggingSettings  = new Logging();
+		     configuration.GetSection("Logging").Bind(_loggingSettings);
+		       OR using get<T>
+		     Logging loggingSettings = configuration.GetSection("Logging").Get<Logging>();
+	
+			  Console.WriteLine($"Default Log Level: {_loggingSettings.LogLevel.Default}")
+
+	- inject Iconfiguration
+		  private readonly IConfiguration configuration;
+		 //var domain = configuration["Domain"];
+
+	
+---- binding exmaple
+
+   "CloudinarySetting": {
+       "CloudName": "dlcc9cbk5",
+       "ApiKey": "783144722411598",
+       "ApiSecret": "JfmdHLrPmrMrlM5rZf3job1-gtw"
+   }
+
+  - registration
+	builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
+
+  - at service
+	
+	Service(IOptions<CloudinarySetting> config){
+		config.value // is CloudinarySetting object
+	}
+
+------------------------------------------------------------------------------
+<< extra info >>
+
+server less application
+
+- when you use firebase
+- Next.js --> based on react
+

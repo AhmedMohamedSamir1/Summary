@@ -1,0 +1,18 @@
+.div-frosoyaLogo img{
+  
+    max-width: 100%;
+    max-height: 350px;
+}
+
+
+<div class="div-frosoyaLogo d-flex justify-content-center">
+    <img src="~/Images/frosoyaLogo.png" class=""/>
+</div>
+
+-----------------------------------------------------------------------
+bootstrap 
+
+.img-fluid{
+    max-width: 100%;
+    height:auto;
+}

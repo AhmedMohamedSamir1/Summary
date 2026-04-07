@@ -1,0 +1,16 @@
+server name : mongod.exe
+
+
+- to display the DBs    	-> show dbs
+- to create DB          	-> use DB_name
+- to create collection  	-> db.createCollection("collection_name") 
+- to drop collection		-> db.collectionName.drop()
+- show collection of DB		-> show collections
+- to drop DB			-> db.dropDatabase()
+
+- insert one collection		-> db.collectionName.insertOne{}
+- insert many collection	-> db.collectionName.insertMany([{}]) 
+
+- select all from collection   -> db.collectionName.find()
+
+- select & where	       -> db.collectionName.find({"field","vlaue"})

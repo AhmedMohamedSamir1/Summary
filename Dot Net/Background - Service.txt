@@ -1,0 +1,70 @@
+using Microsoft.Extensions.Hosting;
+
+
+1. class need to inherit from BackgroundService
+2. private readonly IServiceProvider _serviceProvider;
+	public MediaCleanupService(IServiceProvider serviceProvider)
+	{
+    		_serviceProvider = serviceProvider;
+	}
+
+3. implement the asbstract class method ExecuteAsync
+	- Main entry point for the background task.
+
+	protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+	{
+    	   while (!stoppingToken.IsCancellationRequested)
+    	   {
+        	var delay = GetAmountOfDelay();
+        	await Task.Delay(delay, stoppingToken);
+
+        	await CleanupExpiredMediaAsync(stoppingToken);
+
+        	// Wait 24 hours until the next run
+        	await Task.Delay(TimeSpan.FromDays(1), stoppingToken);
+    	   }
+	}
+
+4. in case of you need the your background service to trigger in specified time every day
+	private TimeSpan GetAmountOfDelay()
+	{
+    	   var now = DateTime.Now;             // Current local time
+    	   var specifiedDate = DateTime.Today.AddHours(16).AddMinutes(6);  // Today at 15:00 (3 PM)
+    	   if (now > specifiedDate)
+        	return specifiedDate.AddDays(1) - now;
+    	   return specifiedDate - now;
+	}
+
+
+5. the modification performed on database
+
+private async Task CleanupExpiredMediaAsync(CancellationToken cancellationToken)
+{
+    // Create a new scope so we can safely get a scoped service like DbContext
+    using var scope = _serviceProvider.CreateScope();
+
+    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+    var now = DateTime.UtcNow;
+
+    var expiredDeployments = await dbContext.Deployments
+        .Where(d => d.RetentionDays.HasValue && d.ConcludedAt.AddDays(d.RetentionDays.Value) < now)
+        .Include(d => d.Participants)
+            .ThenInclude(p => p.MediaItems.Where(m => !m.IsDeleted))
+        .ToListAsync(cancellationToken);
+
+    foreach (var deployment in expiredDeployments)
+    {
+        foreach (var participant in deployment.Participants)
+        {
+            foreach (var mediaItem in participant.MediaItems)
+            {
+                 mediaItem.IsDeleted = true;
+            }
+        }
+    }
+    await dbContext.SaveChangesAsync(cancellationToken);
+}
+
+6. registered 
+    services.AddHostedService<MediaCleanupService>();

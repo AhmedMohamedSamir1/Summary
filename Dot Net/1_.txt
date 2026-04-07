@@ -1,0 +1,13 @@
+permission
+login-scenario
+JWT- scenario
+publishing on IIS
+policies
+
+
+design 
+	3 versions of sidebar
+	3 versions of navbar
+	3 versions of forms
+
+

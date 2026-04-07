@@ -1,0 +1,271 @@
+
+<< function >>
+
+syntax: function functionName(param1 , param2 ){ block of code }
+
+- if you missed setting a value for parameter its value in function will be -> undefined
+- function return undefined if there is no return
+- if you give to the function arguments more than its parameter it will neglect the extra parameter
+- If you send an argument but the function has no parameters, then: The argument is simply ignored — JavaScript won’t throw an error.
+-------------------------------------------------------------------------------------------------------------------------------------------
+
+<<  [user-defined function], function statement, function declaration  >>
+
+function double(n1,n2){ return n1+n2; }
+
+console.log(double);
+// output
+ƒ double(n1,n2){
+    return n1+n2;
+}
+
+------------------------------------------------------------------------------------------------------
+
+<< Function Expression >>
+
+var bar = function() {
+  return "Hi";
+};
+------------------------------------------------------------------------------------------------------
+<< optional parameter >>
+
+- optional parameter value like php , c#
+
+function double(n1,n2=2){
+    return n1+n2;
+}
+console.log(double(5));  // 7
+
+note : in JavaScript there is always a default global object and this object is the browser window
+
+double(3,5) == window.double(3,5) // 
+------------------------------------------------------------------------------------------------------
+
+
+<< nested function >>
+
+- function inside function
+
+function fun1(fname, lname){
+    let mes = "hello";
+    function func2(){
+        return `${mes} ${fname} ${lname}`;
+    }
+    return func2();
+}
+
+console.log(fun1('ahmed', 'mohamed'));   // hello ahmed mohamed
+
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+
+<< anonymous function >>
+
+- function without name it also called function expression
+- function can be assigned in a varaible
+- After a function has been stored in a variable, the variable can be used as a function:
+- used for one action like click on button 
+- can be used as a parameter for another mehtod
+- An anonymous function is not accessible after its initial creation, it can only be accessed by a variable it is stored in
+
+// function expression
+let fun = function(x , y){
+    return x+y;
+};
+
+console.log(fun(5,7)); // 12
+document.write(fun);   // function(x , y){ return x+y; }
+
+
+---------------------------------------------------------------------------------------------------------
+<< Function Hoisting >>
+
+- Hoisting is JavaScript's default behavior of moving [ declarations ] to the top of the current scope.
+
+- Hoisting applies to variable declarations and to function declarations.
+
+- Because of this, JavaScript functions can be called before they are declared:
+
+
+console.log(myFunction(5)); // 25
+function myFunction(y) {
+  return y * y;
+}
+
+
+-------------------------------------------------------------------------------------------------------
+<< Self-Invoking Functions >>
+
+- Function expressions (anonymous function) can be made "self-invoking".
+
+
+(function () {
+  let x = "Hello!!";  // I will invoke myself
+  console.log(x);  // Hello!!
+})();
+
+(function (n1,n2) {
+    console.log(n1+n2);  // 11
+})(5,6); 
+
+these two functios at the above example clalled anonymous self-invoking function 
+
+-------------------------------------------------------------------------------------------------------
+<< arguments object >>
+
+function myFunction(a, b) {
+    // argument[0] // the value of a
+    return arguments.length; // return the number of passed arguments
+  }
+  console.log(myFunction()); //0
+  console.log(myFunction()); //1
+  console.log(myFunction(5,12)); //2
+
+
+- you can know the num of parameters of function using lenght
+  function name(x,y) {   }
+  console.log(name.lenght);
+  
+-------------------------------------------------------------------------------------------------------
+<< arrow function >>
+
+- used with one single statement  
+- used with anonymous func
+
+let calc1 = function (){ return 55; }
+let calc1 = ()=> 55;  // no parameter
+let calc1 = _ => 55;  // no parameter
+let calc2 = (n1,n2) => n1*n2;
+let calc2 = n1 => n1**n1;
+let calc2 = (n1) => n1**n1;
+let fun = (n1,n2)=> {
+    n1++;
+    n2++;
+    return n1+n2;
+};
+
+
+very important note : this refers to the object that call the method, but it differs in arrow function
+		      in arrow function this doesn't refer to the object that calls the method this will remains as it is
+
+------------------------------------------------------------------------------------------------------------------------
+
+<< JavaScript Callbacks>>
+- A callback is a function passed as an argument to another function
+- Where callbacks really shine are in asynchronous functions, where one function has to wait for another function 
+  (like waiting for a file to load).
+- A callback function can run after another function has finished
+
+example 1 : you want to do sum calculation on 2 nums, and then display the result.
+
+function myDisplayer(some) {
+    console.log(some);
+}
+
+function myCalculator(num1, num2, myCallback) {
+    let sum = num1 + num2;
+    myCallback(sum);
+}
+
+myCalculator(5, 5, myDisplayer);
+
+---> myDisplayer is a callback function
+---> When you pass a function as an argument, remember not to use parenthesis. as follow
+	 myCalculator(5, 5, myDisplayer);
+	 myCalculator(5, 5, myDisplayer()); // wrong
+
+
+example 2 : you want to create new array with positve number only usgin callback function
+
+let arr = [1,5,-11,-5,1,56,-155,-44];
+
+function remNeg(arr, isNegative){
+    let posNums = [];
+    for(let i = 0;  i<arr.length ; i++){
+        if(!isNegative(arr[i]))
+            posNums.push(arr[i]);
+    }
+    return posNums;
+}
+function isNegative(num){
+    return num<0
+}
+console.log(remNeg(arr,isNegative));  // [1,5,1,56]
+
+note : it doesn't make any sense here as the callback function is commomly used with asynchronous function
+       where one function has to wait for another function 
+
+
+Callback Hell: it's an issue occured when we have callbacks inside callbacks [nested callback]
+
+--> example on callback hell-->
+function doStep1(init, callback) {
+    const result = init + 1;
+    console.log('we here 1');
+    callback(result);
+}
+
+function doStep2(init, callback) {
+    const result = init + 2;
+    console.log('we here 2');
+    callback(result);
+}
+function doStep3(init, callback) {
+    const result = init + 3;
+    console.log('we here 3');
+    callback(result);
+}
+
+function doOperation() {
+    doStep1(0, (result1) => {
+        doStep2(result1, (result2) => {
+            doStep3(result2, (result3) => { console.log(`result: ${result3}`);
+            });
+        });
+    });
+}
+doOperation();
+
+output:
+we here 1 
+we here 2
+we here 3
+result: 6
+
+---------------------------------------------------------------------------------------------------------
+
+<< higher order function >>
+- is a function that accept functions as a parameters , can return a function like map function
+
+--------------------------------------------------------------------------------------------------------------------------------------------
+self invoking function
+
+(()=>{})();
+
+
+----------------------------------------------------------------------------------------------------
+
+<< function constructor >>
+
+function product() {}
+
+var p1 = new product();
+
+- when using new keyword 
+	- the function product becomes function constrcutor
+	- p1 will be empty object
+	- this inside the function refer to the empty object  
+
+- function constructor equivelent to class
+- any function constructor is an object has a key prototype its value is an object
+- any object (instance) from function constructor has a key __proto__ == key prototype of function constructor
+- any object in JS has a key prototype its value is an object
+ 
+
+function Product(name, price){
+    this.name = name;
+    this.price = price;
+}
+
+var p1 = new Product("watch", 210);  // p1 = {name: 'watch', price: 210, [[Prototype]]: Object }
+console.log(p1.name); // watch
+

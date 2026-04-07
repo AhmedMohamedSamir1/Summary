@@ -1,0 +1,414 @@
+add live server extension: to refresh the page automatically
+add Auto closing tag
+add auto rename tag
+--------------------------------------------------------
+HTML -> hyper text markup language
+- it's used to build the structure of website
+------------------------------------------------------------
+<< tags >>
+
+- two types of tag
+  - opening closing tag (nesting tag):
+  - self closing tag 
+-----------------------------------------------------------
+what is SEO : search engine optimiazation
+	    : rules by browser that developer should follow to guarantee that site will be displayed better in search engine 
+--------------------------------------------------------------------------------
+<< html tag >>
+
+<!DOCTYPE html></html>
+
+- it inform the browser the version of html page
+- page root element 
+
+----------------------------------------------------------------------------------------------------------
+<< header >>
+- info about page for browser
+----------------------------------------------------------------------------------------------------------
+
+<< meta tag >>
+
+- one of header elements
+- self closing tag
+- <meta charset="UTF-8"> 	    // make the page support arabic and english,and covers almost all of the characters and symbols in the world!
+- <meta name="keywords" content=""> // specify the keyword of your page
+- <meta name="description" content="write the text you want that will appears below the title of site in google ...">
+
+- <meta http-equiv="refresh" content="30"> // Refresh document every 30 seconds
+
+- charset attribute:  بتحدد نوع الترميز الخاص بالموقع
+---------------------------------------------------------------------------
+
+<< title tag>>
+
+-  one of header elements 
+-  <title>Document</title>
+----------------------------------------------------------------------------------------
+
+<< heading>>
+
+-> [h1:h6] tags
+-> it's a block element
+
+-------------------------------------------------------------------------------------
+
+<< arrtibutes >>
+- extran info for element
+- global attributes  : id , class , width , height
+- element attributes : 
+---------------------------------------------------------------------------------------
+
+ <<paragraph element >>
+
+- it's a block element
+<p></p>
+
+<pre></pre>  // like paragraph but it allow spacing an new line added by user
+----------------------------------------------------------------------------------------------
+<< preformatted text >>   بيحافظ على المسافات والسطور اللى موجودة جواه
+<pre>
+ this me
+ hello
+</pre>
+
+- block tag
+----------------------------------------------------------------------------------------------
+<< formating elements >>
+
+
+<b>your text</b>  -> bold
+<strong>your text</strong> // bold [important info text]محركات البحث بيدورو على المعلومات من خلالها 
+
+italic 	  	--> <i></i>  --> بتستخدم مع نص الحكمة
+emphasis  	--> <em></em> --> make italic text also , important info text
+mark	  	--> <mark></mark> --> make highlight on text
+underline 	--> <u></u>
+small     	--> <small></small> --> بتخلى حجم الكلام اصغر من الكلام اللى موجود معاها
+deleted text   	--> <del></del>  --> معناها ان الكلام ده محذوف
+inserted text  	--> <ins></ins> -->  النص ده مضاف للمقالة
+subscript text 	--> <sub></sub> --> used in chemistry to make h2o
+superscipt text --> <sup></sup> --> used in math to make the power الأس
+
+---------------------------------------------------------------------
+
+<< Link tag>>
+
+- href: hypertext reference
+- display: inline // default
+
+<a href="http://www.google.com">GOOGLE</a> 			-> to move the page to google
+<a href="http://www.google.com" target="_blank">GOOGLE</a> 	-> to move the page to google in a new tab
+
+<a href="#carPart">Car part</a> -> to move to specific place in the page 
+and this place its id= "carPart" like that -> <div id="carPart">Ahmed</div>
+
+<a href="about.html">about</a>
+
+<a href="about.html#about">about</a>
+
+<a href="mailto:ahmedmohamedmvp@gmail.com"> contact me</a> 
+<a href="mailto:ahmedmohamedmvp@gmail.com?subject=feedback&cc=ahmedasas333@yahoo.com&bcc=ahmed@gmail.com"> contact me</a> 
+<a href="mailto:ahmedmohamedmvp@gmail.com?subject=feedback&cc=ahmedasas333@yahoo.com,ahmedfa@yahoo.com&bcc=ahmed@gmail.com"> contact me</a> 
+
+<a href="https:/www.google.com">
+	<img src="" alt="">
+</a>
+---------------------------------------------------------------------
+
+<<img tag>>
+
+display: inline // default
+
+it has two attribute
+1. src -> it can be an url of image or path on your pc 
+	<img src="images/football_design15.jpg" alt="football_design15">
+	<img src="../football_design15.jpg" alt="football_design15"> // لو الصورة موجودة فى مكان قبل الصفحة	
+<img src="https://www.shutterstock.com/image-illustration/football-stadium-night-imaginary-modelled-600w-1912601503.jpg" alt="football_design15">
+	
+	
+2. alt -> text occurs when image can't load on your page
+----------------------------------------------------------------------------------------------------
+
+<<< unordered list  tags>>>
+
+<ul>
+            <li>html</li>
+            <li>css</li>
+            <li>java script</li>
+</ul>
+
+<ordered list  tags>
+
+<ol>
+            <li>html</li>
+            <li>css</li>
+            <li>java script</li>
+</ol>
+
+list attributes working with ordered attributes: reversed-> reverse the ordering
+		 start="1", or start="12", or start="100"
+		 type = "1" or  type= "21" -> the type will be an number
+		 type = "A", type="a", type="I", type="i"
+
+
+<< discription list >>
+
+//example
+
+<dl>
+    <dt>PHP</dt> // discription term
+        <dd>server side lang</dd>
+        <dd>scripted lang</dd>
+    <dt>C#</dt>
+        <dd>compiled lang</dd>
+        <dd>developed by microsoft</dd>
+</dl>
+		 
+---------------------------------------------------------------------------------------------------
+
+<< table tag >>
+
+tr	-> table row
+thead	-> table header
+tbody	-> table body
+tfoot	-> table footer
+td	-> table data cell
+th	-> table header cell
+
+colspan attribute: given to td and using to merge cells  
+ex: <td colspan="3"></td> // it merge 3 cells 
+
+<< caption tag >> // used to make caption(title) to the table
+
+---------------------------------------------------------------------------------------------------
+
+<< span >>
+
+- inline element
+- used when you want to change word inside the paragraph
+
+-----------------------------------------------------------------------------------------------------
+<< div >>
+
+- container to other elements
+- block element
+
+-----------------------------------------------------------------------------------------------------
+<<< header tag >>>
+block element
+
+<<< Footer Tag >>>
+block element
+
+<<< nav tag >>>
+block element
+
+<<< aside tag >>>
+block element
+
+<<< section tag >>>
+block element
+
+<<< article tag >>>
+block element -> display:block
+-----------------------------------------------------------------------------------------------------
+
+<< figure >>
+- block element
+- used as container for image and figcaption
+- figcaption-> block elements
+
+    <figure>
+        <img src="images/football_design8.jpg">
+        <figcaption>football image baby</figcaption>
+    </figure>
+-----------------------------------------------------------------------------------------------------
+
+<br>
+<hr> // makes horizontal line 
+---------------------------------------------------------------------------------------------------
+<<< audio tag >>
+
+    <audio controls loop autoplay>
+        <source src="audio/Death Note - (Light's Theme B) Music.mp3" type="audio/mpeg">
+ 	<source src="audio/Death Note - (Light's Theme B) Music.ogg" type="audio/ogg">
+	your browser doesn't support the audio
+    </audio>
+
+- controls attribute [required attribute]: to make control on the audio like pause, volume up, volum down and speed
+- autoplay attribute:
+- loop attribute:
+- muted
+- the audio can has more than source to guarantee that browser supports one of audio file types
+- each audio file has a mime type like mp3 its mime type is audio/mpeg
+
+
+---------------------------------------------------------------------------------------------------
+<< video tag >>
+
+<video controls width="500" height="400" loop muted poster="images/football_design15.jpg">
+    <source src="videos/funny nagy elaqaq 1.mp4" type="video/mp4">
+    <source src="videos/funny nagy elaqaq 1.ogg" type="video/ogg">
+    your browser doesn't support the audio
+    <track src="myfile1.vtt" kind="subtitles" srclang="en" label="english">
+    <track src="myfile2.vtt" kind="subtitles" srclang="it" label="italian">
+</video>
+
+
+-it's like the audio
+controls attribute [required attribute]: to make control on the video
+autoplay 
+width:
+height:
+loop:
+muted:
+poster:
+track: the translation that displayed in the screen, note that the file extension is vtt.
+
+---------------------------------------------------------------------------------------------------
+<< label >>
+
+- label: 	inline tag
+- label: used with input
+- for attribute: for="input_id"  used to link the label with the specific input
+
+---------------------------------------------------------------------------------------------------
+
+<< input>>
+
+____input attributes____
+	- required      -> user must fill the input
+	- placeholder   -> 
+	- value         -> 
+	- name          -> to differentiate between inputs , to make data sent when submiting form
+	- id 	        -> unique id for element
+	- disabled      -> prevent sending input data
+	- minlength="5" -> min length of input value is 5 chars
+	- maxlength="9" -> max length of input value is 9 chars
+	- checked       -> with radio and input types
+	- autofocus     -> make cursor focus on , if two input has this att cursor will focus on the first
+        - readonly     
+        - autocomplete="off"	-> prevent autocomplete 
+	- form ="form_id"       -> we you want to send input value that not exist inside form
+        - list="datalist_id"    
+ 
+____input types_____
+
+- type="number" min="0" max="14" step="2" value="0"
+- type="range" min="5" max="14" step="2" value="5"
+- type="email"
+- type="password"
+- type="radio"
+- type="checkbox"
+- type="search"
+- type="url"
+- type="color"
+- type="file" accept=".png, .jpg, .html" multiple
+- type="tel"   // no validation on it
+- type="submit"
+- type="reset"
+- type="button" value "DOWNLOAD"
+- type="hidden"
+- type="date"           // like 05/15/2023
+- type="datetime-local" // like  05/15/2023 09:30 PM
+- type="month"		// like may 2024
+- type="week"
+
+
+
+---------------------------------------------------------------------------------------------------
+
+<< form attributes >>
+
+action=""  --> the url of the page that the data will be sent for
+method ="" --> GET or POST or PUT
+novalidate
+target="_blank"
+
+enctype : 
+  - specifies how the form-data should be encoded when submitting it to the server , can be used only if method="post"
+  - enctype="application/x-www-form-urlencoded"  // default
+    All characters are encoded before sent (spaces are converted to "+" symbols, and special characters are converted to ASCII HEX values)
+
+  - enctype="multipart/form-data"  // This value is necessary if the user will upload a file through the form
+  - text/plain="text/plain"        // Sends data without any encoding at all. Not recommended
+	
+
+-----------------------------------------------------------------------------------------------------------------
+<< select input >>
+
+        <select>
+            <optgroup label="Front End">
+                <option>HTML</option>
+                <option>JS</option>
+                <option>CSS</option>
+            </optgroup>
+            <optgroup>
+                <option selected>C#</option>
+                <option>PHP</option>
+                <option>Python</option>
+            </optgroup>
+        </select>
+
+----------------------------------------------------------------------------------------------------------------
+
+<< textarea input >>
+
+<textarea placeholder="Enter your feedback" cols="18" rows="11"></textarea>
+
+
+----------------------------------------------------------------------------------------------------------------
+<< input with list >>
+
+<input list="programming">
+<datalist id="programming">
+    <option value="PHP">
+    <option value="PYTHON">
+    <option value="C#">
+    <option value="JAVA">
+    <option value="C++">
+    <option value="C">
+    <option value="need">
+</datalist>
+----------------------------------------------------------------------------------------------------------------
+
+<< quote tag >>
+
+- inline tag
+- used with wisdom text
+- <q></q>
+
+<< blockquote >>
+
+- block
+- used with wisdom text
+----------------------------------------------------------------------------------------------------------------
+
+<< word break opportunities tag>>
+<wbr>
+ 
+----------------------------------------------------------------------------------------------------------------
+<< b direction isolation >>
+
+- used to separate the arabic text from english
+<bdi></bdi>
+------------------------------------------------------------------------------------------------------------------------------------
+
+<< code tag >>
+<code></code>
+
+----------------------------------------------------------------------------------------------------------------------
+<< iframe tag >> load another page in part of your page  
+<iframe src="https://elzero.org" ></iframe>
+----------------------------------------------------------------------------------------------------------------------
+
+html entity list
+
+- &lt;
+- &gt;
+
+-----------------------------------------------------------------------------------------------------
+<< paths>>
+./   => refer to the current folder
+../  => refer to previous folder
+

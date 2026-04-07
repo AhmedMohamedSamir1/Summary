@@ -1,0 +1,81 @@
+<< DelegatingHandler >>
+
+
+- DelegatingHandler lets you intercept and modify requests/responses.
+- Every outgoing request passes through a chain of handlers before it reaches the network
+
+
+
+<< simple review about middleware >>
+
+-- Middleware (Server-side)
+	- Lives in the ASP.NET Core request pipeline.
+	- Intercepts incoming HTTP requests from the client before they reach your controllers/endpoints.
+	- Can also intercept and modify the outgoing HTTP response before it is sent back to the client.
+
+
+
+-- DelegatingHandler (Client-side)
+	Lives in the HttpClient pipeline.
+	Intercepts outgoing HTTP requests from your Blazor WebAssembly (or any .NET client) before they leave the app.
+	Can also intercept and modify the incoming HTTP response before your app code receives it.
+
+-----------------------------------------------------------------------------------------------------------------------------
+
+public class JwtTokenDelegatingHandler: DelegatingHandler
+{
+    private readonly JwtService jwtService;
+
+    public JwtTokenDelegatingHandler(JwtService jwtService)
+    {
+        this.jwtService = jwtService;
+    }
+
+    protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+    {
+        var token = await jwtService.GetTokenAsync();
+        if (!string.IsNullOrWhiteSpace(token))
+        {
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+        }
+        return await base.SendAsync(request, cancellationToken);
+    }
+}
+
+
+---------------------------------------------------------------------------------
+
+-- you need to attach the delegate handler with the registration of HttpClient
+
+
+-- you can not attach the delegate handler into Scoped default client
+	builder.Services.AddScoped(serviceProvider => new HttpClient { BaseAddress = new Uri(builder.Configuration.GetValue<string>("NXS")!) });
+
+
+-- to attach a handler like CookieHandler to http client
+
+	- first you need to register your delegate handler
+		builder.Services.AddScoped<JwtTokenDelegatingHandler>();
+	
+	- Register a named HttpClient and attach handler
+		builder.Services.AddHttpClient("Auth", 	 opt => opt.BaseAddress = new Uri("https://localhost:7189/api"))
+		.AddHttpMessageHandler<CookieHandler>();  // AUTH is the name of HttpClient
+		
+
+	- at your class service
+		private readonly IHttpClientFactory httpClientFactory;
+		public class ShipmentService
+ 		{
+     			private readonly IHttpClientFactory httpClientFactory;
+		}
+		
+		var client =  this.httpClientFactory.CreateClient("AUTH"); // AUTH is the name of HttpClient
+
+
+
+// in summary
+	- create your delegate handler that intercept the request and include the token in request header
+	- register the handler
+	- register a named httpClient and attach the delegate handler 
+

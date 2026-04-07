@@ -1,0 +1,45 @@
+| MVC Controller | Razor Pages      |
+| -------------- | ---------------- |
+| `Index()`      | `OnGet()`        |
+| `Create()`     | `OnPost()`       |
+| `Edit()`       | `OnPostEdit()`   |
+| `Delete()`     | `OnPostDelete()` |
+
+
+
+- to call OnPostDelete() in form use -> asp-page-handler
+
+-- MVC, Razor page html navigation
+   <a class="nav-link text-dark" asp-area="" asp-controller="Invitee" asp-action="Index">Invitees</a>
+   <a class="nav-link text-dark" asp-page="/Invitees/Index">Invitees</a>
+
+
+-- method
+ public async Task<IActionResult> OnGet([FromQuery] CourseParameters courseParameters) // index
+ {
+     var res =  await courseService.GetPagedListAsync(courseParameters);
+     return new JsonResult(res.Data);
+ }
+
+-----------------
+
+<a asp-page="./Index" asp-route-pageNumber="2">Next</a>
+ It means: “Navigate to the Index Razor Page in the current folder.” then looks for OnGet() handler
+
+
+---
+  public IActionResult OnGetSearch() { }
+  <a asp-page="./Index" asp-page-handler="Search">
+	it means “Navigate to the Index Razor Page in the current folder, then execute the OnGetSearch() handler.”
+
+
+Redirect Via HTML
+  - <a class="nav-link text-dark" asp-page="/Course/Index">Course</a>
+  - <a class="btn btn-outline-primary fs-5" asp-page="/Course/Add">Add Course</a>
+
+-- Redirect Via C# code
+	return RedirectToPage("./Index");
+	return RedirectToPage("Index");
+
+
+

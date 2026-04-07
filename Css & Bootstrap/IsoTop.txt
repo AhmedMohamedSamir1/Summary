@@ -1,0 +1,62 @@
+<< Iso Package >>
+
+--- data-filter="selector" --> EX
+	<li data-filter="Carton Work">Carton Work</li>
+
+
+-- Problems
+	- interfer with bootstrap row  [not solved]
+	- adding via dom lead to items above each others [solved]
+	- the search is applied in front-end, not considering the new loaded items [not solved]
+
+	
+--------------------------------------------------------------
+
+
+
+
+const tabId = currentTabId;
+const container = document.getElementById(`tab-${tabId}`);
+
+ fetch(`/Project/ShowMore?pageNumber=${pageNumber}&CategoryId=${tabId}`, {
+     method: 'GET'
+ })
+ .then(response => {
+     if (response.ok) return response.json();
+         throw new Error('Failed to load more projects');
+ })
+ .then(data => {
+     data.items.forEach(project => {
+         const div = document.createElement('div');
+         div.className = `hovereffect-card col-12 col-md-6 col-lg-4 col-xl-3 p-0`;
+         div.setAttribute("data-aos","fade-up");
+         div.setAttribute("data-aos-delay",0);
+
+         div.innerHTML = `
+             <figure class="effect-julia rounded">
+                 <img src="/MediaFiles/${project.id}_${project.name.toLowerCase()}/${project.thumbnail}" alt="Thumbnail" />
+                 <figcaption>
+                     <h2 class="mb-2 fw-semibold">${project.name}<span></span></h2>
+                     <div class="content">
+                         <div>${project.categoryName}</div>
+                     </div>
+                     <a class="btn btn-success" href="/project/getById/${project.id}">details</a>
+                 </figcaption>
+             </figure>
+         `;
+
+         container.insertBefore(div, btn);
+     });
+
+         // Update Isotope layout
+        
+
+         pageNumbers[tabId]++; // Next page for this tab
+         if (!data.hasNext) {
+             btn.remove(); // No more pages
+         }
+
+     })
+     .catch(error => {
+         console.error(error);
+     });

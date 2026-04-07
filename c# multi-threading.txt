@@ -1,0 +1,119 @@
+- program loaded into memory called process
+
+- when user double click on program the OS Loader(program) will load the program into ram then the CPU execute the process
+
+- on OS Level the each process is executed for a specific amount of time then another process is executed for amount of time and so on [context switching]
+	
+- on the app level the app can have more than thread and OS context switching between threads
+
+- thread: it behave like new process
+
+- the general using of threading 
+	threading is used when we have a set of instructions need a long time to be executed so we make it running on background
+	so it running parallel without blocking next instructions
+
+- for each process the OS creates a main thread for it 
+- main thread(MT) in windows form responsible for GUI 
+
+
+- instructions executed in parallel
+ 
+
+- creating thread :
+	- when you ceating thread you must assign to it the block of code that it will execute
+	
+	public void long_term(){}
+	Thread t1 = new Thread(long_term);   // Thread constructor takes an [delegate void(){}] as a parameter
+	t1.start();  // execute the function you have (long_term)
+	// if long_term with parameters you need to pass them => t1.start(param1);
+	t1.Name = "test_thread";
+
+-------------------------------------
+- Thread.Sleep(4000);          // susbend the current thread for a specific num of millsecond
+- Thread.CurrentThread.ManagerThreadId // get current thread id
+
+- t1.IsBackground	       // indicator whether or not a thread is a background thread
+- t1.IsBackground = true;      // it terminates when all foreground threads terminate
+- t1.IsBackground = false;     // foreground
+
+- process(program) terminates when all foreground threads are finished and if there is any background thread isn't finished execution it will terminate also
+
+- MT is foreground
+- any thread by default is foreground
+
+- when thread finished its intructions it became sleep but still exist at memory
+-----------------------------------------------------
+
+- cross threading is not allowed at gui which means you can't change any thread controls from another thread
+
+- any control has invoke method
+
+- control.Invoke(()=>{ // block of code}) // execute the delegate on the thread that include the control , used to avoid cross threading error 
+	it means make the owner thread of control execute the block of code 
+
+---------------------------------------------------------------------
+
+<< ThreadPool >>
+- instead of making a new thread every time as it waste for resources we use the threadPool to expoit the finshed threading
+
+- ThreadPool.QueueUserWorkItem((obj) =>{            });
+
+- the drawbacks of threading:-
+	- can not get the returned result
+	- can't make chaining between threads [synchoronization]
+	-
+--------------------------------------------------------------------------------------------
+<< Task >>
+
+- Solve Synchronization problem
+- can get the result
+
+var T = Task.Run(()=>{});  // it's equivalant to  ThreadPool.QueueUserWorkItem((obj) =>{            });
+var T = new Task(()=>{});  // it's equivalant to  ThreadPool.QueueUserWorkItem((obj) =>{            });
+
+T.Start();
+var res = T.Result; // the main thread will wait(freeze) for T task to finish to get the result
+
+va c = new Task<string>(()=>{ return "str"});
+
+MT freezing and Synchronization solution
+	T.ContinueWith();
+	Task.WhenAll(t1,t2).ContinueWith(()=>{});
+
+
+T.ContinueWith(result=>(){
+
+}, TaskScheduler.FromCurrentSynchronizationContext()); // this Task that after T will run on MT
+
+---------------------------------------------------------------------
+
+<< async, await >>
+
+- thread --> threadpool--> task,
+ 
+- it's a summary to continue with
+
+await : 
+  written before task
+  the next code at MT will wait for task until finished but does not make the main thread freeze the main thread is free 
+
+async :  
+
+---------------------------------------------------------------------------------------------
+
+-- remember 'await' operator can only be used within an async method.
+-- return type of async method must be void or Task or Task<T>
+
+
+-- method with name func1 return --> Task<string> to call it
+	1. the current method should be async
+	2. use await before calling the method
+	3. string res = await func1()
+
+---------------------------------------------------------------------------------------------
+
+<< async return type >>
+
+public async Task<(bool Success, string UserId,string Role)> Login(LoginDTO loginDTO){
+	 return (true, user.Id,role);
+}

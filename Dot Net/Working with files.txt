@@ -1,0 +1,771 @@
+public static class FileHelper{
+
+        public static string GetProjectFolderPath()
+        {
+            // Get the directory where the executable is located
+            string executablePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+
+            string executableDirectory = Path.GetDirectoryName(executablePath);
+
+            // Traverse up the directory tree until the project folder is found
+            DirectoryInfo directory = new DirectoryInfo(executableDirectory);
+            while (directory != null)
+            {
+                FileInfo[] projectFiles = directory.GetFiles("*.csproj");
+                if (projectFiles.Length > 0)
+                {
+                    return directory.FullName;
+                }
+
+                directory = directory.Parent;
+            }
+
+            return null;
+        }	
+}
+
+FileHelper.GetProjectFolderPath();   //  C:\App_Projects\Visual_Studio\test\test
+
+--------------------------------------------------------------------------------------------
+
+<< selected file at desktop application >>
+
+ var openFileDialog = new OpenFileDialog();
+ if (openFileDialog.ShowDialog() == true)
+ {
+     filePath = openFileDialog.FileName; // get the full path of the selected file
+     fileName.Text = new FileInfo(filePath).Name; // get the name of selected file 
+     MessageBox.Show(filePath);
+ }
+
+
+- FileInfo? fileInfo = new FileInfo(filePath);
+- FileInfo.Name   // get the name of the file
+- fileInfo.Length // return the size of file in bytes
+- 
+
+--------------------------------------------------------------------------------------------
+
+<< Build Action,  Copy to Output Directory >>
+
+[ Build Action ]
+  -- None
+    - The file is not compiled or embedded — it’s just part of the project (still available via file path).
+    - usage: Files you read manually at runtime (like config.json, data.csv, etc.)
+
+  -- Content
+    - it is included in the build output.
+    - Static files your app needs at runtime (like images, JSON files, templates).
+
+-- Compile
+   - The file is compiled as C# code into the assembly.
+   - For .cs source files
+  
+
+[ Copy to Output Directory ]
+ 
+   - This controls whether (and when) Visual Studio copies your file from the project folder (e.g. /Assets/Sadia.json) 
+     to the output folder (/bin/Debug/net8.0/Assets/Sadia.json) at runtime.
+
+   - Options
+      - Do not copy
+	- File will not appear in your output folder (bin\Debug\net9.0)
+
+      - Copy always
+	- File is copied every build (even if unchanged).
+
+      - Copy if newer
+	 - File is copied only if it’s newer than the one in the output folder.
+	   “Copy if newer” works by comparing the file system modification times (timestamps) between the source and output files — only copying when the source file has been edited more recently.
+	        15:30 (source Last modified) > 15:00 (output Last modified)
+		→ Copy again ✅
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<< AppContext >>
+
+
+- AppContext.BaseDirectory
+	- The main folder where your application is running from.
+	- gives you the absolute path of the folder where your application runs	
+	- EX: D:\\Apps_projects\\visual studio\\JsonService\\JsonService\\bin\\Debug\\net9.0\\
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<< System.IO.File >>
+
+string content = await File.ReadAllTextAsync(filePath);
+	- open the file , read all text, close the file
+
+File.WriteAllTextAsync(fileName, json);
+	- create new file , write specific string to the file , close the file
+	- if the file is exist replace it
+
+
+--------------------------------------------------------------------------------------------
+<< Stream >>
+
+- Stream is an abstract base class in the System.IO namespace.
+- It represents a sequence of bytes that can be read from, written to, or both.
+- Think of it as a "pipeline" or "channel" to move data between sources and destinations.
+- 
+
+
+Depending on the data source/destination, you’ll use a subclass:
+
+| **Class**                       | **Purpose**                                     |
+| ------------------------------- | ----------------------------------------------- |
+| `FileStream`                    | Read/write bytes to a file                      |
+| `MemoryStream`                  | Store data in memory (RAM)                      |
+| `NetworkStream`                 | Read/write over network sockets                 |
+| `BufferedStream`                | Adds buffering to another stream for efficiency |
+| `CryptoStream`                  | Encrypt/decrypt data as it’s read/written       |
+| `GZipStream`, `DeflateStream`   | Compress/decompress data                        |
+| `StreamReader` / `StreamWriter` | Work with text (instead of raw bytes)           |
+| `BinaryReader` / `BinaryWriter` | Work with binary data types                     |
+
+
+- Stream exposes several useful properties:
+	CanRead → bool → Can you read from this stream?
+	CanWrite → bool → Can you write to this stream?
+	CanSeek → bool → Can you jump (seek) to a specific position?
+	Length → long → Total number of bytes in the stream
+	Position → long → Current position in the stream (read/write head)
+
+
+- Stream implements IDisposable.
+   - When you use using, the Dispose() method is automatically called → releases file handles, memory, or network sockets.
+   - using (var fs = new FileStream("test.txt", FileMode.Open))
+     {
+    	// use fs
+     } fs.Dispose() is called automatically
+
+
+- What is I/O?
+   - I/O = Input/Output 
+   - moving data in or out of a system.
+   - Input → keyboard typing, reading from a file, receiving network data
+   - Output → writing to a file, sending data to network, displaying on screen
+   - Disk I/O = Input/Output operations between your program (RAM) and the disk (HDD/SSD).
+   - Every time your app reads a file → that’s a disk read I/O.
+   - Every time your app writes to a file → that’s a disk write I/O.
+   - Without buffer --> Writes go directly to disk → slow.
+   - Without buffer --> Collects bytes in memory first → one trip to disk → much faster.
+
+- Buffer
+	- A buffer is a temporary block of memory (RAM)
+	   - it’s all about reducing the number of slow disk I/O operations.
+	   - Instead of writing every byte immediately to the disk (which is very slow), data is collected in memory first and then written in chunks
+ 	   - Think of it like:
+		- You want to deliver 100 letters to the post office.
+		- Without a buffer → you walk 100 times (slow).
+		- With a buffer → you collect letters in a bag (buffer), then walk once with the bag (fast).
+
+	- Why is Buffering Needed?
+		- Disk access is much slower than memory access.
+		- Writing in small pieces → lots of slow disk I/O.
+		- Writing in larger chunks (buffered) → fewer, faster writes.
+
+	- buffer size = 4096 bytes (4 KB) → matches the size of a disk sector (efficient for most file systems).
+
+	- How Buffer Works in FileStream
+	     EX1: 
+		using var fs = new FileStream("test.txt", FileMode.Create, FileAccess.Write, FileShare.None, bufferSize: 1);
+		byte[] data = Encoding.UTF8.GetBytes("Hello World");
+		foreach (var b in data)
+    		    fs.WriteByte(b); // Writes to disk immediately, 1 byte at a time, Very slow — because 11 separate disk writes happen.
+	    EX2:
+		using var fs = new FileStream("test.txt", FileMode.Create, FileAccess.Write, FileShare.None, bufferSize: 4096);
+		byte[] data = Encoding.UTF8.GetBytes("Hello World");
+		foreach (var b in data)
+		{
+    		   fs.WriteByte(b); // Written to buffer in memory, not disk yet
+		}
+		fs.Flush(); // Writes all buffered data to disk at once
+		👉 Much faster — because all 11 bytes are written once when buffer is flushed.
+		
+	- When does the buffer flush?
+		- When the buffer fills up (bufferSize reached)
+		- When you call Flush() manually
+		- When you call Dispose() or Close()
+
+- FileStream constructors
+	- FileStream(string path, FileMode mode)
+		- using var fs = new FileStream("test.txt", FileMode.Create);
+			- Creates test.txt (overwrite if exists).
+			- Can read & write, but no one else can open the file.
+
+	- FileStream(string path, FileMode mode, FileAccess access)
+		using var fs = new FileStream("test.txt", FileMode.Open, FileAccess.Read);
+			- Opens test.txt only for reading.
+
+	- FileStream(string path, FileMode mode, FileAccess access, FileShare share)
+		- Adds sharing options (whether other processes can access the file at the same time).
+		- using var fs = new FileStream("test.txt", FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Read);
+			- Other processes can only read,
+	
+	- FileStream(string path, FileMode mode, FileAccess access, FileShare share, int bufferSize)
+		- bufferSize: number of bytes buffered internally before writing to disk.
+		- 		
+--------------------------------------------------------------------------------------------
+
+
+<< IFormFile Class >>
+
+action(IFormFile File)
+
+File == null  	// check if the file is null
+File.Length  	// Get the file length in bytes
+
+File.FileName 	// get the file name
+
+mediaFile.Name // get the form field name
+
+IFormFile.ContentType    // get the raw content type header of the uploaded file
+
+
+IFormFile.CopyToAsync(stream)  // copy the content of IFormFile to stream
+
+
+your form need this attribute= "enctype="multipart/form-data"
+
+
+
+
+
+    var files = Directory.GetFiles(folderPath).Select(Path.GetFileName).ToList();
+
+---------------------------------------------------------------------------------------------
+
+<< Saving >>
+
+ // validate the file
+ if (mediaFile == null || mediaFile.Length == 0)
+ {
+     return Results.BadRequest(new ApiResponse(400, false, "No file uploaded"));
+ }
+
+ var _root = webHostEnvironment.ContentRootPath;	
+ //var _root = webHostEnvironment.WebRootPath;
+
+ // Create directory (folder) if it doesn't exist
+ var targetDirectory = Path.Combine(_root, "MediaFiles");
+ if (!Directory.Exists(targetDirectory))
+    Directory.CreateDirectory(targetDirectory);
+
+ // make the file name unique
+ var uniqueFileName = $"{Guid.NewGuid().ToString("N").Substring(0, 9)}_{mediaFile.FileName}";
+
+ // get the full path that media file will be stored in 
+ var filePath = Path.Combine(targetDirectory, uniqueFileName);
+
+ // Save the file
+ using (var stream = new FileStream(filePath, FileMode.Create))
+ {
+    await mediaFile.CopyToAsync(stream);
+ }
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+
+<< helpers steps>>
+
+
+-- Path.Combine
+
+var _root = "C:\\App_Projects\\Visual_Studio\\RobustMoro\\RobustMoro.MVC\\wwwroot"
+var excelFilePath = Path.Combine(_root,"users.xlsx"); 	// C:\\App_Projects\\Visual_Studio\\RobustMoro\\RobustMoro.MVC\\wwwroot\\users.xlsx
+
+
+var targetDirectory = Path.Combine(webHostEnvironment.WebRootPath, "PurchaseOrder", project.Name+"_"+project.Id);
+
+	-> wwwroot\\PurchaseOrder\\project1_3   --> this directory of folder will be created
+
+
+--- determine if the directory file exists
+
+	var targetDirectory = Path.Combine(_root, "MediaFiles");
+	if (!Directory.Exists(targetDirectory))
+    		Directory.CreateDirectory(targetDirectory);
+
+
+var uniqueFileName = userName + SupplierId + evidenceForCreationDTO.File.FileName;
+var filePath = Path.Combine(targetDirectory, uniqueFileName);
+
+
+--- determine if the specified file exists
+if (System.IO.File.Exists(filePath)) 
+    System.IO.File.Delete(filePath); / delete the didicated file
+
+
+--- Save the file
+using (var fileStream = new FileStream(filePath, FileMode.Create))
+{
+    evidenceForCreationDTO.File.CopyTo(fileStream);
+}
+
+
+
+
+string raw = @"C:\Users\Ahmed\Desktop\myPhoto.png";
+string safe = Path.GetFileName(raw); // "myPhoto.png"
+
+
+string path = "D:\\Apps_projects\\visual studio\\NXS\\NXSExpress.Server\\wwwroot\\Shipment Docs\\8_NXS486099572057\\Saad-Hany_DotNET-Resume.pdf"
+	- note that double backslahes  \\ so if you need to get the file name using GetFileName repace the \\ with /
+- string file = Path.GetFileName(path.Replace("\\", "/"))
+
+
+--- Content Types
+	- pdf     --> application/pdf
+	- excell   --> application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+<< IWebHostEnvironment >>
+
+- IWebHostEnvironment is a key service in ASP.NET Core that provides information about the web hosting environment your application is running in
+
+- inject IWebHostEnvironment
+	private readonly IWebHostEnvironment webHostEnvironment;
+	public UserService (IWebHostEnvironment webHostEnvironment){ this.webHostEnvironment = webHostEnvironment; } 
+
+- usages
+  
+  IWebHostEnvironment.ContentRootPath to access the root directory of the application.
+
+  var _root = webHostEnvironment.WebRootPath; 		// "C:\\App_Projects\\Visual_Studio\\RobustMoro\\RobustMoro.MVC\\wwwroot"
+  var root =  webHostEnvironment.ContentRootPath	// C:\\App_Projects\Visual_Studio\\RobustMoro\\RobustMoro.MVC
+  var targetDirectory = Path.Combine(webHostEnvironment.WebRootPath, "Quotation"); // "C:\\App_Projects\\Visual_Studio\\RobustMoro\\RobustMoro.MVC\\wwwroot\\Quotation"
+  
+  if (!Directory.Exists(targetDirectory))
+  {
+      Directory.CreateDirectory(targetDirectory);
+  }	
+		 
+-------------------------------------------------------------------------------------------------------------------------------------------
+
+<< export data to sheet excel >>
+
+-  Install-Package EPPlus
+
+- service method
+
+ public async Task<(bool status, string path)> ExportUsersToExcelFile(DateTime? Date)
+ {
+     try
+     {   
+         ExcelPackage.LicenseContext = LicenseContext.NonCommercial;  // Set the EPPlus license context
+
+         // 1. Fetch data from the repository
+         var users = new List<User>();
+         if(Date == null)
+          users = await this.unit.UserRepository.GetAll();
+         else
+             users = await this.unit.UserRepository.GetAllWithFilter(user=> user.CreatedDate.Date == Date.Value.Date);
+
+         var UsersGetDTO = mapper.Map<List<User>, List<UserReportDTO>>(users);
+
+         // 2. Define the path for the Excel file
+
+         
+
+         var _root = webHostEnvironment.WebRootPath;         // "C:\\App_Projects\\Visual_Studio\\RobustMoro\\RobustMoro.MVC\\wwwroot"
+
+         var excelFilePath = Path.Combine(_root,"users.xlsx"); // C:\\App_Projects\\Visual_Studio\\RobustMoro\\RobustMoro.MVC\\wwwroot\\users.xlsx
+
+         if (File.Exists(excelFilePath))
+         {
+             File.Delete(excelFilePath);
+         }
+
+         // 3. Create Excel package
+         using (var package = new ExcelPackage(new FileInfo(excelFilePath)))
+         {
+             // Create worksheet
+             var worksheet = package.Workbook.Worksheets.Add("Users"); // create file
+
+             // 4. Write header row with styling
+             var headerRow = typeof(UserReportDTO).GetProperties().Select(prop => prop.Name).ToArray();
+             for (int col = 0; col < headerRow.Length; col++)
+             {
+                 // Set header text
+                 worksheet.Cells[1, col + 1].Value = headerRow[col];
+
+                 // Make header bold and apply background color
+                 worksheet.Cells[1, col + 1].Style.Font.Bold = true;
+                 worksheet.Cells[1, col + 1].Style.Font.Size = 16;
+                 worksheet.Cells[1, col + 1].Style.Font.Color.SetColor(Color.White);
+                 worksheet.Cells[1, col + 1].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                 worksheet.Cells[1, col + 1].Style.Fill.BackgroundColor.SetColor(Color.DarkGreen);
+                 worksheet.Cells[1, col + 1].Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin, Color.Black);
+
+                 if (headerRow[col].ToLower() == "email")
+                 {
+                     worksheet.Column(col + 1).Width = 28;
+                 }
+                 else
+                 {
+                     worksheet.Column(col + 1).Width = 20;
+                 }
+             }
+
+             // 5. Write data rows and apply alternating row colors
+             for (int row = 0; row < UsersGetDTO.Count; row++)
+             {
+                 var user = UsersGetDTO[row];
+                 for (int col = 0; col < headerRow.Length; col++)
+                 {
+                     worksheet.Cells[row + 2, col + 1].Value = typeof(UserReportDTO).GetProperties()[col].GetValue(user)?.ToString() ?? "";
+
+                     // Apply alternating row colors (white/gray)
+                     if (row % 2 == 0)
+                     {
+                         worksheet.Cells[row + 2, col + 1].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                         worksheet.Cells[row + 2, col + 1].Style.Fill.BackgroundColor.SetColor(Color.White);
+                     }
+                     else
+                     {
+                         worksheet.Cells[row + 2, col + 1].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                         worksheet.Cells[row + 2, col + 1].Style.Fill.BackgroundColor.SetColor(Color.LightGray);
+                     }
+
+                     // Add borders for each cell
+                     worksheet.Cells[row + 2, col + 1].Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin, Color.Black);
+                 }
+             }
+
+             // 6. Save the Excel file
+             package.Save();
+         }
+
+         return (true,excelFilePath);
+     }
+     catch (Exception ex)
+     {
+         return (false,string.Empty);
+     }
+ }
+
+
+- controller action
+
+        public async Task <IActionResult> exportUsers(DateTime? Date)
+        {
+            var exported =  await userService.ExportUsersToExcelFile(Date);
+            if (exported.status)
+            {
+                var bytes = System.IO.File.ReadAllBytes(exported.path);
+
+                return File(bytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet","report.xlsx");
+            }
+            else
+            {
+                return Json(false);
+            }
+        }
+
+
+- in java script
+	
+	// blob is the raw file data received from the server 
+	then(blob=>{
+              const url = window.URL.createObjectURL(blob);  // Creates a temporary URL representing the file (blob) in memory.
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = "users_report.xlsx";
+              document.body.appendChild(a);
+              a.click();
+              a.remove();
+              window.URL.revokeObjectURL(url);  // : Releases the memory associated with the temporary file URL after download the file to avoid memory leaks.				
+              showAlert('info', 'Done', 'The file has been downloaded.');       
+        })
+
+
+- Blob is a data type in JavaScript that represents large abount of binary data, It can hold text, images, videos, or any raw file data in a binary format.
+
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+
+
+<< EPPlus Package >>
+
+- EPPlus requires a license context to be explicitly set. Since EPPlus 5+, the default license mode is Commercial, 
+  and you need to specify that you are using the NonCommercial license if you are using it for free.
+
+- to Set EPPlus license context
+	- ExcelPackage.LicenseContext = LicenseContext.NonCommercial; 
+
+
+-- to read data from excell sheet
+
+using (var stream = new MemoryStream())
+{
+    await file.CopyToAsync(stream);
+    using (var package = new ExcelPackage(stream))
+    {
+        ExcelWorksheet worksheet = package.Workbook.Worksheets[0];  
+        int rowCount = worksheet.Dimension.Rows;
+        int colCount = worksheet.Dimension.Columns;
+
+        for (int row = 2; row <= rowCount; row++) // Start from row 2 (skip headers)
+        {
+            double weight = worksheet.Cells[row, 1].GetValue<double>();
+
+            for (int col = 2, z=0; col <= colCount; col++,z++) // Columns contain price values
+            {
+                decimal price = decimal.Parse(worksheet.Cells[row, col].GetValue<double>().ToString("F2"));
+
+                int zoneId = zones[z].Id;
+
+                var priceListItem = new PriceListItemDTO
+                {
+                    Weight = weight,
+                    Price = price,
+                    ZoneId = zoneId,
+                    PriceListId = priceListId
+                };
+
+                priceListItems.Add(priceListItem);
+            }
+        }
+    }
+}
+
+
+-----------------------------------------------------------
+
+<< iTextSharp >>
+
+
+- install-package iTextSharp // deprecated do not use it
+
+-- Install-Package itext -version 9.1.0
+-- Install-package itext.bouncy-castle-adapter 9.1.0
+
+
+------- Codes
+	
+	public Color CreateColor(int red, int green, int blue)
+	{
+    	   DeviceRgb createdColor = new DeviceRgb(red, green, blue);
+    	   return createdColor;
+	}
+
+	- ElementPropertyContainer<T>
+
+		- T ElementPropertyContainer<T>.SetFontSize(28)
+
+	   	- T ElementPropertyContainer<T>.SetFontColor(CreateColor(246,0,0))
+
+		- T ElementPropertyContainer<T>.SetBorder(Border.NO_BORDER)
+
+		- T SetHorizontalAlignment(HorizontalAlignment.RIGHT)
+
+	- AbstractElement<T> : ElementPropertyContainer<T>
+
+	- BlockElement<T>: AbstractElement<T>
+
+
+-- Paragraph : BlockElement<Paragraph>
+
+   - Paragraph headerTbl_title = new Paragraph("NXS Express")
+   - var p = new Paragraph().Add("Email:").Add("\n").Add("ahmedmohamed@gmail.com");
+
+
+- Align the content inside the cell
+	cell.SetTextAlignment(TextAlignment.RIGHT);
+
+
+- create bold font
+	PdfFont boldFont = PdfFontFactory.CreateFont(StandardFonts.HELVETICA_BOLD);
+
+
+--- Image
+	string logoPath = System.IO.Path.Combine(AppContext.BaseDirectory, "Assets","Images", "logo.PNG"); // build action: content, copy to output directory: copy if new
+ 	Image logo = new Image(ImageDataFactory.Create(logoPath));
+ 	logo.ScaleToFit(100f, 100f);
+
+--- Bar Code Image 
+ 	Barcode128 barcode = new Barcode128(ItextHelper.PdfDocument);
+ 	barcode.SetCodeType(Barcode128.CODE128);
+ 	barcode.SetCode(shipment.TrackingNumber);
+ 	Image headerTbl_barcodeImg = new Image(barcode.CreateFormXObject(ItextHelper.PdfDocument)).SetHorizontalAlignment(HorizontalAlignment.RIGHT);
+
+--- Creating Table
+
+ var comments_totalTable = new iText.Layout.Element.Table(UnitValue.CreatePercentArray(new float[] { 50f, 15f, 35f })) // left-empty-right
+     .SetWidth(UnitValue.CreatePercentValue(100));  // Table width is 100% of parent container
+
+// the empty --> comments_totalTable.AddCell(new Cell().SetMinHeight(10).SetBorder(Border.NO_BORDER));
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+<< DownLoad Directory as ZIP >>
+
+
+[HttpGet("DownLoadMediaItems/{id}")]
+public async Task<IActionResult> DownLoadMediaItems(int id)
+{
+    var deployment = await service.GetByIdWithIncludes(id, "Location.Event");
+    if (deployment != null)
+    {
+        string root = webHostEnvironment.WebRootPath;
+        var sourcePath = Path.Combine(root,"MediaFiles",
+            $"{deployment.Location.Event.Name}_{deployment.Location.Event.Id}",
+            $"{deployment.Location.Name}_{deployment.Location.Id}");
+
+        if (!Directory.Exists(sourcePath))
+            return NotFound("Media folder not found");
+
+        // Create a temporary zip file path
+        string tempZipPath = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}.zip");
+        try
+        {
+            ZipFile.CreateFromDirectory(sourcePath, tempZipPath);
+            byte[] zipBytes = System.IO.File.ReadAllBytes(tempZipPath);
+            var DownloadedFileName = $"{deployment.Location.Event.Name}_{deployment.Location.Event.Id} "+
+            $"{deployment.Location.Name}_{deployment.Location.Id}"+".zip";
+            return File(zipBytes, "application/zip", DownloadedFileName);
+        }
+        finally
+        {
+            if (System.IO.File.Exists(tempZipPath))
+                System.IO.File.Delete(tempZipPath);
+        }
+
+    }
+
+    return BadRequest("Operation Failed");
+}
+
+---------------------------------------------------------------------------------------------------------------
+
+<< Exporting the Data as ClosedXML >> 
+
+- installing ClosedXML Package
+	- Install-Package ClosedXML
+
+- code to help you
+	
+
+public async Task<IActionResult> Export(ExportDTO exportDTO)
+{
+    var res = await userRepo.ListAllAsync(u => u.CreatedAt >= exportDTO.From && u.CreatedAt <= exportDTO.To, null, "Branch", "Store");
+    var usersGetDTO = mapper.Map<List<UserGetDTO>>(res);
+    var _root = webHostEnvironment.WebRootPath;
+    var excelFilePath = Path.Combine(_root, "users.xlsx");
+    if (System.IO.File.Exists(excelFilePath))
+    {
+        System.IO.File.Delete(excelFilePath);
+    }
+
+    using var workbook = new XLWorkbook();
+    var worksheet = workbook.Worksheets.Add("Users");
+
+    string [] headerRow = { "Id", "Name", "Phone", "Offer", "Receipt", "BranchName", "StoreName", "CreatedAt" };
+    for (int col = 0; col < headerRow.Length; col++)
+    {
+        var cell = worksheet.Cell(1, col + 1);
+        cell.Value = headerRow[col];
+        cell.Style.Font.Bold = true;
+        cell.Style.Font.FontColor = XLColor.White;
+        cell.Style.Font.FontSize = 18;
+        cell.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+        cell.Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
+
+        cell.Style.Fill.BackgroundColor = XLColor.DarkGreen;
+        cell.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+        if (headerRow[col].ToLower() == "id")
+            worksheet.Column(col + 1).Width = 10;
+        else if (headerRow[col].ToLower() == "offer")
+            worksheet.Column(col + 1).Width = 40;
+        else if (headerRow[col].ToLower() == "receipt")
+            worksheet.Column(col + 1).Width = 40;
+        else if (headerRow[col].ToLower() == "storename")
+            worksheet.Column(col + 1).Width = 40;
+        else
+            worksheet.Column(col + 1).Width = 22;
+    }
+
+    for (int row = 0; row < usersGetDTO.Count; row++)
+    {
+        var user = usersGetDTO[row];
+        object[] rowData = {
+            user.Id, user.Name, user.Phone,
+            user.Offer.GetEnumDescription(), user.ReceiptImg,
+            user.BranchName, user.StoreName,
+            user.CreatedAt.ToString("yyyy-MM-dd HH:mm")
+        };
+
+        for (int col = 0; col < headerRow.Length; col++)
+        {
+            var cell = worksheet.Cell(row + 2, col + 1);
+            if(col==4)
+            {
+                var receiptUrl  = Path.Combine(_root, "ReceiptImages", rowData[col].ToString());
+                cell.SetHyperlink(new XLHyperlink(receiptUrl));
+                cell.Style.Font.Underline = XLFontUnderlineValues.Single;
+            }
+            cell.Value = rowData[col].ToString();
+            cell.Style.Fill.BackgroundColor = (row % 2 == 0) ? XLColor.White : XLColor.LightGray;
+            cell.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+            cell.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+            cell.Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
+
+        }
+    }
+    
+    workbook.SaveAs(excelFilePath);
+    using var stream = new MemoryStream();
+    workbook.SaveAs(stream); // save 
+    stream.Position = 0;
+
+    return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "report.xlsx");
+}
+
+
+-----------------------------------------------------------------
+
+<< Json File >>
+
+using var stream = File.OpenRead("Assets/AppData/Questions.Json");  // return FileStream
+_questions = JsonSerializer.Deserialize<List<Question>>(stream);    // return List<Question>
+
+
+
+// serialize -> convert object to json
+// Deserialize -> convert json to object
+
+
+
+
+        public async Task<List<string>> AddAllCountriesFromJsonFile(string filePath)
+        {
+            using var stream = File.OpenRead(filePath);
+            using var doc = await JsonDocument.ParseAsync(stream);
+
+            var countryNames = new List<string>();
+
+            foreach (var element in doc.RootElement.EnumerateArray())
+            {
+                if (element.TryGetProperty("countryName", out var countryNameProp))
+                {
+                    var countryName = countryNameProp.GetString()?.ToLower();
+
+                    int count = await repository.GetCountWithFilterAsync(c => c.Name.ToLower() == countryName);
+
+                    if (count == 0)
+                    {
+                        countryNames.Add(countryNameProp.GetString());
+                    }
+                }
+            }
+
+            return countryNames;
+        }
+
+
+

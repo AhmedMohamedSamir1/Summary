@@ -1,0 +1,194 @@
+<< Linked List >>
+
+- array is fixed size stored sequentially , storing array elements sequentially helped us in indexing any item arr[2]== *(arr+2)
+- when remove an element from array we need to shifting the elements
+- so we need linkedList : not sequential , dynamic size
+- 
+
+
+------------------------------------------------------------------------------------------
+
+<< standard >>
+- at DS you need to keep in mind what is node consists of ? and what is container consists of
+ 
+
+---------------------------------------------------------------------------------------------
+- one way  linkedlist (singel linkedlist) -> consist of head, tail, each node consist of data, pointer to the next node
+- two ways linkedlist (double linkedlist) -> consist of head, tail, each node consist of data, pointer to the next node , pointer to the previous node
+
+--> Linkedlist implementation
+    - void add(int val)
+	//exp
+	1. if list is empty [head,tail is null]: head&tail=newNode
+	2. if list is not empty : tail->next=newNode , newNode->prev=tail , tail=newNode
+
+   - Node* getNodeByData(int _data)
+	//exp
+	1. if head is null(emptyList): return null
+	2. else: code to find the node that has _data and return it
+
+  - void remove(int _data)
+	1. get the node that has _data -> getNodeByData(int _data)
+	2. if node is null which means there is node has _data return
+	3. if you have one element: head=tail=null
+	4. if you have more than elements and you want to remove head: head=head->next , head->prev=null
+	5. if you have more than elements and you want to remove tail: tail=tail->previous , tail->next = NULL
+	6. if you have more than elements, you remove from middle: node->previous->next = node->next , node->next->previous = node->previous;
+
+class Node{
+public:
+    int data;
+    Node*previous;
+    Node*next;
+
+    Node(int _data){
+        this->data = _data;
+        previous = NULL;
+        next = NULL;
+    }
+};
+
+class LinkedList{
+private:
+    Node* head;
+    Node *tail;
+    int count;
+
+public:
+
+    LinkedList(){
+        head = tail = NULL;
+        count = 0;
+    }
+
+    void add(int val){
+        Node *node = new Node(val);
+        if(head==NULL){
+                head = tail = node;
+
+        }else{
+                tail->next = node;
+                node->previous = tail;
+                tail = node;
+        }
+        count++;
+    }
+
+    Node* getNodeByData(int _data){
+        if(head==NULL)
+            return NULL;
+        else{
+            Node*temp = head;
+            while(temp!=NULL){
+                if(temp->data == _data)
+                    return temp;
+                temp = temp->next;
+            }
+            return NULL;
+        }
+    }
+
+    void removeData(int _data){
+        Node* node = getNodeByData(_data);
+        if(node==NULL)
+            return;
+        else if(node == head){
+                if(head==tail){
+                     head = tail = NULL;
+                }else{
+                    head = head->next;
+                    head->previous = NULL;
+                }
+        }else if(node==tail){
+            tail = tail->previous;
+            tail->next = NULL;
+        }
+        else{
+            node->previous->next = node->next;
+            node->next->previous = node->previous;
+        }
+        count--;
+        delete node;
+    }
+
+    void display(){
+        Node*temp = head;
+        while(temp!=NULL){
+            cout<< temp->data<<endl;
+            temp = temp->next;
+        }
+    }
+
+    int getCount(){return count;}
+
+    void InsertAfter(int data, int afterData){
+        Node*node = getNodeByData(afterData);
+        if(node==NULL)
+            return;
+        else{
+            Node* newNode = new Node(data);
+            if(node==tail){
+                    node->next = newNode;
+                    newNode->previous = node;
+                    tail = newNode;
+                }
+            else{
+                    newNode->next = node->next;
+                    newNode->previous = node;
+                    node->next->previous = newNode;
+                     node->next = newNode;
+                }
+                count++;
+        }
+    }
+
+    int getCount2(){
+        Node*node = head;
+        int c = 0;
+        while(node!=NULL){
+            c++;
+            node = node->next;
+        }
+        return c;
+    }
+
+    int getNodeDataByIndex(int index){
+        if(head==NULL)
+            return -1;
+        if(index>=count || index<0)
+            return -1;
+        else{
+            Node*node = head;
+            for(int i =0 ; i<index;i++){
+                node = node->next;
+            }
+        return node->data;
+        }
+    }
+};
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<< binary search tree >>
+
+add:
+ 1. if BST is empty -> root  newNode
+ 2. else, code to add 
+
+remove
+ 1. if the deleted node will be the root
+	if root without left and right
+	else if root with left only
+	else if root with right only
+	else root with right and left  -> the newroot will be the largest num from left or the smallest num from right [the best]
+				       -> the new root can be the the left node of root, and the right will be at the right of smallest node from the left
+					 [leads to unbalanced tree, (tree become like linked list)] or vice versa 
+2. if the deleted node will be the root
+	if node without left and right
+	else if node with left only
+	else if node with right only
+	else node with right and left
+
+In-order: left, root, right.
+Pre-order: root, left, right.
+Post-order: left, right, root.
+

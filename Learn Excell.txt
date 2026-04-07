@@ -1,0 +1,43 @@
+=Suppliers!$A$2:$A$1000
+
+// Suppliers! --> look in the sheet named Suppliers
+// 
+
+--------------
+
+<< Match >>
+
+  =MATCH(lookup_value, lookup_array, [match_type])
+	- It tells you where in a list a certain value appears (its row or position number).
+
+  --- Example
+	A (Name)	B (ID)
+	  Ahmed		  1
+	  Amr		  2
+	  Omer		  3
+
+    =MATCH("Amr", A2:A4, 0) // Result = 2 , Because Amr is the 2nd item in the range A2:A4
+----------------------------------------------------------------------------------------------
+
+<< Index >>
+
+- It tells Excel to go to a certain position in a range and return what’s there.
+
+=INDEX(array, row_num, [column_num])
+
+A (Name)	B (ID)
+  Ahmed		1
+  Amr		2
+  Omer		3
+
+
+=INDEX(B2:B4, 2) .. Result = 2 because the 2nd value in range B2:B4 is 2.
+------------------------------------------------------------------------------------------------------
+
+-- to create named rang
+	- Formula + Name Manager + New + Press the name , refer to (use ctrl + t to specify the range)
+
+
+--
+
+=IF(B2<>"", INDEX(SuppliersIDs, MATCH(B2, SuppliersNames, 0)), "")

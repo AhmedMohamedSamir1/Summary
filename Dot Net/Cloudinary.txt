@@ -1,0 +1,17 @@
+
+-- Installation
+	Install-Package CloudinaryDotNet
+
+
+
+
+ImageUploadResult uploadResult = await _cloudinary.UploadAsync(uploadParams);
+
+
+-- to ensure the operation success , you have 3 methods
+	- uploadResult.StatusCode!= HttpStatusCode.OK
+	- uploadResult.Error!=null
+	- string.IsNullOrEmpty(uploadResult.PublicId)
+
+
+	

@@ -1,0 +1,1397 @@
+<< bootstrap gridsystem >>
+
+the main objective of bootstrap is to developing responsive web
+ 
+<link rel="stylesheet" href="css/bootstrap.min.css">
+<script src="js/bootstrap.min.js"></script>
+
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+
+--------------------------------------------------------------------------------------------------------------------------------------
+
+
+<< screens >>
+
+- they called Breakpoints
+- first of all : the parent element should be with class="row" --> display:flex; flex-wrap:wrap;  row>* {width:100%, max-width:100%}
+
+xs : < 576px
+sm : ≥ 576px
+md : ≥ 768px
+lg : ≥ 992px
+xl : ≥1200px
+xxl: ≥1400px
+
+
+------------------------------------------------------------------------------------------------------------------------
+
+<< container,  container-fluid >>
+
+- .container class which sets a max-width at each responsive breakpoint , the container will be centered of screen also
+
+			xs	sm	md	lg	xl	xxl
+.container		100%	540px	720px	960px	1140px	1320px
+.container-sm		100%	540px	720px	960px	1140px	1320px
+.container-md		100%	100%	720px	960px	1140px	1320px
+.container-lg		100%	100%	100%	960px	1140px	1320px
+.container-xl		100%	100%	100%	100%	1140px	1320px
+.container-xxl		100%	100%	100%	100%	100%	1320px
+.container-fluid	100%	100%	100%	100%	100%	100%
+
+
+--------------------------------------------------------------------------------------------------------------------
+
+<< bootstrap grid system >>
+
+- by default each row takes 12 columns
+
+- first of all : the parent element should be with class="row" --> display:flex; flex-wrap:wrap; // row>* {width:100%, max-width:100%}
+
+- row children takes by default flex-shrink: 0; width: 100%; max-width: 100%;
+
+- col -> elements with class col parent space divided equally between them, flex-grow: 1; flex-shrink: 0; flex-basis: 0% 
+
+- col-6 -> child take 50% of parent width		
+
+- You can control the number of columns per screen size:
+	- row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-6
+		// example 1
+	        <div class="row row-cols-6">      // the div.row will have 6 column instead of 12
+                    <div class="col-2">1</div>
+                    <div class="col">2</div>
+                    <div class="col">3</div>
+                    <div class="col">4</div>
+                    <div class="col">5</div>
+                    <div class="col">6</div>
+                </div>
+
+	 	
+
+                <div class="row row-cols-6">
+                    <div class="col-6">1</div>  <!-- it takes 50% of parent which is 3 column -->
+                    <div class="col">2</div>
+                    <div class="col">3</div>
+                    <div class="col">4</div>                    
+                </div>
+
+
+- the childs with class="col-md" --> the parent area will divided equally between childs on medium and larger screens(if not exist)
+- the childs with class="col-sm" --> the parent area will divided equally between childs on small and larger screens
+- xs --> this screen doesn't included in a class like the other screens, to determine it we can use this class --> col
+
+
+
+- col-md-3 : on md screen and larger(if not exist) the child will take 3 columns from the row that contains 12 columns
+- col-sm-3 : on sm screen and larger the child will take 3 columns from the row that contains 12 columns
+- col-auto --> auto : child takes width that accomodate its conetnt only
+	
+//example
+
+        <main class="container">
+            <header class="row">
+                <div class="col-6 col-md-3">Ahmed</div>
+                <div class="col-6 col-md-3">Ahmed</div>
+                <div class="col-md-3 col-6">Ahmed</div>
+                <div class="col-md-3 col-6">Ahmed</div>
+            </header>
+        </main>
+
+--------------------------------------------------------------------------------------------------------------------
+<< Text/Typography >>
+
+- <p class="h1">h1 Bootstrap heading</p> // p will become like h1 
+- <p class="h2">h2 Bootstrap heading</p> // p will become like h2 
+
+
+
+--- Display Headings
+	- make the text more (larger font-size and lighter font-weight) than normal headings ,
+          and there are six classes to choose from: .display-1 to .display-6:
+
+--- small 
+	- <h1>h1 heading <small>secondary text</small></h1>
+	- the small text will be like the h1 text in font size
+
+--------------------------------------------------------------------------------------------------------------------
+
+<< Text Colors >>
+
+- .text-muted
+- .text-primary
+- .text-success
+- .text-info
+- .text-warning
+- .text-danger
+- .text-secondary
+- .text-white
+- .text-dark
+- .text-body (default body color/often black)
+- .text-light
+
+
+- You can also add 50% opacity for black or white text with the 
+	.text-black-50 , .text-white-50 classes:
+
+
+- .bg-primary
+- .bg-success
+- .bg-info
+- .bg-warning
+- .bg-danger
+- .bg-secondary
+- .bg-dark
+- .bg-light
+
+
+- .text-bg-color -> Bootstrap will automatically handle the appropriate text color for each background
+	- text-bg-primary
+	- text-bg-success
+	- text-bg-info
+	- text-bg-warning
+	- text-bg-danger
+	- text-bg-secondary
+	- text-bg-dark
+	- text-bg-light
+
+
+--------------------------------------------------------------------------------------------------------------------
+
+<< table >>
+
+table element classes
+   - class="table"               // mendatory class of you intend using bootstrap table classes it,  adds basic styling to a table:
+   - class="table table-striped" 	     // adds zebra-stripes to a table
+   - class="table table-hover"
+   - class="table table-dark"  		    // adds a black background to the table
+   - class="table table-dark table-striped"  // Combine .table-dark and .table-striped to create a dark, striped table
+   - class="table table-dark table-hover"    // Hoverable (grey background color) Dark Table
+   - class=".table-borderless"		     // class removes borders from the table:
+
+- you could give make the tr of table with background using table-bootstrapColor
+	- <tr class="table-dark">
+	- <tr class="table-primary">
+	- <tr class="table-success">
+	- <tr class="table-danger">
+	- ......
+
+- Small table // cutting cell padding in half:
+	<table class="table table-bordered table-sm">
+
+- Responsive Tables
+	class adds a scrollbar to the table when needed (when it is too big horizontally):
+	<div class="table-responsive">
+  	  <table class="table">
+    	  ...
+  	  </table>
+	</div>
+
+--------------------------------------------------------------------------------------------------------------------
+
+<< colors in bootstrap >>
+
+- primary       -->  A bright blue color
+- secondary	-->  
+- success 	--> A green color, typically used for success messages
+- danger        --> A red color, used for errors or important warnings.
+- warning	--> A yellow/orange color for cautions. 
+- info 		--> A cyan/teal color for informational messages.
+- light 	--> A light gray color
+- dark 		-->  A dark gray or near black color.
+- muted 	-->  A lighter gray color used for secondary text.
+- white		--> Pure white color, often for backgrounds or text contrast.
+
+----------------------------------------------------------------------------------------------------------------------
+
+<< images >>
+
+- class="rounded" 	 // class adds rounded corners to an image:
+- class="rounded-circle" // shapes the image to a circle:
+- class="img-thumbnail"  // hapes the image to a thumbnail (bordered)
+
+
+--- Aligning Images
+	- class="float-start"
+	- class="float-end"
+
+--- Centered Image
+	- class="mx-auto d-block"
+
+-- Responsive Image
+	- class="img-fluid" //  The image will then scale nicely to the parent element, applies max-width: 100%; and height: auto;
+---------------------------------------------------------------------------------------------------------------------------------------
+
+
+<< button >>
+
+<button type="button" class="btn">Basic</button>
+<button type="button" class="btn btn-primary">Primary</button>
+<button type="button" class="btn btn-secondary">Secondary</button>
+<button type="button" class="btn btn-success">Success</button>
+<button type="button" class="btn btn-info">Info</button>
+<button type="button" class="btn btn-warning">Warning</button>
+<button type="button" class="btn btn-danger">Danger</button>
+<button type="button" class="btn btn-dark">Dark</button>
+<button type="button" class="btn btn-light">Light</button>
+<button type="button" class="btn btn-link">Link</button>
+	
+--- The button classes can be used on <a>, <button>, or <input> elements:
+	<button type="button" class="btn btn-success">Button</button>
+	<input type="button" class="btn btn-success" value="Input Button">
+	<input type="submit" class="btn btn-success" value="Submit Button">
+	<input type="reset" class="btn btn-success" value="Reset Button">	
+
+--- Outline buttons
+	<button type="button" class="btn btn-outline-primary">Primary</button>
+	<button type="button" class="btn btn-outline-secondary">Secondary</button>
+
+- The .btn classes are designed to be used with the <button> element. However, you can also use these classes on <a> or <input>
+	<a class="btn btn-primary" href="#" role="button">Link</a>
+	<button class="btn btn-primary" type="submit">Button</button>
+	<input class="btn btn-primary" type="button" value="Input">
+
+
+- Button Sizes
+	- Use the .btn-lg class for large buttons or .btn-sm class for small buttons:
+            <button type="button" class="btn btn-primary btn-lg">Large</button>
+	    <button type="button" class="btn btn-primary">Default</button>
+	    <button type="button" class="btn btn-primary btn-sm">Small</button>
+
+
+- to maka a full width button
+            <div class="d-grid">
+  		<button type="button" class="btn btn-primary btn-block">Full-Width Button</button>
+	    </div>  
+
+- If you have many block-level buttons, you can control the space between them with the .gap-* class:
+	<div class="d-grid gap-3">
+  	   <button type="button" class="btn btn-primary btn-block">Full-Width Button</button>
+  	   <button type="button" class="btn btn-primary btn-block">Full-Width Button</button>
+  	   <button type="button" class="btn btn-primary btn-block">Full-Width Button</button>
+	</div>
+
+
+	
+--- disabled, active classes
+	- disabled attribute Make <button> element inactive
+	- The class .active makes a button appear pressed 
+
+
+
+--- button with dropdown
+
+	<button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown">Sony</button>
+
+	<ul class="dropdown-menu">
+  	   <li><a class="dropdown-item" href="#">Tablet</a></li>
+  	   <li><a class="dropdown-item" href="#">Smartphone</a></li>
+	</ul>
+	// Bootstrap doesn’t require an id or linking attributes.
+
+
+--- Spinner Buttons
+	<button class="btn btn-primary">
+  		<span class="spinner-border spinner-border-sm"></span>
+	</button>
+
+	<button class="btn btn-primary">
+  		<span class="spinner-border spinner-border-sm"></span>Loading..
+	</button>
+
+	<button class="btn btn-primary" disabled>
+  		<span class="spinner-border spinner-border-sm"></span>Loading..
+	</button>
+
+	<button class="btn btn-primary" disabled>
+  		<span class="spinner-grow spinner-grow-sm"></span>Loading..
+	</button>
+
+
+- <a> don't support the disabled attribute, so you must add the .disabled class to make it visually appear disabled.
+
+-------------------------------------------------------------------------------------------------------------------------------------
+
+<< Progress Bar >>
+
+- parent is progress, child is progress-bar
+
+- To create a default progress bar, add a .progress class to a container element 
+  and add the .progress-bar class to its child element.
+  Use the CSS width property to set the width of the progress bar:
+
+--- Progress Bar Height
+  <div class="progress" style="height:20px">
+  	<div class="progress-bar" style="width:40%;"></div>
+  </div>
+
+--- Progress Bar Labels
+	- Add text inside the progress bar to show the visible percentage:
+	  <div class="progress">
+  	     <div class="progress-bar" style="width:70%">70%</div>
+	  </div>
+
+--- Colored Progress Bars
+	<div class="progress-bar bg-success" style="width:20%"></div>
+
+--- Striped Progress Bars
+	class="progress-bar progress-bar-striped"
+
+--- Animated Progress Bar
+	class="progress-bar progress-bar-striped progress-bar-animated"
+
+
+------------------------------------------------------------------------------------------------------------------------
+
+<< Spinners >>
+
+<div class="spinner-border"></div>
+
+--- Colored Spinners
+	<div class="spinner-border text-muted"></div>
+	<div class="spinner-border text-primary"></div>
+
+--- Growing Spinners
+	<div class="spinner-grow text-muted"></div>
+
+--- Spinner Size
+	.spinner-border-sm or .spinner-grow-sm
+	<div class="spinner-border spinner-border-sm"></div>
+	<div class="spinner-grow spinner-grow-sm"></div>
+
+	
+------------------------------------------------------------------------------------------------------------------------
+
+<< Breadcrumbs >>
+
+- the parent is .breadcrumb 
+- and child  is .breadcrumb-item
+
+
+<ul class="breadcrumb">
+  <li class="breadcrumb-item"><a href="#">Photos</a></li>
+  <li class="breadcrumb-item"><a href="#">Summer 2017</a></li>
+  <li class="breadcrumb-item"><a href="#">Italy</a></li>
+  <li class="breadcrumb-item active">Rome</li>
+</ul>
+
+
+------------------------------------------------------------------------------------------------------------------------
+
+<< List Group >>
+
+- parent is list-group
+- child is list-group-item
+
+
+-- List group with active items
+   <ul class="list-group">
+     <li class="list-group-item active">Active item</li>
+     <li class="list-group-item">Second item</li>
+     <li class="list-group-item">Third item</li>
+   </ul>
+
+
+-- you can add disabled items using disabled
+
+-- List Group With Linked Items
+   <div class="list-group">
+     <a href="#" class="list-group-item list-group-item-action">First item</a>
+     <a href="#" class="list-group-item list-group-item-action">Second item</a>
+     <a href="#" class="list-group-item list-group-item-action">Third item</a>
+   </div>
+
+-- Numbered List Groups
+  <ol class="list-group list-group-numbered">
+    <li class="list-group-item">First item</li>
+    <li class="list-group-item">Second item</li>
+    <li class="list-group-item">Third item</li>
+  </ol>
+
+-- Horizontal List Groups
+	<ul class="list-group list-group-horizontal">
+  		<li class="list-group-item">First item</li>
+  		<li class="list-group-item">Second item</li>
+  		<li class="list-group-item">Third item</li>
+  		<li class="list-group-item">Fourth item</li>
+	</ul>
+
+
+-- Contextual Classes
+	- <li class="list-group-item list-group-item-success">Success item</li>
+	- <li class="list-group-item list-group-item-info">Info item</li>
+
+
+------------------------------------------------------------------------------------------------------------------------
+
+<< Cards >>
+
+- is a bordered box with some padding around its content.
+
+
+- parent is class="card"
+
+- card strcuture
+	<div class="card">
+	   <img class="card-img-top"> // could be card-img-bottom
+  	   <div class="card-header">Header</div>
+  	   <div class="card-body">
+		card-title
+		card-text
+	   </div>
+  	   <div class="card-footer">Footer</div>
+	</div> 
+
+--- card-body contains
+	- card-title
+	- card-text
+
+
+--- Turn an image into a card background and use .card-img-overlay
+
+    <div class="card" style="width:500px">
+      <img class="card-img-top" src="img_avatar1.png" alt="Card image">
+      <div class="card-img-overlay">
+        <h4 class="card-title">John Doe</h4>
+        <p class="card-text">Some example text.</p>
+        <a href="#" class="btn btn-primary">See Profile</a>
+      </div>
+    </div>
+    -- note: card-img-overlay: position: absolute; top: 0; right: 0; bottom: 0; left: 0;
+
+
+------------------------------------------------------------------------------------------------------------------------
+
+
+<< Collapse >>
+
+- .collapse : class indicates to this element is a collapsible element
+
+- data-bs-toggle="collapse" : It tells Bootstrap that this element will be used to toggle (show/hide) a collapsible element (element with class collapse).
+
+- href="#collapseExample" or data-bs-target="#collapseExample" : the collapsable element that will be toggled has the id collapseExample
+
+- By default, the collapsible content is hidden. However, you can add the .show class to show the content by default
+
+- when you click on the element that has data-bs-toggle="collapse" it will add class show to its target
+
+- data-bs-parent="#sidebar" : make all collapsible elements under the specified parent will be closed when the collapsible item is shown.
+
+--------------------------------------------------------------------------------------------------------------------
+
+<< Nav Menus >>
+
+-- simple structure
+   <ul class="nav">
+     <li class="nav-item">
+       <a class="nav-link" href="#">Link</a>
+     </li>
+     <li class="nav-item">
+       <a class="nav-link" href="#">Link</a>
+     </li>
+   </ul>
+
+-- Vertical Nav
+   <ul class="nav flex-column">
+
+-- class="nav-link active" , "nav-link disabled"
+
+-- Tabs
+    <ul class="nav nav-tabs">
+
+-- Toggleable / Dynamic Tabs
+	<ul class="nav nav-tabs">
+  	   <li class="nav-item">
+    	       <a class="nav-link active" data-bs-toggle="tab" href="#home">Home</a>
+  	   </li>
+  	   <li class="nav-item">
+    		<a class="nav-link" data-bs-toggle="tab" href="#menu1">Menu 1</a>
+  	   </li>
+  	   <li class="nav-item">
+    		<a class="nav-link" data-bs-toggle="tab" href="#menu2">Menu 2</a>
+  	   </li>
+	</ul>
+
+	<!-- Tab panes -->
+	<div class="tab-content">
+  	   <div class="tab-pane container active" id="home">...</div>
+  	   <div class="tab-pane container fade" id="menu1">...</div>
+  	   <div class="tab-pane container fade" id="menu2">...</div>
+	</div>
+
+-- Toggleable / Dynamic Pills
+	<ul class="nav nav-pills">
+  	   <li class="nav-item">
+    		<a class="nav-link active" data-bs-toggle="pill" href="#home">Home</a>
+  	   </li>
+  	   <li class="nav-item">
+    		<a class="nav-link" data-bs-toggle="pill" href="#menu1">Menu 1</a>
+  	   </li>
+  	   <li class="nav-item">
+    		<a class="nav-link" data-bs-toggle="pill" href="#menu2">Menu 2</a>
+  	   </li>
+	</ul>
+
+	<!-- Tab panes -->
+	<div class="tab-content">
+  	   <div class="tab-pane container active" id="home">...</div>
+  	   <div class="tab-pane container fade" id="menu1">...</div>
+  	   <div class="tab-pane container fade" id="menu2">...</div>
+	</div>
+
+
+--------------------------------------------------------------------------------------------------------------------
+
+<< Navbar >>
+
+-- background-color
+	- (.bg-primary, .bg-success, .bg-info, .bg-warning, .bg-danger, .bg-secondary, .bg-dark , .bg-light)
+
+-- text-color
+	- .navbar-dark 
+	- .navbar-light
+
+
+-- navbar-expand
+	items of navbard Always expanded, Never collapses
+
+-- navbar-expand-sm
+	- makes the items in the form of expanded from sm screens
+
+-- navbar-collapse
+	- This class is used to collapse/expand a part of the navbar.
+	- Makes the links hide when the navbar is collapsed
+	- Makes them appear when the navbar is expanded
+
+----- Example
+
+
+<nav class="navbar navbar-expand-sm bg-danger">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="javascript:void(0)">Logo</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mynavbar">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="mynavbar">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="javascript:void(0)">Link</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="javascript:void(0)">Link</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="javascript:void(0)">Link</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+
+
+--------------------------------------------------------------------------------------------------------------------
+
+<< Offcanvas >>
+
+- it is often used as a sidebar navigation menu.
+
+- example 
+	<button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#demo">Open Offcanvas Sidebar</button>
+
+	<div class="offcanvas offcanvas-start" id="demo">
+  	   <div class="offcanvas-header">
+    		<h1 class="offcanvas-title">Heading</h1>
+    		<button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+  	   </div>
+  	   <div class="offcanvas-body">
+    		<p>Some text lorem ipsum.</p>
+    	   	<button class="btn btn-secondary" type="button">A Button</button>
+  	   </div>
+	</div>
+
+--- Offcanvas Position
+	- offcanvas-start
+	- offcanvas-end
+	- offcanvas-top
+	- offcanvas-bottom
+
+
+
+--------------------------------------------------------------------------------------------------------------------
+
+<< text-color, text-align, vertical align, white-space >>
+
+
+- text-color
+	- text-primary
+	- text-black-50 // approxmaltely looks like grey
+	- text-white-50
+
+- verical align
+	- please note that vertical-align only affects inline, inline-block, inline-table, and table cell elements.
+	   class="align-baseline"
+	   class="align-top"
+	   class="align-top"
+	   class="align-middle"
+	   class="align-bottom"
+	   class="align-text-top"
+	   class="align-text-bottom"
+
+- text align
+	class="text-start"
+	class="text-center"
+	class="text-end"
+	class="text-md-end"
+
+
+- white-space
+	- used with overflow property
+	- class="text-nowrap"  // equal to white-space: nowrap
+--------------------------------------------------------------------------------------------------------------------
+
+<<font-weight >>
+
+- fw-bold
+
+--------------------------------------------------------------------------------------------------------------------
+<< Text selection >>
+
+class="user-select-all"    // when user click on the text the text selected
+class="user-select-auto"   // default click double click on the text to select the text
+class="user-select-none"   // the text will not selected 
+----------------------------------------------------------------------------------------------------------------------
+<< over flow >>
+
+<div class="overflow-auto">...</div>
+<div class="overflow-hidden">...</div>
+<div class="overflow-visible">...</div>
+<div class="overflow-scroll">...</div>
+
+--------------------------------------------------------------------------------------------------------------------
+<< list >>
+
+class="list-unstyled"
+
+-------------------------------------------------------------------------------------------------------------
+<< position  >>
+
+<div class="position-static">...</div>
+<div class="position-relative">...</div>
+<div class="position-absolute">...</div>
+<div class="position-fixed">...</div>
+<div class="position-sticky">...</div>
+
+top - for the vertical top position
+start - for the horizontal left position (in LTR)
+bottom - for the vertical bottom position
+end - for the horizontal right position (in LTR)
+
+top-50
+top-0
+
+example
+<div class="position-absolute top-50 start-50"></div>
+
+translate-middle-x // transform:translateX(-50%)
+translate-middle-y // transform:translateY(-50%)	
+
+class = "translate-middle" --> transform:translate(-50%, -50%)
+
+
+.sticky-top{
+   position: sticky;
+   top: 0; 
+}
+
+
+----------------------------------------------------------------------------------------------------------------------
+<< shadow >>
+
+class="hadow-none"
+class="shadow-sm"
+class="shadow"
+class="shadow-lg"
+--------------------------------------------------------------------------------------------------------------------
+<< size of element >>
+
+<div class="w-100"></div> // element eith width 100% and height 0
+
+w-25
+w-50
+w-75
+w-100
+w-auto 
+
+h-25
+h-50
+h-75
+h-100
+
+class="mw-100" 	   // max-width:100%
+class="mh-100" 	   // max-height:100%
+class="min-vw-100" // Min-width 100vw
+class="min-vh-100" // Min-height 100vh
+class="vw-100" 	   // Width 100vw
+class="vh-100"     // Height 100vh
+
+---------------------------------------------------------------------------------------------------------------------------------------
+<< border , border radius >>
+
+<span class="border"></span>
+<span class="border-top"></span>
+<span class="border-end"></span>
+<span class="border-bottom"></span>
+<span class="border-start"></span>
+
+<span class="border border-primary"></span>
+<span class="border border-secondary"></span>
+<span class="border border-success"></span>
+<span class="border border-danger"></span>
+<span class="border border-warning"></span>
+<span class="border border-info"></span>
+<span class="border border-light"></span>
+<span class="border border-dark"></span>
+<span class="border border-white"></span>
+
+// border width
+<span class="border border-1"></span>
+<span class="border border-2"></span>
+<span class="border border-3"></span>
+<span class="border border-4"></span>
+<span class="border border-5"></span>
+
+// Border-radius
+<span class="rounded"></span>
+<span class="rounded-top"></span>
+<span class="rounded-bottom"></span>
+<span class="rounded-start"></span>
+<span class="rounded-left"></span>
+<span class="rounded-sm"></span>
+<span class="rounded-lg"></span>
+<span class="rounded-circle"></span>  // border-raduis:100%
+<span class="rounded-pill"></span>
+
+// Use the scaling classes for larger or smaller rounded corners , Sizes range from 0 to 3, 
+<span class="rounded-0"></span>
+<span class="rounded-1"></span>
+<span class="rounded-2"></span>
+<span class="rounded-3"></span>
+
+---------------------------------------------------------------------------------------------------------------------
+<< display >>
+
+d-{value} for xs
+d-{breakpoint}-{value} for sm, md, lg, xl, and xxl.
+
+- value is one of them 
+ none
+ inline
+ inline-block
+ block
+ grid
+ table
+ table-cell
+ table-row
+ flex
+ inline-flex
+
+examples
+
+d-inline
+d-block
+d-sm-block for sm or larger
+d-none
+d-none d-lg-block // hide on screens smaller than lg
+
+Display in print [Change the display value of elements when printing]
+d-print-value
+
+The print and display classes can be combined.
+d-none d-lg-block d-print-block
+------------------------------------------------------------------------------------------------------------------
+
+<< margin - padding >>
+
+{property}{sides}-{size} for xs , {property}{sides}-{breakpoint}-{size} for sm, md, lg, and xl.
+	ml-2                    , mr-sm-2
+
+
+// margin
+m 
+ms
+me
+mt
+mb
+mx
+my
+
+// padding 
+p
+ps
+pe
+pt
+pb
+px
+py
+
+margin padding size is one of
+0
+1
+2
+3
+4
+5
+
+class="p-2"
+class="ms-0"
+class="ms-1"
+class="ms-2"
+class="ms-3"
+class="ms-4"
+class="ms-5"
+class="mx-auto"
+
+class="ms-auto"
+--------------------------------------------------------------------------------------------------------------------
+
+<< visibility>>
+
+class="visible">
+class="invisible">
+----------------------------------------------------------------------------------------------------------------------
+
+
+
+<< flex >>
+
+d-flex
+d-inline-flex
+d-sm-inline-flex
+
+// flex-wrap: given to parent
+flex-wrap
+flex-nowrap
+flex-wrap-reverse
+flex-md-nowrap
+
+// flex-deirecrion: given to parent
+flex-row [default] 
+flex-row-reverse
+flex-column
+flex-column-reverse
+flex-sm-column-reverse
+
+// justify content: given to parent
+justify-content-start
+justify-content-end
+justify-content-center
+justify-content-between
+justify-content-around
+justify-content-evenly
+justify-content-sm-start
+
+// align-items : given to parent
+align-items-start
+align-items-end
+align-items-center
+align-items-baseline
+align-items-stretch
+
+
+
+// align-content : given to parent
+align-content-start
+align-content-end
+align-content-end
+align-content-between
+align-content-around
+align-content-stretch
+align-content-md-start
+
+
+// Align self : given to child
+align-self-start
+align-self-end
+align-self-center
+align-self-baseline
+align-self-stretch
+align-self-sm-end
+
+// flex-grow == flex-grow:1; flex-shrink:1; flex-basis:auto ,  given to child 
+flex-fill
+flex-md-fill
+
+//  flex-grow , flex-shrink => given to child 
+flex-grow-1    : take all available space
+flex-shrink-1  : is forced to wrap its contents to a new line, “shrinking” to allow more space for the flex item with class="w-100" or flex-grow-1
+flex-shrinks-0 : it will retain the width it needs, and not wrap its content
+flex-sm-grow-1 
+flex-sm-shrink-1
+
+
+Auto margins Flexbox can do some pretty awesome things when you mix flex alignments with auto margins
+
+<div class="d-flex bd-highlight mb-3">
+  <div class="p-2 me-auto bd-highlight">Flex item</div>  <!-- me-auto make the 2 next div pushed to the right-->
+  <div class="p-2 bd-highlight">Flex item</div>
+  <div class="p-2 bd-highlight">Flex item</div>
+</div>
+
+
+// order : given ot child
+
+order-0
+order-1
+order-2
+order-3
+order-4
+order-5
+order-sm-4
+order-first
+order-sm-first
+order-last
+order-md-last
+
+
+
+align content : : given to parent  which is row 
+	class="align-items-start"
+	class="align-items-center"
+	class="align-items-md-center"
+	class="align-items-end"
+
+self content : given to child
+	class="align-self-start"
+	class="align-self-center"
+	class="align-self-lg-end"
+
+
+Gap : parent : given to parent [row]
+gap-value , value 1,2,3,4,5
+
+	<div class="row gap-3">
+                <div class="col p-2 bg-light border">Grid item 1</div>
+                <div class="col p-2 bg-light border">Grid item 2</div>
+                <div class="col p-2 bg-light border">Grid item 3</div>
+                
+         </div>        
+--------------------------------------------------------------------------------------------------------------------
+
+<< grid >>
+
+class="d-grid" // dispaly grid
+class="gap-2"  // gap:
+
+--------------------------------------------------------------------------------------------------------------------
+
+<< alert >>
+
+
+--- alert types
+	class="alert alert-primary"
+	class="alert alert-secondary"
+	class="alert alert-success"
+	class="alert alert-danger"
+	class="alert alert-warning"
+	class="alert alert-info"
+	class="alert alert-light"
+	class="alert alert-dark"
+
+
+--- Alert Links
+	<div class="alert alert-success">
+  		<strong>Success!</strong> You should <a href="#" class="alert-link">read this message</a>.
+	</div>
+
+--- Closing Alerts
+	To close the alert message, add a .alert-dismissible class to the alert container. Then add class="btn-close" 
+	and data-bs-dismiss="alert" to a link or a button element (when you click on this the alert box will disappear).
+
+	- Example 1:
+	  <div class="alert alert-success alert-dismissible">
+  		<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  		<strong>Success!</strong> This alert box could indicate a successful or positive action.
+	  </div>
+
+	- Example 2 (Animated Alerts)
+	  <div class="alert alert-danger alert-dismissible fade show">
+		<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+	  </div>
+	   the alert disappears instantly when you click the close button.
+	   fade → enables transition effect
+	   show → makes the element visible and prepares it for animation
+
+--- Alert example
+	<div class="alert alert-primary">A simple primary alert—check it out!</div>
+
+
+--------------------------------------------------------------------------------------------------------------------
+
+
+<< Button Groups >>
+
+- Group a series of buttons together on a single line or stack them in a vertical column.
+
+<div class="btn-group">
+  <button type="button" class="btn btn-primary">Apple</button>
+  <button type="button" class="btn btn-primary">Samsung</button>
+  <button type="button" class="btn btn-primary">Sony</button>
+</div>
+
+--- sizes
+	btn-group-lg
+	btn-group
+	btn-group-sm
+
+--- to create a vertical button group
+	class="btn-group-vertical">
+
+
+-- Button groups are "inline" by default, which makes them appear side by side when you have group of links
+
+
+
+
+
+Mixed styles:
+            <div class="btn-group">
+                <button type="button" class="btn btn-danger">Left</button>
+                <button type="button" class="btn btn-warning">Middle</button>
+                <button type="button" class="btn btn-success">Right</button>
+
+             </div>
+
+Outlined styles:
+            <div class="btn-group">
+                <button type="button" class="btn btn-outline-primary active">Left</button>
+                <button type="button" class="btn btn-outline-primary">Middle</button>
+                <button type="button" class="btn btn-outline-primary">Right</button>
+            </div>
+
+
+radio-buttons grouping:
+            <div class="btn-group">
+                <input type="radio" class="btn-check" name="btnradio" id="btnradio1"  checked>
+                <label class="btn btn-outline-primary" for="btnradio1">Radio 1</label>
+              
+                <input type="radio" class="btn-check" name="btnradio" id="btnradio2">
+                <label class="btn btn-outline-primary" for="btnradio2">Radio 2</label>
+            
+                <input type="radio" class="btn-check" name="btnradio" id="btnradio3">
+                <label class="btn btn-outline-primary" for="btnradio3">Radio 3</label>
+            </div>
+
+- Button toolbar Combine sets of button groups into button toolbars for more complex components
+
+	    <div class="btn-toolbar">
+                <div class="btn-group me-2">
+                    <button type="button" class="btn btn-primary">1</button>
+                    <button type="button" class="btn btn-primary">2</button>
+                    <button type="button" class="btn btn-primary">3</button>
+                </div>
+
+                <div class="btn-group me-2">
+                    <button type="button" class="btn btn-secondary">5</button>
+                    <button type="button" class="btn btn-secondary">6</button>
+                </div>
+
+                <div class="btn-group">
+                    <button type="button" class="btn btn-info">8</button>
+                </div>
+            </div>
+
+- TO CONTROL THE SIZE
+class="btn-group btn-group-lg"
+class="btn-group btn-group"
+class="btn-group btn-group-sm"
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+<< Badges >>
+
+- Badges are used to add additional information to any content:
+- Use the .badge class together with a contextual class (like .bg-secondary) within <span>
+- Note that badges scale to match the size of the parent element (if any):
+
+Example
+	<h1>Example heading <span class="badge bg-secondary">New</span></h1>
+	<h2>Example heading <span class="badge bg-success">New</span></h2>
+	<h3>Example heading <span class="badge bg-danger">New</span></h3>
+
+- Contextual Badges
+	<span class="badge bg-primary">Primary</span>
+	<span class="badge bg-secondary">Secondary</span>
+	<span class="badge bg-success">Success</span>
+	<span class="badge bg-danger">Danger</span>
+	<span class="badge bg-warning">Warning</span>
+	<span class="badge bg-info">Info</span>
+	<span class="badge bg-light">Light</span>
+	<span class="badge bg-dark">Dark</span>
+
+
+- .rounded-pill utility class to make badges more rounded with a larger border-radius.
+	<span class="badge rounded-pill bg-primary">Primary</span>
+
+
+- Badge inside an abutton Element
+	<button type="button" class="btn btn-primary">
+		Messages <span class="badge bg-danger">4</span>
+	</button>
+
+	
+- Badges can be used as part of buttons to provide a counter.
+
+ <button type="button" class="btn btn-primary">
+  	Notifications <span class="badge bg-secondary">4</span>
+ </button>
+
+<button class="btn btn-danger btn-lg position-relative"> alert
+       <span class="position-absolute start-100 translate-middle badge bg-secondary rounded-circle p-2 border border-light">
+</button>
+
+<button class="btn btn-danger btn-lg position-relative">alert
+       <span class="position-absolute start-100 translate-middle badge bg-secondary rounded-pill p-2 border border-light">+99
+</button>
+--------------------------------------------------------------------------------------------------------------------
+
+<< Collapse >>
+
+- Toggle the visibility of content across your project with a few classes and our JavaScript plugins.
+- Buttons or anchors are used as triggers that are mapped to specific elements you toggle.
+
+            <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample">
+                    Button with data-bs-target
+             </button>
+	     <!-- data-bs-toggle="collapse" data-bs-target="#element_id" -->
+
+              <div class="collapse" id="collapseExample">
+                <div class="card card-body">
+                    Some placeholder content for the collapse component. This panel is hidden by default but revealed when the user activates the relevant trigger.
+                </div>
+              </div>
+
+class="show" make the collapse element start with appearance
+
+---------------------------------------------------------------------------------------------------------------------
+
+<< forms and inputs >>
+
+Disabled the input: disabled 
+read only 	  : readonly
+
+<< input classes >>
+	
+	
+	class="input-group"  		--> position: relative; display: flex; flex-wrap: wrap; align-items: stretch; width: 100%;	
+	class="input-group-text"        --> display: flex; align-items: center; font-size:1rem;
+	
+	
+
+
+
+// email input :
+            <div class="mb-3">
+                <label for="exampleFormControlInput1" class="form-label">Email address</label>
+                <input type="email" class="form-control" id="exampleFormControlInput1" placeholder="name@example.com">
+            </div>
+
+// <textarea  
+	    <div class="mb-3">
+                <label for="exampleFormControlTextarea1" class="form-label">Example textarea</label>
+                <textarea class="form-control" id="exampleFormControlTextarea1" rows="3" style="resize: none;"></textarea>
+            </div>
+
+// input with label at the same row :
+            <div class="mb-3 row p-2">
+                <label for="inputEmail" class="col-2 col-form-label-lg">Email</label>
+                <div class="col-sm-10">
+                    <input type="email" class="form-control form-control-lg" id="inputEmail">
+                </div>
+             </div>
+
+-- input file : 
+            <input class="form-control" type="file" id="formFile">
+
+
+--  input with data list option :
+            <label for="exampleDataList" class="form-label">Datalist example</label>
+            <input class="form-control" list="datalistOptions" id="exampleDataList" placeholder="Type to search...">
+            <datalist id="datalistOptions">
+                <option value="San Francisco">
+                <option value="New York">
+                <option value="Seattle">
+                <option value="Los Angeles">
+                <option value="Chicago">
+            </datalist>
+
+-- select input
+		
+	    <select class="form-select">
+                <option selected>click to select from menu</option>
+                <option value="1">One</option>
+                <option value="2">Two</option>
+                <option value="3">Three</option>
+            </select>
+
+-- select input with multiple selection
+	    <select class="form-select" multiple>
+                <option selected>Open this select menu</option>
+                <option value="1">One</option>
+                <option value="2">Two</option>
+                <option value="3">Three</option>
+            </select>
+
+<< check , radio classess >
+class="form-check"       // parent div 
+class="form-check-input" // input
+class="form-check-label" // label
+
+// check box with label 	
+	    <div class="form-check" style="font-size: 22px;"> <!-- class="form-check" display:block-->
+                <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                <label class="form-check-label" for="flexCheckDefault">
+                    Default checkbox
+                </label>
+            </div>
+
+// radio buttons [remember that group of radio button should be with same name]
+	     <div class="form-check">
+                <input class="form-check-input" type="radio" name="rbName" id="rbName1" checked>
+                <label class="form-check-label" for="rbName1">Male</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="rbName" id="rbName2">
+                <label class="form-check-label" for="rbName2">Female</label>
+            </div>
+
+//  Switch input :
+            <div class="form-check form-switch" style="font-size: 22px;">
+                <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault" checked>
+                <label class="form-check-label" for="flexSwitchCheckDefault">Default switch checkbox input</label>
+            </div>
+
+// Range :
+	        <label for="customRange3" class="form-label">Example range</label>
+                <input type="range" class="form-range" min="0" max="5" step="0.5" id="customRange3">
+
+
+// input group 1: [icon and input]
+            <div class="input-group mb-3">
+                <span class="input-group-text"><i class="bi bi-windows"></i></span>
+                <input type="text" class="form-control" placeholder="Username"> 
+            </div>
+
+
+// input group  [label with input group] : class="input-group input-group-sm" // size of input group
+					    
+              <label for="basic-url" class="form-label">Your vanity URL</label>
+              <div class="input-group mb-3">
+                <span class="input-group-text">https://example.com/users/</span>
+                <input type="text" class="form-control" id="basic-url" aria-describedby="basic-addon3">
+              </div>
+
+// floating input [my favourite]
+
+              <div class="form-floating mb-3">
+                <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com">
+                <label for="floatingInput">Email address</label>
+              </div>
+
+// floating input with input group : 
+
+            <div class="input-group">
+                <span class="input-group-text bi bi-windows"></span>
+                <div class="form-floating">
+                    <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com">
+                    <label for="floatingInput">Email address</label>
+                  </div>
+            </div>
+
+
+
+
+-- form group [label at above, input below]  // the most common used
+	<div class="form-group">
+        	<label class="form-label">Full Name</label>
+        	<input class="form-control" type="text" name="name" placeholder="Enter name">
+	</div>
+
+-- form group [label and toggleSwitch]
+          <div class="form-group col-md-3 d-flex align-items-end">
+                <div class="form-check form-switch fs-4">
+                    <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault">
+                    <label class="form-check-label ms-2 mb-0" for="flexSwitchCheckDefault">is shipped to village?</label>
+                </div>
+            </div>
+---------------------------------------------------------------------------------------------------------------------
+
+
+<< bootstrap validation >>
+
+<<classes >>
+class="is-valid"      // for input
+class="is-invalid"    // for input
+
+class="needs-validation" // for form
+class="was-validated"    // for form
+
+
+example 1:
+            <form class="row g-3 needs-validation was-validated" novalidate action="#">
+                <div class="col-md-4">
+                    <label for="validationCustom01" class="form-label">First name</label>
+                    <input type="text" class="form-control" id="validationCustom01" required>
+                    <div class="valid-feedback">Looks good!</div>
+                    <div class="invalid-feedback">Please choose a username </div>
+                </div>
+
+                <div class="col-md-4">
+                    <label for="validationCustom01" class="form-label">First name</label>
+                    <input type="text" class="form-control" id="validationCustom01" required>
+                    <div class="valid-feedback">Looks good!</div>
+                    <div class="invalid-feedback">Please choose a as </div>
+                </div>
+
+                <div class="col-12">
+                    <button class="btn btn-primary" type="submit">Submit form</button>
+                </div>
+            </form>
+
+<script>
+        (() => {
+
+            const forms = document.querySelectorAll('.needs-validation');
+
+            forms.forEach(form=>{
+                form.addEventListener('submit',(event)=>{
+                    if(!form.checkValidity()){
+                        console.log(event.type);
+                        event.preventDefault();   
+                        form.classList.add('was-validated');
+                    }
+                });
+            });
+        })();
+
+</script>
+
+
+------------------------------------------------------------------------------------------------------------------------------
+
+<< to make an image background for div >>
+- these are the properties you might need
+
+	background-image: url('/images/car1.webp');
+        background-repeat: no-repeat;
+        background-size: cover;
+	background-position-x: center; 
+	background-size: 100%;
+
+------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+

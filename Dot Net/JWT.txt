@@ -1,0 +1,112 @@
+<< JWT code>>
+
+- at Infrastracture layer
+	JWT folder
+	wtTokenHelper.cs
+
+
+- Install-package Microsoft.AspNetCore.Authentication.JwtBearer
+- Install-package System.IdentityModel.Tokens.Jwt
+
+  public class JwtTokenHelper
+  {
+    public static string GenerateToken(List<Claim> _userdata)
+    {
+        List<Claim> userdata = _userdata;
+
+        string key = "welcome to my secret key Ahmed Mohamed Samir Elsayed";
+        var secertkey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(key));
+        var signingcer = new SigningCredentials(secertkey, SecurityAlgorithms.HmacSha256);
+
+        var token = new JwtSecurityToken(
+            claims: userdata,
+            expires: DateTime.Now.AddDays(10),
+            signingCredentials: signingcer
+            );
+
+        //token object => encoded string
+        var tokenstring = new JwtSecurityTokenHandler().WriteToken(token);
+        return tokenstring;
+    }
+
+  }
+
+- List<Claim> _userdata
+	- These claims represent the user's information and roles that will be embedded in the JWT
+
+- string key = "welcome to my secret key Ahmed Mohamed Samir Elsayed"; 
+	- The secret key is crucial for the security of the JWT
+
+- var secertkey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(key));
+	- SymmetricSecurityKey: A class provided by the Microsoft.IdentityModel.Tokens namespace that represents a symmetric key used for signing and validating tokens.
+ 	- Encoding.ASCII.GetBytes(key): Converts the secret key string into a byte array using ASCII encoding.
+	- secertkey Stores the symmetric security key created from the byte array.
+
+- var signingcer = new SigningCredentials(secertkey, SecurityAlgorithms.HmacSha256);
+	- SigningCredentials: Specifies the credentials (key and algorithm) used to sign the JWT.
+	- secertkey: The symmetric security key created earlier.
+	- SecurityAlgorithms.HmacSha256: Specifies the algorithm used for signing, in this case, HMAC-SHA256, which is a widely used hashing algorithm for JWTs.
+
+- signing meaning: Ensures the token's integrity and authenticity, The server can verify that the token was issued by a trusted source and that it hasn't been altered.	
+
+- JwtSecurityToken: Represents the JWT, including its claims, expiration, and signing credentials.
+- claims: userdata: Embeds the list of claims into the token.
+- expires: DateTime.Now.AddDays(1): Sets the token's expiration time to one day from the current time. After this time, the token will be considered invalid.
+- signingCredentials: signingcer: Applies the signing credentials to the token to ensure it's signed.	
+
+- Claims: Contain information about the user or entity, such as user ID, roles, permissions, etc.
+
+
+// at program.cs
+
+public static IServiceCollection RegisterJWT(this IServiceCollection services)
+{
+    services.AddAuthentication(
+        option => option.DefaultAuthenticateScheme = "myscheme")
+        .AddJwtBearer(
+            "myscheme",
+            op =>
+            {
+                string key = "welcome to my secret key Ahmed Mohamed Samir Elsayed";
+                var secertkey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(key));
+                op.TokenValidationParameters = new TokenValidationParameters()
+                {
+                    IssuerSigningKey = secertkey,
+                    ValidateIssuer = false,
+                    ValidateAudience = false
+
+                };
+            });
+
+    return services;
+}
+
+- ensure that you add these middleware
+	  app.UseAuthentication();
+  	  app.UseAuthorization();
+--------------------------------------------------------------------------------------------------------------
+
+
+
+
+[HttpPost("login")]
+public async Task<IActionResult> Login(UserLogInDTO userLogInDTO)
+{
+    var result   = await userService.login(userLogInDTO);
+    if (result.Success)
+    {
+        List<Claim> claims = new List<Claim>()
+        {
+            new Claim(ClaimTypes.Role, result.Role!),
+            new Claim("id", result.UserId!),
+        };
+        JwtTokenHelper.GenerateToken(claims);
+        var Token = JwtTokenHelper.GenerateToken(claims);
+        return Created("Login Successfully", new { token = Token, id = result.UserId, role = result.Role });
+
+    }
+    else
+    {
+        return BadRequest(new ApiResponse(400, result.msg));
+    }
+}

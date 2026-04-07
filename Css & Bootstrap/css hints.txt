@@ -1,0 +1,13 @@
+
+- to remove the padding and margin from entire page --> html, body { margin: 0; padding: 0; }
+
+- if you have an element and you want to add "absolute" element above it you can make to the element before and make that before absolute 
+  but keep in mind the hover will not work on before and remember the z-index
+
+- the visibility does not affect with transition so you need opacity with it
+
+- if you try making element fixed and its parent has perspective it will not work
+
+- if you keep making left margin until element go to screen left the scroll will not happen but the scroll will happen if you make margin to right
+
+- That tiny upward "jerk" or jump when unhovering is a common side effect when nested hover effects

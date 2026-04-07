@@ -1,0 +1,1060 @@
+- java script : client side and server side
+- used to make your website dynamic
+
+
+<script src="java.js"></script> // script tag recommended to be at the end of body tag
+ 
+// note if you have 2 js files hosted[included] in the same html, 
+		they act as one file which means you need to keep in mind the varibales names
+
+./   => refer to the current folder
+../  => refer to previous folder
+
+-- Comments like c++
+
+-----------------------------------------------------------------------------------------
+
+<< variable with var >>
+
+-  to define variable in java script you can use -> var
+   var num = 20;
+   var name="ahmed";
+   var flag = true;
+   var x;  // x is undefined by default at this line
+   
+- allow redeclare to variable --> var x = 5; var x = 6;  // valid
+- can re-assign the variable with any value type
+
+- variable defined with var keyword assigned to window object as a key, to access it -> window.variable_name , window is optional 
+  which means  window.fname == fname
+- function statement also added to window object as a key
+
+- js engine performs the code on two phases sequentially
+  1. declaration phase: 
+  2. execution phase
+
+ - declaration phase: Before any code runs line by line, JS performs a “pre-scan” of your code.
+	1. global execution context is created [container], script will be executed in this conatiner
+	2. global window object is created
+	3. special variable this is created and initially will refer to window object.
+	4. allocate memory for each variable defined by var keyword and assign it with undefined [hiosting]
+	5. function statement [hiosting] 
+        6. When function is called, executional context is created for this method and pushed in the stack of global execution context
+	   and function will be executed inside it and this executional context will be removed at end of function scope
+ 
+- Hoisting is JavaScript's default behavior of moving [ declarations ] to the top of the current scope.
+- shadwing : when variable inside function with the same name of variable existed globally
+
+- hoisting is done to function statement , not function expression
+	function statement : Entire function declarations are hoisted
+	function expression: only the variable defined with var key word is hoisted, not the entire function.
+
+-- Example 
+	console.log(a); // ?
+	console.log(foo()); // ?
+
+	var a = 10;
+
+	function foo() {
+  	   return 5;
+	}
+	output
+	   - undefined
+	   - 5
+
+-- Example of Function Expression (Not Fully Hoisted)
+
+	console.log(bar);   // ?
+	console.log(bar()); // ❌ Error
+
+	var bar = function()   // Only var bar is hoisted → value = undefined
+	{
+  	  return "Hi";
+	};
+	// output
+	undefined
+	TypeError: bar is not a function
+
+
+----------------------------------------------------------------------------------------------------------------------------------
+
+<< var , let, const , symbol>>
+
+- variable at javascript is dynamic variable declaration (loosly typed)
+
+- to define a variable -> var x = 5;
+
+- <div id="hello">hello ahmed </div>  // hello is a consider a global variable in you system ,
+  console.log(hello) will display -> <div id="hello">hello ahmed </div>
+  hello.innerHTML="welcome there";    // <div id="hello">welcome there</div>
+
+
+- var keyword: 
+	- allow redeclare to variable --> var x = 5; var x = 6; 
+	- allow reassigning any value to variable
+	- added to window object
+	- var x; // console.log(x) --> undefined
+	- function scope
+
+- let keyword :
+	 - not allow redeclare to variable --> let x = 5;   let x = 6;  // error x has already been declared
+	 - access before declaration [error] 
+	 - the variable isn't added to window object
+	 - allow reassigning any value to variable 
+	 - let x; 	console.log(x); // undefined
+	 - block scope
+
+- const keyword :
+	- not allow redeclare to variable --> const x = 5; const x = 6;  // error x has already been declared
+	- access before declaration [error]
+	- must be intitialize
+	- not allow to reassign any value to variable
+	- block scope
+
+- symbol 
+	- primitive DT
+	let x = Symbol(); // x carries a value unique on application
+	let x = Symbol("age");
+	let Y = Symbol("age");
+	console.log(x==Y);     // FALSE, the "age" is just a description
+---------------------------------------------------------------------------------------------------------------------
+
+<< falsy values, data types , typeof, datatype buit-in function >>
+
+- falsy values , any values else is truethy value
+	1. 0
+	2. false
+	3. NaN
+	4. undefined
+	5. ""
+	6. null
+
+- primitive data type: store one single simple value
+	1. String
+	2. Number
+	3. Boolean
+	4. udefined
+	5. null
+- reference data types, such as objects and arrays, reference types can have null value
+	anything at java script is an object [eng: sara]
+
+console.log(typeof('ahmed')); 	// string
+console.log(typeof(3)); 	// number
+console.log(typeof(3.5));  	// number
+console.log(typeof(true));	// boolean
+console.log(typeof(undefined)); // undefined
+console.log(typeof NaN);	// number
+console.log(typeof null); 	// object , because the datatype that can carry null value is the object 
+
+console.log(typeof([10,12,15]));  				   // object
+console.log(typeof({name:'ahmed', age:'56' , country:'emirates'})); // object
+
+- var x; console.log(typeof x); // undefined
+
+- Number() // convert the value into number
+	console.log(Number("12")); //12
+	console.log(Number("12.9")); //12.9
+	console.log(Number("ah")); // NaN
+	console.log(Number(true)); // 1
+	console.log(Number(false)); // 0
+	console.log(Number(NaN));   // NaN
+
+- String(); // convert the value into string
+	console.log(String("12.5")); //"12.5"
+	console.log(String(133)); //"133"
+	console.log(String(true)); // "true"
+	console.log(String(false)); // "false"
+	console.log(String(NaN));   // "NaN"
+
+- Boolean() // convert the value to boolean 
+	console.log(Boolean(66));  // true
+	console.log(Boolean("ahmed")); // true
+	console.log(Boolean(""));   // false
+	console.log(Boolean(NaN));   // false
+	console.log(Boolean(null));   // false
+--------------------------------------------------------------------------------------------------
+
+<< NaN keyword >>
+
+console.log(Number("ah"));  // NaN
+console.log(typeof NaN);    // number
+
+- isNaN() : used to check if the variable is string or not
+console.log(isNaN("ahmed")); // true
+console.log(isNaN(5)); // false
+console.log(isNaN("5353")); // false because of coersion
+NaN==NaN // false as NaN represented by rondom number
+--------------------------------------------------------------------------------------------------
+<< output >>
+
+alert('hello world');
+
+document.write("Hello world...");
+document.write("html code");
+
+console.log("Hello ahmed");
+console.error("error");
+
+directive %c --> used to specify which text you want to make styling on it
+example console.log("hello %cahmed", "color:red; font-size:30px");
+
+you can have two %c directives
+example console.log("%chello %cahmed", "color:red; font-size:30px" , "color:red; font-size:25px");
+
+var res = confirm("Are you sure");
+
+---------------------------------------------------------------------------------------------------
+<< operator >>
+
+ \  --> escape operator , also used as line continue
+ \n --> end line 
+ \t --> tab
+ +  --> concatenate opertor
+
+ `` --> backtich operator let x = "we lov";  let v = ' java';  
+	console.log(`${x} ${v}`); // we lov java
+	console.log(`${x}${v} \\ '' "" `);  // we lovjava \ '' ""
+	console.log(`${5*8} ${54}`);        //40 54
+
+	console.log(`${x}${v}`);                // we love java
+	let v = `<div>backtich operator </div>`;
+	document.write(v);
+---------------------------------------------------------------------------------------------------------------------------------------
+   
+<< Arithmetic operators >>
+
+-> + 
+   console.log(10+"ahmed");  // 10ahmed
+   console.log(5+"5"); // 55 -> engine make coercion , coercion occurs when js engine convert from DT to another DT automatically
+   console.log("5" + "9"); // 59
+   undefined+undefined  // NaN
+   undefined+5	 	// NaN		
+   undefined+null	// NaN
+   NaN+5		// NaN 
+   null+null		// 0
+   null+5		// 5
+
+-> - 
+   10-"10"     // 0
+   10-"ahmed"  // NaN
+   1 - NaN     // NaN
+
+ *  // console.log( "5" * "5" );  // 25
+ /  // 20/5 -> 4 , 20/3 = 6.6666666667  , Math.trunc(20/3) // 6
+ ** // 2**4 -> 32
+ %  // 10%3 -> 1 
+ ++ //
+ -- // 
+ 
+ unary plus	: return number if it's not number
+     	+100    // 100  
+	+"100"   // 100  
+	+"ahmed" // NaN  
+	+"15.4"  //15.4 
+	+null    //0 
+	+flase   //0
+	+true  // 1
+
+ unary negation : return number if it's not number and negate it 
+         -"100"   //-100 
+	 -"-100"  // 100
+ 	 -"ahmed" // NaN 
+	 -"15.5"  // -15.5
+	 -false   // -0 
+	 -null    // -0 
+	 -true    //-1
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<< assignment operator >>
+
+ = assignment  operator
+-------------------------------------------------------------------------------------------------------------------------------------------
+
+<< comparison operator >>
+
+-> ==   - compare values only no matter the data type
+	- it unify the data types of two opertor if they not by making coercion to number
+	- "true"==true  // false
+	- 10 == "10"    // true
+ 
+-> ===   compare values and datatypes
+-> <
+-> >
+--------------------------------------------------------------------------------------------------------------------------------------------
+<<logical opertor >>
+
+ !
+ &&
+ ||
+
+
+<< logical or, logical and [short circuits] , nullish coalescing operator >>
+
+logical or --> ||  // almost used with null , undefined , falsy value 
+
+	let price =645;
+	console.log(`${price||200}`); // 645
+
+	let price=null;
+	console.log(`${price||200}`);  // 200
+	
+	let price;  // undefined
+	console.log(`${price||200}`); // 200
+	
+	let price=""; // falsy value
+	console.log(`${price||200}`); //200
+
+	let price=0;  // falsy value
+	console.log(`${price||200}`); //200
+
+	let price=false;  // falsy value
+	console.log(`${price||200}`); // 200
+
+	console.log(100&&"ahm");  // "ahm"
+	console.log(100&&0);  	  // 0
+
+nullish coalescing operator --> ?? // used with null , undefined
+ 
+	let price=null;
+	console.log(price??200);  // 200
+	
+	let price;// undefined
+	console.log(price??200);  // 200
+
+--------------------------------------------------------------------------------------------------------------------------------------------
+<< condition >>
+
+if(condition){ block of code }
+else if(condition){block of code}
+else { block of code}
+
+
+<< ternary condition >>
+
+condition?if code true :if code false
+
+let res = gender==="male"?'mr':'mrs'
+---------------------------------------------------------------------------------------------------------------------------------------------
+switch(day){
+  case 0:
+    block of code
+    break;
+  case 1:
+    block of code
+    break;
+  case 2:
+  case 3:
+    block of code
+    break;
+  default:
+    block of code;
+}
+----------------------------------------------------------------------------------------------------------------------------------------------
+
+<< number and number methods>>
+
+console.log(12e3);  // 12000
+console.log(12e+3); // 12000
+
+console.log(100_457_547); // syntatic sugar // 100457547
+
+
+console.log(Number.MAX_SAFE_INTEGER); // 9007199254740991  = 2^53 − 1.
+console.log(Number.MAX_VALUE);	      // 1.7976931348623157e+308
+console.log(Number.MAX_VALUE+212);    // 1.7976931348623157e+308
+
+
+
+console.log((100).toString());  // "100"
+console.log(100..toString());   // "100" why .. as the first . consider as decimal point
+console.log(100.666668.toFixed(2)); // "100.67" , note that tofixed() return the new number in the form string
+
+console.log(Number("15 ahmed"));  	// Nan
+console.log(+"15 ahmed");       	// NaN
+console.log(parseInt("15 ahmed"));       	// 15
+console.log(parseInt("ahmed s 15 ahmed"));       // NaN
+
+console.log(parseInt("86.9"));       // 86
+console.log(parseInt(86.9));       // 86
+console.log(parseFloat("86.9"));       // 86.9
+console.log(parseInt("ah"));       // NaN
+
+
+console.log(Number.isInteger("86.9"));       // false
+console.log(Number.isInteger(86.9));       // false
+console.log(Number.isInteger(86));       // true
+console.log(Number.isInteger(true));       // false
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+<< math object >>
+
+console.log(Math.PI);         // 3.14159
+console.log(Math.sqrt(16));   // 4
+console.log(Math.abs(-16));   // 16
+console.log(Math.sign(10));   // 1
+console.log(Math.sign(-10));  // -1
+console.log(Math.sign(0));    // 0
+
+
+console.log(Math.round(5.5));   // 6
+console.log(Math.ceil(5.2));   // 6
+console.log(Math.ceil(5.0));   // 5
+console.log(Math.floor(5.9));  // 5
+console.log(Math.min(5,6,7,-77,-8764,5,3));  // -8764
+console.log(Math.max(5,6,7,-77,8764,5,3));  // 8764
+
+
+console.log(Math.pow(2,4));  // 16
+
+console.log(Math.random());  // return rondom number between 0 and 1
+console.log(Math.floor(Math.random()*10));  // return rondom number between 0 and 10
+
+console.log(Math.trunc(54.8));  // Returns the integral part of the a number //54
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<< string >>
+
+let my_name = " ahmed mohamed ";
+console.log(my_name.trim());    "ahmed mohamed"   // trim remove the spaces from begining and ending of string //  ahmed mohamed
+console.log(my_name.trimStart()); // "ahmed mohamed "
+console.log(my_name.trimEnd());   // " ahmed mohamed"
+
+let user = "Ahmed";
+
+console.log(user[1]); // h
+console.log(user.length); // 5
+console.log(user[5]); // undefined
+console.log(user.charAt(1)); // h
+console.log(user.charAt(5)); // ""
+console.log(user.toLowerCase()); // ahmed
+console.log(user.toUpperCase()); // AHMED
+console.log("ahmed".concat(" ","mohamed")); //ahmed mohamed
+console.log("ahmed".includes("ah"));  // true
+
+indexOf(value [mandatory] , start=0 [optional] )     //start searching from begining return the index of value, return -1 if the value not exist
+	let val = "elzero web school";  
+	console.log(val.indexOf('o'));  // 5
+	console.log(val.indexOf('o' , -7));  // 5 negative value to start param converted into 0
+
+lastIndexOf(value [mandatory] , start=str.length-1[optional])  // start searching from end and return the index of value, return -1 if the value not exist
+	let val = "elzero web school";  
+	console.log(val.lastIndexOf('o')); // 15
+	console.log(val.lastIndexOf('o' , -7));  // -1 , negative value to start param converted into 0
+
+slice(start index=0 [optional] , end = length [optional] not including end) , if end param -1 means the last index
+	
+	let val = "elzero web school";
+
+	console.log(val.slice(7));      //  web school
+	console.log(val.slice(7, 10));  // web
+
+
+	console.log(val.slice(-1)); // l  , note -1 means the last index
+	console.log(val.slice(-6)); // school
+	console.log(val.slice(-6, -3)); // sch
+
+repeat(number[req])  // copy a string number of times and appended them together into 1 string 
+	let val = "elzero web school";
+	console.log(val.repeat(2));  // elzero web schoolelzero web school
+
+
+split(separate[optioanl] , limit[optional]) Split a string into substrings using the specified separator and return them as an array.
+	let val = "elzero web school";
+	console.log(val.split());     // ["elzero web school"]
+	console.log(val.split(""));   //  ['e', 'l', 'z', 'e', 'r', 'o', ' ', 'w', 'e', 'b', ' ', 's', 'c', 'h', 'o', 'o', 'l']
+	console.log(val.split(" "));  // ['elzero', 'web', 'school']
+	console.log(val.split(" ",2));  // ['elzero', 'web']
+
+
+substring(start index [mandatory] , end =str.length[optional] not including end)
+    	- if start > end it will swap
+    	- negative index value will be 0
+
+	let val = "elzero web school";
+	console.log(val.substring(7));   // web school
+	console.log(val.substring(0,5));   // elzer
+	console.log(val.substring(5,0));   // elzer
+	console.log(val.substring(-3,10)); // elzero web
+
+
+substr(start index [req] , num of chars you want to extract = str.length - start index  [optional])
+      - negative start from end
+      - start>=length return ""
+
+	let val = "elzero web school";
+
+	console.log(val.substr(2));   // zero web school
+	console.log(val.substr(0,6)); // elzero
+	console.log(val.substr(-6));   // school
+	console.log(val.substr(-6 , 3)); // sch
+	console.log(val.substr(17 , 3)); // ""
+
+
+includes(value[req] , start_index= 0 [optional])
+     - start searching from index 0 [default]
+
+     	let val = "elzero web school";
+	console.log(val.includes("elzero")); //true
+	console.log(val.includes("web")); //true
+	console.log(val.includes("web",11)); //false
+
+
+startsWith(value[req], start_index= 0 [optional])   
+	let val = "elzero web school";
+	console.log(val.startsWith("el")); //true
+	console.log(val.startsWith("el" , 2)); //false
+
+
+endsWith(value[req], length = str.length [optional])
+	console.log(val.endsWith("ol")); //true
+	console.log(val.endsWith("web" , 10)); //true
+	console.log(val.startsWith("sc" , 10)); //false
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+
+<<loop >>
+
+for(let i = 0 ; i<arr.length ; i++)
+{ 
+	// block of code 
+}
+
+// continue , break like c#
+// label : to make label for loop
+
+syntax --> labelName : for( ; ; ){}
+
+break : labelName // to break specific loop
+
+while(condition){}
+
+do{}while(condition);
+
+
+forEach(){}
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+
+local - global - var
+
+- scope --> {} of any loop-if-function
+- if variable x is global you can access it from any function
+- if variable x is global and another variable x exists local in function the x that inside function will be used inside it
+- the process in run time as following the interpreter looks for the variable inside the function or scope if not exists it will look for it globally
+
+- var is not block scope its global as it added to window object so var it's global
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+<< rest parameter, spread operator, >>
+
+- rest parameter: 
+	- used to receive all function arguments in one parameter this parameter called reset parameter and it's like array
+	- only one allowed in the function
+	- must be the last parameter
+
+	function calc(...numbers){
+    	   console.log(Array.isArray(numbers)) // true
+    	   console.log(numbers.length);  // 4
+    	   console.log(numbers[1]);  // 2
+	}
+	calc(1,2,3,4);
+
+- spread operator
+	var arr = [5,1,2,8,4,7,52,1,2]
+	var maxVal = Math.max(...arr);   // 52
+
+
+------------------------------------------------------------------------------------------
+
+<< destructuring >>
+
+var arr = ["ahmed", "mohamed", "samir"];
+var [y,x] = arr;
+console.log(x); // mohamed
+console.log(y); // ahmed
+
+[y,,x] = arr;
+	console.log(x); // samir
+	console.log(y); // ahmed
+
+[x,...y] = arr;
+console.log(x);  // ahmed
+console.log(y);  // ["mohamed", "samir"]
+
+
+let person = {
+	fname: "ali",
+	lname: "ahmed",
+	age: 20,
+	color: "red",
+};
+
+let { fname: n, age: a } = person;
+	console.log(n);  // ali
+    	console.log(a);  // 20
+
+let { fname: fname, age: lname } = person;  // the syntax sugar => let { fname, lname } = person; in case of key and variable is the same name
+	console.log(n);  // ali
+	console.log(a);  // ahmed
+------------------------------------------------------------------------------------------------------------------------------------------
+<< 
+	1. object declaration
+	2. acssess object properties using dot notation , bracket(subscript) notation
+	3. loop on an object
+        4. add or update properties to current object
+	5. create object using new keyword
+	6. create object with create method
+	7. assign method 
+	8. Object.keys() , Object.values(), Object.entries()
+	9. Proxy Object
+>>
+
+1. object declaration
+   - group related data together
+   - var person = {}; // empty object
+
+   let user = {
+       userName:"ahmed",
+       userAge:"23",
+       sayHello: function(){	
+           return `hello ${this.userName}`
+	   // return `hello ${user.userName}`
+	   // note: you can't access the property of object without using the name of object or this
+      }
+   };
+
+   console.log(user.userName);      // ahmed
+   console.log(user.userAge);       // 23
+   console.log(user.sayHello());    // hello ahmed
+   console.log(user["sayHello"]()); // hello ahmed  
+
+
+
+   - syntax sugar in object declaration
+     var fname = "ahmed";
+     var obj = {
+       fname, // when value of the key is a variable with the same name  
+       lname  // error
+       display(){ }
+     }
+  
+  - var fname = "perons_name";
+    let person{
+      [fname]: "ali" // it means the key will be the value of variable fname; 
+    }
+   // person{person_name:ali};
+
+
+2. acssess object properties using dot notation , bracket(subscript) notation>>
+
+   let user = {
+       userName: "ahmed",
+       "from where": 'egypt',
+   }
+
+   console.log(user.userName);	   // dot notation 
+   console.log(user["userName"]);
+   console.log(user["from where"]); // bracket notation 
+   console.log(user.age);	    // undefined
+   var x = "userName";
+   user[x] = "wael";
+
+   - any valid string can work as property name wich means userName property is like "userName"
+   - dot notation only used with valid name
+   - bracket notation only used with valid name property or property name in the form of string
+
+3. loop on an object
+
+   for(var i in user)
+     console.log(i);
+     // userName
+     // from where
+
+   for(var i in user)
+     // console.log(user.i); // undefined -> there is no key i in object user
+     console.log(user[i]);
+     // ahmed
+     // egypt
+
+
+
+4. add or update properties to current object
+
+let user = {};
+user.age = 22;		     // added if not exist, updated if existed
+user['userName'] = "ahmed"; // added if not exist, updated if existed
+
+user.sayHello = function(){
+	return "hello";
+}
+
+5. create object using new keyword >>
+ 
+  let user  = new Object({
+     userName = "ahmed",
+  });
+
+
+
+6. create an object with create method
+
+ - Creates an object that has the specified prototype
+   let user = {
+      userName: "ahmed",
+      age: 22,
+      doubleAge: function(){ return this.age*2; }
+   }
+
+ let copyObject = Object.create({});
+ console.log(copyObject);
+
+ let copyObject2 = Object.create(user);  // create a new object with key user as a prototype    
+ console.log(copyObject2.userName); // 'ahmed'
+ copyObject2.userName = "wael";
+ console.log(copyObject2.userName); // wael
+ console.log(copyObject2.age);  // 22
+ copyObject2.age = 30;
+ console.log(copyObject2.doubleAge()); //60
+
+
+7. Object.assign() 
+   - Copy the properties and method from one or more source objects to a target object. Returns the target object.
+   - it can used to make a default values to object properties , 
+ let user = {
+     userName: "ahmed",
+     age: 22,
+     doubleAge: function(){
+         return this.age*2;
+     }
+ }
+ let obj1 = {
+    userName:"object",
+    printName:function(){
+        return this.userName;
+    }
+ };
+ let obj2 = {
+     userName:"object2"
+ };
+
+let myObj = Object.assign(user, obj1 , obj2);
+console.log(myObj.userName); // object2
+console.log(myObj.age);  // 22
+console.log(myObj.doubleAge()); // 44
+console.log(myObj.printName()); // object2
+
+
+8. Object.keys() , Object.values()
+	- Object.keys(Person);    // returns the keys of object in the form of array
+	- Object.values(Person)  // returns the values of object in the form of array
+	- Object.entries(Person)  // returns the array of array each array consist of key,value of the object
+-----------------------------------------------------------------------------------------------------------
+
+<< this keyword, call(), apply(), bind(), closure >>
+
+- this refer to object that calls the method
+- this can refer to button or html element -> document.getElememntById("cl").onClick = function(){ console.log(this) } 
+
+- you can call the function and determine which caller object you want this refers to using function call
+	person1.func.call(product)  // this inside the method func will refer to product object
+	person1.func.call()         //  this will refer to window object if you do not determine which object you want this refer to
+	person1.func.call(product, param1, param2, .....)	
+	person1.func.call(null) 
+
+- you can call the function and determine which caller object you want this refers to using function apply()
+  the difference between apply() and call() is : apply() takes the parameter on the form of array
+	person1.func.apply(product, [ele1, ele2]);
+
+- bind() : return the function with specified caller of  this 
+	pesrson1.display.bind(product);  // the function display returned with this refers to product
+
+- closure
+
+   function greet() {
+	var x = "hello";
+	var y = "alaa";
+	function sayHello() {	console.log(x); }
+	return sayHello;
+   } 
+  var res = greet();
+  res();           // hello due to the closure of the x
+  
+  -  When you use the addEventListener in a loop, the variables like quantityValueDiv and totalPriceDiv are captured by the closure, 
+     and when the event is triggered (e.g., a click event), it will reference the final values of these variables.
+------------------------------------------------------------------------------------------------------------------------
+
+<< Iterations 
+	1. iterable object explanation
+	2. for of 
+	3. override the behavior of Symbol("Symbol.iterator") function
+	4. for in	
+        5. how to make an object iterable
+	6. generator function
+ >>
+
+1. iterable object explanation
+	- any iterable object has Symbol("Symbol.iterator") key and its value is a function
+	- the reference of Symbol("Symbol.iterator") is Symbol.iterator
+
+	- because of stupidity : remember 
+		var x = Symbol("Symbol.iterator");  // the reference of symbol here is x
+		var person = {  name:"ahmed",
+    				[x] : function(){console.log(this.name);}
+		     	     }
+    
+	- more details	
+  	let arr = ["ahmed", "mohamed", "samir"];
+  	// arr[Symbol.iterator]() ==> function return an object and this object has key next its value is a function and this function 
+  	// returns an object in the form of {value: , done: }
+  
+  	let arr = ["ahmed", "mohamed", "samir"];
+  	let iter = arr[Symbol.iterator](); // return an object 
+  	console.log(iter.next()); // {value: 'ahmed', done: false}
+  	console.log(iter.next()); // {value: 'mohamed', done: false}
+  	console.log(iter.next()); // {value: 'samir', done: false}
+  	console.log(iter.next()); // {value: undefined, done: true}
+
+ 
+2. for-of
+  - need object to be iterable
+  - it call the function method next() and return the value
+
+  let arr = ["ahmed","mohamed","wael"];
+  for(let val of arr)
+      console.log(val);  // ahmed mohamed wael
+
+3. override the behavior of Symbol("Symbol.iterator") function
+   let arr = ["ahmed", "mohamed", "samir"];
+   arr[Symbol.iterator] = function(){
+     let index = 0;
+     return {
+        next: function(){
+            if(index < arr.length ){
+                return {
+                    value: arr[index++],
+                    done: false,
+                }
+            }
+            else{
+                return {
+                    value: undefined,
+                    done: true,
+                }
+            }
+        }
+    };
+   }
+ 
+  for(let val of arr){
+     console.log(val);
+  }
+
+
+4. for-in
+   - used with array and objects
+   - does not object to be iterable
+   - with array
+     let arr = [1,5,7];
+     for(let index in arr){
+       console.log(index);      // 0 1 2
+       console.log(arr[index]); // 1 5 7 
+    }
+   
+   - with object
+   for(var i in user)
+     console.log(i);     // userName  from where
+   
+   for(var i in user)
+     // console.log(user.i); // undefined -> there is no key i in object user
+     console.log(user[i]); // ahmed egypt
+
+
+
+5. how to make an object iterable
+  - add to it a Symbol("Symbol.iterator") key its value a function that returns an object and this object has a key next 
+    its value is a function and this function returns an object in the form of {value: , done: }
+
+	let person = {
+    		fname: "ahmed",
+    		mname:"mohamed",
+    		lname:"samir",
+	};
+
+	person[Symbol.iterator] = function(){
+    	let step = 0
+    	return {
+           next: function(){
+             step++;
+             if(step < 4){
+                return {
+                    value: step,
+                    done : false
+                }
+             }
+             else{
+                return {
+                    value: undefined,
+                    done:true
+                }
+            }
+         }
+       };
+     }
+for(let val of person){
+    console.log(val);   // 1 2 3
+}
+
+
+6. generator function
+        - it facilitates the previous structure that makes an object iterable
+	- that returns an object and this object has a key next 
+    		its value is a function and this function returns an object in the form of {value: , done: }
+
+	let arr = ["ahmed", "mohamed", "samir"];
+	arr[Symbol.iterator] = display
+
+	function* display(){
+    		for (let i = 0; i < arr.length; i++) 
+        	yield `val ${i+1} = ${arr[i]}`  // yield is a keyword used only inside generator function
+	}
+	for( let i of arr)
+      	  console.log(i);
+------------------------------------------------------------------------------------------------------------------------
+
+ 
+<< modules  [export, import] >>
+
+- import and export are used to share code between different files or modules
+- export keyword is used to make variables, functions, classes, interfaces, or any other code available for use in other modules.
+- The import keyword is used to bring the code that has been exported from other modules.
+
+- In TypeScript, each file is considered a module if it contains any import or export statements.
+
+- you can import the expoerted elements
+- you have only on export default
+
+There are two types of export: Named Exports (the most commonly used), Default Exports
+
+- export naming --> export + element(class, variable, method, etc.)
+ 
+	- at html
+		<script type="module" src="main.js"></script>
+
+	- at script.js
+		export function add(){ console.log("this is add from script"); }
+		export function sub(){ console.log("this is sub from script"); }
+	- at main.js
+		import {add, sub} from './script.js';  //
+		add();
+
+- export default
+	- the js file allows you only one export default
+	- at html
+		<script type="module" src="main.js"></script>
+
+	- at script.js
+		export default function sub(){ console.log("this is sub from script"); }
+
+	- at main.js
+		- import sub from './script.js';
+		- because there is only one export default you can import it with any name you want
+		- import exp_def from './script.js';  // you don't need curly braces when importing the default export.
+
+		 
+- import sub, {add, mul} from './script.js'; // the default is first
+
+- import * as all from './script.js';
+	all.add()
+	all.default()
+
+------------------------------------------------------------------------------------------------------------------------
+
+<< regax >>
+- you can use regax object -> var res = new RegExp("[abc]");
+- you can use  /pattern/  ->  var res = /[abc]/; 
+
+let text = "123456789";
+var res = new RegExp("[abc]");      
+console.log(res.test(text));        // false
+
+
+[abc]     	// is string contains a or b or c
+[^abc]    	// is string contains chars other than a , b , c
+/[^abc]/  	// is string contains chars other than a , b , c -> not contains a or b or c
+/^[abc]/  	// is string start with a or b or c
+^(15|23|32);  // start with 15 or 23 or 32
+
+[0-9]     // is string contains any digit between 0:9 
+[a-z]     // is string contains any char between a-z
+[a-zA-Z]  // will match any character from a to z or A to Z.
+
+^[a-zA-Z]{4,}  // start with at least 4 chars
+^[a-zA-Z]{4}  //  must start with 4 chars
+
+[^0-5]    // is string contains digits not between 0:5
+
+\d  	  // is string contains any digits 
+\D        // is string contains any non-digit characters.
+\s        // is string contains any white space
+\S 	  // is string contains any non-whitespace characters.
+\w 	  // matches any word character (basically alpha-numeric)
+\W: 	  // matches any non-word character.
+
+\bahmed   // is string contains ahmed at the begining of any word
+ahmed\b   // is string contains ahmed at the end of any word
+
+
+
+n+        // is string contain at 1 or more n
+n*	  // is string contains 0 or more n
+n?        // n character may or may not be present in the string to be matched.
+
+
+$ 	      // It tells the computer that the match must occur at the end of the string or before \n at the end of the line or string.   
+. => wildcard // .a => is char a existed 1 or more
+\ => 	      // 
+
+.{4,}  	      // it means any 4 char at least 
+  
+() grouping characters	// group more than regular expression
+   
+
+{2}  // means that the preceding character must to be repeated 2 
+{min,} means the preceding character is matches min or more 
+{min,max} means that the preceding character is repeated at least min & at most max times.
+
+ 
+//1. start with at least 4 char 
+//2. following by make or play
+//3. following by 2 digits
+//4. following by [amr or ahmed]
+//5. following by @
+//6. follwing by gmail or yahoo
+//7. follwing by .
+//8. end by com or edu
+
+
+var res = /^[a-zA-Z]{4,}(make|play)[0-9]{2}(amr|ahmed)\@(gmail|yahoo)\.(com|edu)$/;
+
+-----------------------------------------------------------------------------------------------------------
+<< date >>
+var date = new Date();
+
+console.log(date); // Fri Dec 01 2023 23:59:43 GMT+0200 (Eastern European Standard Time)
+
+sun: 0
+mon: 1
+tue: 2
+wed: 3
+thr: 4
+fri: 5
+sat: 6
+
+console.log(date.getDay()); // 6
+console.log(date.getDay()); // 6
+

@@ -1,0 +1,121 @@
+- app.routes.ts
+
+	at export const routes: Routes = [
+		{path:'', component:ContentComponent},
+    		{path: 'products', component: ProductsComponent },
+    		{path:'products/:id', component: ProductDetailsComponent},
+    		{path:'products/:id/edit', component: ProductFormComponent}, // if id=0 it's an indicator to add [not recommended]
+		 path: '**', component: NotFoundComponent },
+		---------------------------------------------------------------------------------------------------------------
+
+		// nested routes
+		{
+        		path: 'admin',
+        		component: AdminLayoutComponent,
+        		children: [
+				{ path: '', pathMatch: 'full', redirectTo: 'Vision' },
+            			{ path: '', component: AdminDashboardComponent },
+            			{ path: 'home', component: AdminDashboardComponent },
+            			{ path: 'employees', component: EmployeesComponent },
+				
+        		],
+    		},
+	];
+
+
+--- paths with lazy loading
+	{
+          path: 'dashboard', 
+          loadComponent: () => import('./Components/Layouts/dashboard/dashboard.component').then(m => m.DashboardComponent),
+          children:[
+            {
+		path:'home',
+                loadComponent: () => import('./Components/home/home.component').then(m => m.HomeComponent),
+            },
+            {
+              path:'about',
+              loadComponent: () => import('./Components/about/about.component').then(m => m.AboutComponent),
+            }
+           ]
+	},
+
+----------------------------------------------------------------------------------------------------------------------------------------
+
+
+- at app.component.ts 
+	import { RouterOutlet } from '@angular/router';
+	imports: [RouterOutlet],
+
+
+- at app.component.html --> <router-outlet></router-outlet>
+
+
+-- to get parameters from URL
+
+	import { ActivatedRoute} from '@angular/router';
+
+	constructor(public activatedRoute: ActivatedRoute) {
+		this.productId = this.activatedRoute.snapshot.params['id'];  // id existed at path route
+		this.productId = this.activatedRoute.snapshot.ParamMap.get('id');  // id existed at path route
+		this.route.snapshot.queryParamMap.get('userId');	     // userId existed at Query String
+	}
+
+
+-- navigate to route 
+
+	- at typeScript
+		import { Router } from '@angular/router';
+		constructor(private router: Router) { } // Router is a service
+
+			this.router.navigate(['products'])
+			this.router.navigate(['/admin','project']);
+			this.router.navigate(['/orders', id]);
+			this.router.navigateByUrl('/Details');
+			this.router.navigate(['/login'], { replaceUrl: true });
+				- { replaceUrl: true }
+					- replaces the previous route in the browser's history. 
+				   	  This effectively removes the ability to navigate back to the authenticated pages.
+	- at html 
+		imports: [RouterLink, RouterLinkActive]
+		[routerLink]="['/']"
+		[routerLink]="['products',0, 'edit']"
+		[routerLink]="['/admin/tag/edit', item.id]"
+		routerLink="/admin/tag/add"
+		[routerLink]="['/admin','tag', 'add']"
+
+		[routerlinkacive] = "'text-danger'"  // if the route for this element matches the current route, the class text-danger will be added to the element
+		[routerLinkActiveOption] = "{exact: true}" //  means the class will only be applied if the route exactly matches the current route.
+
+		- very important note: ensure that you do not have attribute href="" as it disturb angular routing
+ 		- Always ensure that RouterModule is imported in the module where you intend to use routing directives like routerLink to avoid any issues with routing functionalities.
+			- imports: [RouterModule]
+
+
+- Angular Does Not Reinitialize the Same Component
+	- If you're already on /admin/project/details/26, clicking another item that navigate to /admin/project/details/27
+ 	  only updates the URL, but Angular does not reload the same Component for performance reasons,
+ 	- the sol:  ngOnInit() {
+    			this.activatedRoute.params.subscribe(params => {
+      			this.projectId = params['id'];
+      			this.loadRequiredDataAndInitializeDropdowns();
+    		    });
+  		}
+
+	- the sol:
+		this.activatedRoute.paramMap.subscribe( (paramMap)=> { this.currentId = paramMap.get('id') } );
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+import { ActivatedRoute, Route, Router, RouterLink, RouterLinkActive } from '@angular/router';
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+<< Location Service >>
+
+- import { Location } from '@angualr/common';
+
+- constructor (private _Location: Location){}
+
+- this._Location.back();
+

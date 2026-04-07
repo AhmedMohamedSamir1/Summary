@@ -1,0 +1,36 @@
+var random = new Random();
+
+random.Next()  		  // Returns a non-negative random integer
+Next(maxValue) 		  // Returns random int between 0 and maxValue - 1 , random.Next(10) → 0–9
+Next(minValue, maxValue)  // Returns random int between minValue and maxValue - 1
+random.NextDouble();      // Returns a random double between 0.0 and 1.0
+
+
+--- rondom from list
+
+int[] values = { 55, 44, 33, 22 };
+Random random = new Random();
+int index = random(values.Length)
+randomValue = values[index]
+
+
+--- to make it generate based on probability
+
+var values = new[]  { 50, 25, 15, 10 };
+var weights = new[] { 0.5, 0.25 , 0.15,  0.1 };
+
+roll = random.NextDouble() // say it .8
+
+double cumulative = 0.0;
+for (int i = 0; i < values.Length; i++)
+{
+    cumulative += weights[i];
+    if (roll < cumulative)
+    {
+        Console.WriteLine($"Random Value: {values[i]}");
+        break;
+    }
+}
+
+----------------------------------------------------------------
+
