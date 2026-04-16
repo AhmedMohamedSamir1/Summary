@@ -208,7 +208,7 @@ F:/professional web developement/101_summary/.git/
 ----------------------------------------------
 
 
-- netsh wlan show profile name="network_name" key=clear
+- netsh wlan show profile name="IT" key=clear
 
 
 - Unable to copy file "D:\Apps_projects\visual studio\Khoury_Stand\Khoury_Stand\obj\Debug\net9.0\apphost.exe" 
