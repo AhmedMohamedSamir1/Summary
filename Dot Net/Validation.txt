@@ -36,7 +36,7 @@ return BadRequest(new ApiValidation() { Errors = errors });
 - inherit from AbstractValidator<T> is an abstract class that implements the IValidator<T> interface.
 
 - Registration      
-	- builder.Services.AddScoped<IValidator<TagDTO>, TagValidator>(); // the easy one for me
+	- builder.Services.AddScoped< IValidator<TagDTO>, TagValidator >(); // the easy one for me
 	- builder.Services.AddScoped<TagValidator>();  
 	- builder.Services.AddValidatorsFromAssembly(typeof(TagValidator).Assembly);
 		- Scans the specified assembly for all classes that implement IValidator<T> and registers them with the DI container.
