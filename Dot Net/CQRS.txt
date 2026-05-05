@@ -1,4 +1,38 @@
 - stands for: CQRS stands for Command and Query Responsibility Segregation
 - It is a design pattern that separates read operations (queries) from write operations (commands).
-	Command = modifies state (e.g., CreateOrder, UpdateCustomer)
-	Query = retrieves data (e.g., GetOrdersByCustomer)
+- Instead of having one model/service doing everything, CQRS splits responsibilities into two sides:
+
+- Core Idea
+   - Commands → change state (Create, Update, Delete)
+   - Queries → read data (Get, List, Search)
+   - Each has its own models, handlers, and sometimes even separate databases.
+
+- Why use CQRS in ASP.NET?
+   - you’re following patterns like Clean Architecture or DDD
+   - You want cleaner separation of concerns
+   - 
+
+- Usually implemented with libraries like : MediatR (very common)
+	- MediatR (very common)
+
+
+----------------------------------------------------------------------------------------------------------------
+
+-- Application
+   - Commands
+	- CreateOrderCommand.cs
+   - Queries/
+	- GetOrderByIdQuery.cs
+   
+   - Handlers/
+	- CreateOrderHandler.cs
+	- GetOrderByIdHandler.cs
+
+
+
+-- Example
+	- Command (Write)
+		public record CreateUserCommand(string Name, string Email) : IRequest<int>;
+
+	- Handler
+	

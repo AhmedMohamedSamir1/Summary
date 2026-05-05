@@ -95,7 +95,7 @@ Example:
 	- IOrderService
 	- OrderService
 	- DTOS
-	- External Services Interfaces (Payment, Email, SMS, Files)
+	- External Services Interfaces ( Payment, Email, SMS, Files )
 	- Depends only on Domain Layer
 
   - Infrastructure
