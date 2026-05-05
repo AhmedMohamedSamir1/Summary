@@ -1140,7 +1140,7 @@ This happens because the server is returning a plain text response instead of JS
 		<div *ngIf="show">
   			<ng-container *ngTemplateOutlet="myTemplate"></ng-container>
 		</div>
-		- note we inject(outlet) the the ng-template using ngTemplateOutlet  and it renders the content
+		- note we inject( outlet ) the the ng-template using ngTemplateOutlet  and it renders the content
 
 	- Exmaple 2: Using ng-template for Conditional Rendering (Alternate Views)
 		<div *ngIf="isLoggedIn; else guestView">
@@ -1307,19 +1307,22 @@ new Types
 	   - Helper.ts [Helper Class]
 		- ToQueryString()
 	- resolvers
+	- Validators
 	
   -- Pages: contains the components which is not reusable and could be accessed via route
 	    - employee
 		- employee-list component
 		- new-employee  component	
 		
-  -- Shared: contains things that are connected with UI like 
+  -- Shared: contains things that are connected with UI like loader
 	    - Directives
 	    - Pipes,
 	    - ReusableComponents
 		- header
 		- footer
 		- sidebar
+	    - Base: Logic realted to UI like 
+		- BaseComponent.ts
   -- Layouts
 	MainLayout
 	AuthLayout

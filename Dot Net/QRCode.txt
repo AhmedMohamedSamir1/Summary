@@ -18,7 +18,7 @@ public static class QRCodeHelper
     }
 }
 
-------------------------------------------------
+------------------------------------------------------------------------------------
 
 at html
    <img src="@Model.QRCode" alt="User QR Code" width="200" height="200"/>

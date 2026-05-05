@@ -127,6 +127,20 @@ it has two attribute
 	
 	
 2. alt -> text occurs when image can't load on your page
+
+
+<img src="product-800.jpg" 
+     srcset="product-400.jpg 400w, 
+             product-800.jpg 800w, 
+             product-1600.jpg 1600w"
+     sizes="(max-width: 600px) 400px, 
+            (max-width: 1200px) 800px, 
+            1600px"
+     alt="Product Name"
+     style="width:100%; height:auto;">
+
+
+
 ----------------------------------------------------------------------------------------------------
 
 <<< unordered list  tags>>>

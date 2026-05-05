@@ -124,9 +124,33 @@ it has two attribute
 	<img src="images/football_design15.jpg" alt="football_design15">
 	<img src="../football_design15.jpg" alt="football_design15"> // لو الصورة موجودة فى مكان قبل الصفحة	
 <img src="https://www.shutterstock.com/image-illustration/football-stadium-night-imaginary-modelled-600w-1912601503.jpg" alt="football_design15">
-	
+
 	
 2. alt -> text occurs when image can't load on your page
+
+
+<img 
+  src="image-800.jpg" 
+  srcset="image-400.jpg 400w, image-800.jpg 800w, image-1600.jpg 1600w"
+  sizes="(max-width: 768px) 100vw, 800px"
+  alt="Example image">
+
+	- 400w, 800w, 1600w = image width in pixels // “Here are different sizes of the same image.
+	- If screen ≤ 768px → image takes 100% of viewport width
+	- For example 
+		Mobile device (375px width, 2x DPR) Needs ~750px image -->  Chooses 800w
+	  	Desktop (large screen)	--> Might choose 1600w
+
+-- the original must be  --> min(width, height) >= 1600 then generate 1600, generate 800, generate 400
+{
+  "original": "/products/10/original.jpg",
+  "sizes": {
+    "1600": "/products/10/1600.jpg",
+    "800": "/products/10/800.jpg",
+    "400": "/products/10/400.jpg"
+  }
+}
+
 ----------------------------------------------------------------------------------------------------
 
 <<< unordered list  tags>>>

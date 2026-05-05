@@ -1,0 +1,125 @@
+-- installation
+   - npm install fabric
+
+
+-- the behavior of fabric: there are two canvas
+	- Lower Canvas (your original), the one written in html page
+	- Upper Canvas (auto-created), Created automatically by Fabric
+		Used for: Selection borders, Dragging previews, Mouse interactions, Controls (resize handles, rotation, etc.)
+
+	- <div class="canvas-container">
+		<canvas class="lower-canvas"></canvas>
+   		<canvas class="upper-canvas"></canvas>
+	  </div>
+
+
+-- init canvas
+	private canvas!: fabric.Canvas;
+	const canvas = new fabric.Canvas('myCanvas');
+	
+
+-- to create object and add it to canvas
+	const rect = new fabric.Rect({
+  	   left: 100,
+  	   top: 100,
+  	   width: 200,
+  	   height: 100,
+  	   fill: 'red'
+	});
+	this.canvas.add(rect);
+
+-- Rendering Engine
+	- it rerenders everthing when any change occurs like moving any element
+
+
+-- properties
+	- left
+	- top
+	- scalex
+	- scaley
+	- angle
+	- opacity
+	- selectable: true // this element is selectable, if false the user can't move it
+	- evented: غير قابل للتفاعل
+	- 
+
+
+
+
+
+-- for Z-Index / Layering
+	- canvas.bringToFront(obj);
+	- canvas.sendToBack(obj);
+
+
+-- to Group objects together
+	- const group = new fabric.Group([rect, text]);
+	- canvas.add(group);
+	// why using it: move group together as on element
+
+-- Events
+	canvas.on('object:selected', (e) => {
+   	   console.log(e.target);
+	});
+
+
+
+
+-- to save the design [ serialization ]
+	- const json = canvas.toJSON();
+
+-- to load the design
+	- canvas.loadFromJSON(json);
+
+
+-- to convert the design into image [ exporting ]
+	- const image = canvas.toDataURL();
+
+-- the basic parent for all elements
+	- fabric.Object
+	
+-- oojects of canvas
+	- fabric.Canvas
+	- fabric.Object
+	- fabric.FabricImage
+	- fabric.Textbox
+	- fabric.Rect
+	- fabric.Circle
+	- fabric.Group
+
+
+-- 
+
+--
+
+--
+
+
+
+-- -- canvas memebers
+	
+	-- to access the current selected element
+		- const active = canvas.getActiveObject();
+	
+	-- canvas.getWidth()
+	-- canvas.getHeight()
+	-- canvas.getObjects()
+	-- 	canvas.getElement()
+	--
+	--
+	--
+	--
+	--
+	--
+
+---------------------------------------------------------------------------
+
+
+<< code >>
+
+
+@ViewChild('canvasElement') canvasRef!: ElementRef<HTMLCanvasElement>;
+private canvas!: fabric.Canvas;
+
+
+
