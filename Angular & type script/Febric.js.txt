@@ -13,10 +13,15 @@
 	  </div>
 
 
--- init canvas
+-- initialize canvas
 	private canvas!: fabric.Canvas;
-	const canvas = new fabric.Canvas('myCanvas');
-	
+	canvas = new fabric.Canvas('myCanvas');
+
+-- fabric.Canvas members
+	canvas.getElement();    // return HTMLCanvasElement
+	canvas.setDimensions({ width, height });
+	canvas.renderAll();
+
 
 -- to create object and add it to canvas
 	const rect = new fabric.Rect({
@@ -42,7 +47,6 @@
 	- selectable: true // this element is selectable, if false the user can't move it
 	- evented: غير قابل للتفاعل
 	- 
-
 
 
 
