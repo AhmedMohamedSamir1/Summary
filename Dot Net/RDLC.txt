@@ -1,0 +1,92 @@
+- steps needs to performed before run 
+
+- select the RDLC file for (ReportSanctionAML.rdlc) + right click + open with + Automatic Editor Selector(XML)
+- change inside xmlns from 2016 to 2008
+- search on -- ReportSections + delete ony the tags 
+	<ReportSections>
+	   <ReportSection>
+	   </ReportSection>
+	</ReportSections>
+	- delete only these tags do not delete the tags inside them [ body, page ]
+
+- delete this tag with its children  <ReportParametersLayout></ReportParametersLayout>
+
+------------------------------------------------------------------------------------------------------------------------
+
+
+private readonly ReportViewer reportViewer;
+
+ public SanctionAMLController()
+ {
+	reportViewer = new ReportViewer();
+ }
+
+
+[HttpPost]
+public HttpResponseMessage ReportAction([FromBody] SanctionAMLParam sanctionAMLParam){
+
+	string printType = "EXCEL";
+	reportViewer.ProcessingMode = ProcessingMode.Local;
+	string reportPath = HttpContext.Current.Server.MapPath("~/Reports/Reports2/ReportSanctionAML.rdlc");
+	
+	var data = this._service.GetSanctionResults(sanctionAMLParam); // the result
+	
+	    reportViewer.LocalReport.ReportPath = reportPath;
+            var rds = new ReportDataSource("SanctionResults", data); // SanctionResults is the dataset name
+            reportViewer.LocalReport.DataSources.Clear();
+            reportViewer.LocalReport.DataSources.Add(rds);
+            reportViewer.LocalReport.Refresh();
+}
+
+--------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+public class CommonService : ICommonService
+{
+
+    public HttpResponseMessage PrintReportFileToClientSide(ReportViewer reportViewer, string fileName, string printType = "PDF")
+    {
+        try
+        {
+            if (printType == "Excel" || printType == "EXCEL")
+            {
+                printType = "EXCELOPENXML";
+            }
+            byte[] bytes = reportViewer.LocalReport.Render(printType, null, out string mimeType, out string encoding, out string extension, out string[] streamids, out Warning[] warnings);
+
+            if (bytes == null || bytes.Length == 0)
+            {
+                return new HttpResponseMessage(HttpStatusCode.NotFound)
+                {
+                    Content = new StringContent("Report generation returned empty data.")
+                };
+            }
+           
+            string fileExtension = printType.Equals("EXCELOPENXML", StringComparison.OrdinalIgnoreCase) ? "xlsx" : "pdf";
+            string fullFileName = $"{fileName}.{fileExtension}";
+            string contentType = printType.Equals("EXCELOPENXML", StringComparison.OrdinalIgnoreCase)
+                ? "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                : "application/pdf";
+
+            HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new ByteArrayContent(bytes)
+            };
+
+            response.Content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(contentType);
+            response.Content.Headers.Add("Content-Disposition", $"attachment; filename*=UTF-8''{Uri.EscapeDataString(fullFileName)}");
+
+            response.Headers.Add("Access-Control-Expose-Headers", "Content-Disposition");
+            return response;
+        }
+        catch (Exception ex)
+        {
+            return new HttpResponseMessage(HttpStatusCode.InternalServerError)
+            {
+                Content = new StringContent("Error generating report: " + ex.Message)
+            };
+        }
+    }
+
+}

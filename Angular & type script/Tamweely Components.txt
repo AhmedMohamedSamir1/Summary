@@ -1,3 +1,29 @@
+<< example for create new component >>
+ 
+-- create your component for example -> aml-sanction
+	
+-- add it in the specified LazyLoading Module for example -> LazyLoading / BranchTransactionLoading
+	- branchtransactionloading.module.ts
+		- declarations: 
+			[ 
+			   ....
+			   AmlResultsComponent
+			] 
+
+	- branchtransactionloading-routing.module.ts
+		const routes: Routes = [
+			....
+			{path: 'AMLResults' , component : AmlResultsComponent}
+		]
+	
+
+
+
+
+
+
+---------------------------------------------------------------------------------------------------------------
+
 
 <div class="content-wrapper">
     <section class="content">
@@ -161,6 +187,126 @@ Swal.fire({
 	backdrop: true,
 	confirmButtonText: this.translate.instant('OK'),
 })
+
+
+------
+
+
+Download() {
+
+  if (this.form.status == "VALID") {
+
+    Swal.fire({
+      title: this.translate.instant('Download') + '-' + this.translate.instant('AMLResultsReport'),
+      text: this.translate.instant('ContinueText'),
+      allowEscapeKey: true,
+      allowOutsideClick: false,
+      backdrop: true,
+      showCancelButton: true,
+      cancelButtonText: this.translate.instant('Cancel'),
+      confirmButtonText: this.translate.instant('OK'),
+    }).then(result => {
+
+      if (result.isConfirmed) {
+
+        this.submitted = true;
+
+        const PageParam: IPageParam = {
+          ...this.form.value
+        };
+
+        // Start Request
+        const request = this.BranchTransactionService.GetAMLSancationResult(PageParam).subscribe({
+
+          next: (response: Blob) => {
+
+            const downloadURL = window.URL.createObjectURL(response);
+
+            const link = document.createElement('a');
+            link.href = downloadURL;
+            link.download = 'SanctionAML_Report.xlsx';
+
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            window.URL.revokeObjectURL(downloadURL);
+
+            Swal.close();
+
+            this.submitted = false;
+            this.form.reset();
+          },
+
+          error: (error) => {
+
+            Swal.fire({
+              icon: 'error',
+              title: this.translate.instant('error'),
+              text: this.translate.instant('OperationFailed'),
+              allowEscapeKey: true,
+              allowOutsideClick: false,
+              backdrop: true,
+              confirmButtonText: this.translate.instant('OK'),
+            });
+
+            console.log(error);
+
+            this.submitted = false;
+          }
+
+        });
+
+        // Loading Dialog
+        Swal.fire({
+          title: this.translate.instant('downloadingAfile'),
+          text: this.translate.instant('SanctionAmlReportLongProcessingMsg'),
+          
+          allowOutsideClick: false,
+          allowEscapeKey: false,
+          showCancelButton: true,
+          cancelButtonText: this.translate.instant('Cancel'),
+
+          didOpen: () => {
+            Swal.showLoading();
+          }
+
+        }).then((dialogResult) => {
+
+          // User clicked cancel
+          if (dialogResult.dismiss === Swal.DismissReason.cancel) {
+
+            request.unsubscribe();
+
+            this.submitted = false;
+
+            Swal.fire({
+              icon: 'info',
+              title: this.translate.instant('CancelOperation'),
+              text: this.translate.instant('DownloadReportCancelled')
+            });
+
+          }
+
+        });
+
+      }
+      else {
+
+        this.submitted = false;
+
+      }
+
+    });
+
+  }
+  else {
+
+    this.form.markAllAsTouched();
+
+  }
+
+}
 
 
 

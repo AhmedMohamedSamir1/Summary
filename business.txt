@@ -192,6 +192,21 @@ departed --> غادرت
 	- Women's T-shirts (category)
 		- Comfort Colors Women's Crewneck Boxy T-shirt  [ Variant ]
 
+	- Short-Sleeve
+
+--- Jackets
+	- Soft Shell Jacket
+		- Carhartt Gilliam Vest
+			- Colors
+			- Sizes 
+		- Port Authority Value Fleece Vest - Printed
+	- Vest
+	- Blazers
+	- Women Jacket
+	
+--- 
+
+
 --- Products
    - T-Shirts
    - SweatShirts
