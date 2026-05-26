@@ -331,6 +331,7 @@ document.getElementById('saveBtn').addEventListener('click', () => {
 
 
 document.getElementById('loadDesignBtn').addEventListener('click', () => {
+
     // مثال: load من JSON محفوظ
     const jsonFromDB = prompt("Paste saved JSON here"); // أو fetch من الـ backend
     if (!jsonFromDB) return;
@@ -338,6 +339,7 @@ document.getElementById('loadDesignBtn').addEventListener('click', () => {
     const savedData = JSON.parse(jsonFromDB);
 
     savedData.forEach(item => {
+        
         if (item.type === 'i-text') {
             const text = new fabric.IText(item.text, {
                 left: item.left,
@@ -350,6 +352,7 @@ document.getElementById('loadDesignBtn').addEventListener('click', () => {
             });
             canvas.add(text);
         }
+
         if (item.type === 'image') {
             fabric.Image.fromURL(item.src, img => {
                 img.set({

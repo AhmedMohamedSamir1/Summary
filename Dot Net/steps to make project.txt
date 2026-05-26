@@ -2,6 +2,7 @@
 
 - EF packaes
 	- Install-Package Microsoft.EntityFrameworkCore.SqlServer  // enables Entity Framework (EF) Core to communicate with SQL Server databases. (AT Infrastructure layer)
+		8.0.22
 	- Install-Package Microsoft.EntityFrameworkCore.Tools      // provide EF Core commands like Add-Migration, Update-Database, and Remove-Migration (At presentation layer)
 
 	- Install-Package Microsoft.EntityFrameworkCore.Proxies	  // for lazy loading (not recommended with Auto mapper)
