@@ -8,6 +8,8 @@
    git config --global user.name "AhmedMohamedSamir1"
    git config --global user.email "ahmedmohamedmvp@gmail.com"
 
+   git config --global user.email "amsamir@tamweely.com.eg"
+
 
 - to ensure that your machine identify you device
 	git config user.name  -> output: Ahmed M Samir
