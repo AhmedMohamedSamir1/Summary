@@ -1,0 +1,25 @@
+public static class EnumerableExtensions
+{
+    public static bool IsEmpty<T>(this IEnumerable<T> source) => !source.Any();
+}
+List<int> numbers = new List<int>();
+bool empty = numbers.IsEmpty();
+
+
+// C# 14
+public static class EnumerableExtensions
+{
+    extension<TSource>(IEnumerable<TSource> source) // extension members for IEnumerable<TSource>
+    {
+        public bool IsEmpty => !source.Any();
+    }
+}
+
+List<int> numbers = new List<int>();
+numbers.IsEmpty
+
+
+
+-- Null-Conditional Assignment
+	obj?.Property = value
+
