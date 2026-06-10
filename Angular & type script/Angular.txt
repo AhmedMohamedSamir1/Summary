@@ -1289,28 +1289,24 @@ new Types
 
 --Inside app
 
-  -- core : contains the things that is are not connected with UI
+  -- Core : contains the things that is are not connected with UI
 	- Interceptors
-	- gaurds
-	- services
-	- constants
+	- Gaurds
+	- Services
+	- Constants
 	   - Global.Constant.ts
-	- models
-	   - classes
+	- Models
+	   - Classes
 	   - Interfaces : 
-		- DTOs
-		   - ColorOptionDTOs
-		- Results
-		   - OperationResult
 	- Enums
 	- Helpers
 	   - Helper.ts [Helper Class]
 		- ToQueryString()
-	- resolvers
+	- Resolvers
 	- Validators
 	
   -- Pages: contains the components which is not reusable and could be accessed via route
-	    - employee
+	    - Employee
 		- employee-list component
 		- new-employee  component	
 		
@@ -1318,15 +1314,57 @@ new Types
 	    - Directives
 	    - Pipes,
 	    - ReusableComponents
-		- header
-		- footer
-		- sidebar
-	    - Base: Logic realted to UI like 
-		- BaseComponent.ts
+		- Header
+		- Footer
+		- Sidebar
+	    - Base: Logic realted to UI
+		- BaseLogic.ts
   -- Layouts
-	MainLayout
-	AuthLayout
+	MainLayout.ts
+	AuthLayout.ts
+
+  -- Environments
+	- environment.development.ts
+	- environment.ts
 
   -- assets folder
   
   -- css folder
+
+
+
+--------------------------------------------------------------
+
+
+-- Pages:  components which could be accessed via route
+	- Product
+		- new-product component
+		- product-list component
+		- product-review component
+
+-- Core:
+	- Services
+		- ProductService.ts
+	- Interceptors
+	- Gaurds
+	- constants
+	- models
+	    - classes
+	    - Interfaces 
+	- Enums
+	- Helpers
+	   - Helper.ts [Helper Class]
+		- ToQueryString()
+	- Validators
+
+-- Shared: contains things which connected to dom 
+	- ReusableComponents
+	- Directives
+	- Pipes,
+
+
+-- environments
+	- environment.development.ts
+	- environment.ts
+
+-- 

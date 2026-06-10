@@ -1,0 +1,9 @@
+<< Installation >>
+
+npm install admin-lte@4.0.0
+ 
+-- also it need bootstrap, bootstrap icon, overlayscrollbars
+	npm install @ng-bootstrap/ng-bootstrap
+	npm i bootstrap-icons
+	npm install overlayscrollbars
+
