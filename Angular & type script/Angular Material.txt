@@ -1,7 +1,18 @@
-
-
 -- installation
 	ng add @angular/material
 
+--------------------------------------------------
 
--- 
+<< Layout >>
+
+-- it contain header, footer, sidebar, content
+
+-- header
+	- height: from 60 to 80 px
+	- logo height: from 48–64 px
+	- you could use this approach for header height : Header Height = Logo Height + (Vertical Padding × 2)		
+	- 
+
+-- side bar
+	- width: from 240px to 280px
+	- 	
