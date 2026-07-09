@@ -1,0 +1,109 @@
+
+--- installation
+	install-package Hangfire.AspNetCore -Version 1.8.23
+	    install-package Newtonsoft.Json 13.0.3 // to get rid of the warning you are getting after installing the above
+	install-package Hangfire.SqlServer
+	Install-Package Hangfire.Dashboard.BasicAuthorization
+
+--- Registeration
+	
+	// to configure hangfire
+	builder.Services.AddHangfire(config =>
+	{
+	   config
+		.UseSimpleAssemblyNameTypeSerializer()
+        	.UseRecommendedSerializerSettings()
+		.UseSqlServerStorage( builder.Configuration.GetConnectionString("DefaultConnection"));
+	});
+
+	builder.Services.AddHangfireServer();
+	app.UseHangfireDashboard("/hangfire");  // before app.run();
+	
+	-- ApiURL/hangfire
+		The dashboard lets you:
+		View scheduled jobs
+		Retry failed jobs
+		Monitor processing
+		See recurring jobs
+		Delete jobs
+
+
+
+
+---- HangFire Types
+
+- Fire-and-Forget (runs once immediately)
+	✔ Runs exactly one time
+	✔ Immediately (as soon as a worker is free)
+	- IBackgroundJobClient.Enqueue<EmailJobService>(x => x.SendDailyReport());
+	- 
+
+- Delayed [Schedule] Job ( i.e Runs after 10 minutes: )
+	✔ Runs exactly one time
+	✔ But in the future
+	IBackgroundJobClient.Schedule<EmailJobService>(x => x.SendDailyReport(), TimeSpan.FromMinutes(10));
+
+
+- Recurring Job (Runs every day at midnight)
+	IRecurringJobManager.AddOrUpdate<EmailJobService>( "daily-report", x => x.SendDailyReport(), Cron.Daily);
+	IRecurringJobManager.AddOrUpdate<EmailJobService>( "hourly-report", x => x.SendDailyReport(), Cron.Hourly);
+
+	-- registered in Program.cs
+
+
+- Continuation Job [ Runs after another job finishes ]
+	- Runs exactly one time
+	- BUT only after another job succeeds
+
+- 
+	var jobId = IBackgroundJobClient.Enqueue<EmailJobService>( x => x.SendDailyReport());
+	IBackgroundJobClient.ContinueJobWith<EmailJobService>(jobId, x => x.SendDailyReport());
+
+
+
+--------
+
+<< schedule inside service >>
+
+ private readonly IBackgroundJobClient _jobs;
+
+ public TagService(IBackgroundJobClient jobs)
+ {
+   _jobs = jobs;
+ }
+
+ public void ScheduleDelete()
+ {
+    var runAt = DateTime.Now.AddMinutes(10);
+    _jobs.Schedule<TagJob>(
+     x => x.Delete(1),
+     runAt);
+ }
+
+
+
+-----------------
+
+
+┌──────── minute (0 - 59)
+│   ┌────── hour (0 - 23)
+│   │ ┌──── day of month
+│   │ │ ┌── month
+│   │ │ │ ┌─ day of week
+│   │ │ │ │
+*/5 *  * * *
+
+
+*/5 → every 5 minutes
+* → every hour
+* → every day
+* → every day
+
+
+
+
+
+
+	
+
+	
