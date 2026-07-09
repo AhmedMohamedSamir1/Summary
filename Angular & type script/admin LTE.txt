@@ -7,3 +7,5 @@ npm install admin-lte@4.0.0
 	npm i bootstrap-icons
 	npm install overlayscrollbars
 
+
+-- 

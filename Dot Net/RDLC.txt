@@ -13,6 +13,10 @@
 
 ------------------------------------------------------------------------------------------------------------------------
 
+DataSouce contain datasets
+
+--------------------------------------
+using Microsoft.Reporting.WebForms; // note this using for report viewer
 
 private readonly ReportViewer reportViewer;
 
@@ -32,7 +36,7 @@ public HttpResponseMessage ReportAction([FromBody] SanctionAMLParam sanctionAMLP
 	var data = this._service.GetSanctionResults(sanctionAMLParam); // the result
 	
 	    reportViewer.LocalReport.ReportPath = reportPath;
-            var rds = new ReportDataSource("SanctionResults", data); // SanctionResults is the dataset name
+            var rds = new ReportDataSource("SanctionResults", data); // SanctionResults is the dataset name in RDLC
             reportViewer.LocalReport.DataSources.Clear();
             reportViewer.LocalReport.DataSources.Add(rds);
             reportViewer.LocalReport.Refresh();
@@ -90,3 +94,310 @@ public class CommonService : ICommonService
     }
 
 }
+
+
+ 
+
+--------------------------
+<< Test report design>>
+
+
+
+[HttpGet]
+public HttpResponseMessage ReportAction()
+{
+  try
+  {        
+     string printType = "PDF";
+     reportViewer.ProcessingMode = ProcessingMode.Local;
+     string reportPath = HttpContext.Current.Server.MapPath("~/Reports/Islamic/CreditStudyForRenewalCustomers.rdlc"); // the report path
+
+                // var data = /*this._service.GetSanctionResults(sanctionAMLParam);*/ // the result
+                reportViewer.LocalReport.ReportPath = reportPath;
+                var rds = new ReportDataSource("SanctionResults"); // SanctionResults is the dataset name
+                reportViewer.LocalReport.DataSources.Clear();
+                //reportViewer.LocalReport.DataSources.Add(rds);
+                reportViewer.LocalReport.Refresh();
+
+                return _commonService.PrintReportFileToClientSide(reportViewer, "ContractOnlineWekala", printType);
+            }
+            catch (Exception ex)
+            {
+                var error = ex.ToString();
+                throw;
+            }
+        }
+
+
+
+
+
+ ---------------------------------------------------------------
+
+<< Add SP to  DataSet >>
+
+-- open the data set --> double click on datasetName.XSD
+-- right click on opened DataSet Designer + Add + TableAdapter
+-- choose  connection string should your app use to connect to the DB + next
+-- Use existing stored procedure
+--
+
+
+-- at Report data
+	- rebuild app + right click on dataset + add dataset + select the DataSource for example islamic + select avaialable dataset
+
+
+-- if you update the stored proc you need to the table adapter you added at dataset
+	- right click and configure 	
+--------------------------------------------------------------------------------------
+<< RDLC >>
+
+
+=Lookup(1, Fields!GuarantorRow.Value, Fields!GuarantorName.Value, "GetRequestGuarantors")
+	- at GetRequestGuarantors dataset
+	- look for row where GuarantorRow=1 
+	- get GuarantorName 
+
+
+=First(Fields!BranchNameAr.Value, "DataSet1")
+
+
+=Code.ToArabicDays(Format(First(Fields!Date.Value),"dddd")) -- إنه في يوم
+
+=Code.ToArabicNumber(Format(First(Fields!Date.Value),"yyyy/MM/dd")) -- الموافق
+
+
+=Code.ToArabicNumber( First(Fields!NumOfMonths.Value, "DataSet1") )
+
+( قروض متوسطة وطويلة الأمد+ CPLTD سحب على المكشوف +الجزء المستحق من القروض طويلة الأجل)
+----------------------------------------------------------------------
+
+
+<< method that support millions of tafkeet >>
+
+Function ConvertAboveThousand(value As Integer) As String
+
+	  Dim result As String = ""
+
+	  Dim millions As Integer = value \ 1000000
+	  Dim thousands As Integer = (value Mod 1000000) \ 1000
+	  Dim remainder As Integer = value Mod 1000
+
+	  If millions &gt; 0 Then
+	  result &amp;= ConvertBelowThousand(millions) &amp; " مليون"
+
+	  If thousands &gt; 0 Or remainder &gt; 0 Then
+	  result &amp;= " و "
+	  End If
+	  End If
+
+	  If thousands &gt; 0 Then
+	  result &amp;= ConvertBelowThousand(thousands) &amp; " ألف"
+
+	  If remainder &gt; 0 Then
+	  result &amp;= " و "
+	  End If
+	  End If
+
+	  If remainder &gt; 0 Then
+	  result &amp;= ConvertBelowThousand(remainder)
+	  End If
+
+	  Return result.Trim()
+
+End Function
+
+
+
+عدد القوائم المالية, عدد الضامنين, استيفاء كشف حساب بنكي, معدل عبىء الدين
+
+-----------------------------------------------------------------------
+
+Public Function ToArabicNumber(input As String) As String
+		
+	If input Is Nothing Then
+	    Return ""
+	End If
+		
+	Dim output As String
+
+	output = input.Replace("1","١")
+		output = output.Replace("2","٢")
+		output = output.Replace("3","٣")
+		output = output.Replace("4","٤")
+		output = output.Replace("5","٥")
+		output = output.Replace("6","٦")
+		output = output.Replace("7","٧")
+		output = output.Replace("8","٨")
+		output = output.Replace("9","٩")
+		output = output.Replace("0","٠")
+		output = output.Replace(".",".")
+
+	Return output
+	End Function
+
+
+---------------------------------------------------------------------------
+
+
+<< ALL code >>
+
+// under the tag DataSets
+
+	<Code>
+
+		Public Function GetMobile2(ByVal phones As String) As String
+		If String.IsNullOrEmpty(phones) Then Return ""
+
+		Dim arr() As String = Split(phones, "-")
+
+		If arr.Length &gt; 1 Then
+		Return arr(1)
+		End If
+
+		Return ""
+		End Function
+
+		Public Function ToArabicNumber(input As String) As String
+		Dim output As String
+
+		output = input.Replace("1","١")
+		output = output.Replace("2","٢")
+		output = output.Replace("3","٣")
+		output = output.Replace("4","٤")
+		output = output.Replace("5","٥")
+		output = output.Replace("6","٦")
+		output = output.Replace("7","٧")
+		output = output.Replace("8","٨")
+		output = output.Replace("9","٩")
+		output = output.Replace("0","٠")
+		output = output.Replace(".",".")
+
+		Return output
+		End Function
+
+		Public Function ToArabicDays(input As String) As String
+		Dim output As String
+
+		output = input.Replace("Monday","الإثنين")
+		output = output.Replace("Tuesday","الثلاثاء")
+		output = output.Replace("Wednesday","الأربعاء")
+		output = output.Replace("Thursday","الخميس")
+		output = output.Replace("Friday","الجمعة")
+		output = output.Replace("Saturday","السبت")
+		output = output.Replace("Sunday","الأحَد")
+
+
+		Return output
+		End Function
+
+		Function ConvertToTafkeetArabic(amount As Decimal) As String
+		Dim ones() As String = {"", "واحد", "اثنان", "ثلاثة", "أربعة", "خمسة", "ستة", "سبعة", "ثمانية", "تسعة"}
+		Dim tens() As String = {"", "عشرة", "عشرون", "ثلاثون", "أربعون", "خمسون", "ستون", "سبعون", "ثمانون", "تسعون"}
+		Dim teens() As String = {"عشرة", "أحد عشر", "اثنا عشر", "ثلاثة عشر", "أربعة عشر", "خمسة عشر", "ستة عشر", "سبعة عشر", "ثمانية عشر", "تسعة عشر"}
+		Dim hundreds() As String = {"", "مائة", "مائتان", "ثلاثمائة", "أربعمائة", "خمسمائة", "ستمائة", "سبعمائة", "ثمانمائة", "تسعمائة"}
+		Dim result As String = ""
+
+		' Split integer and fractional parts
+		Dim integerPart As Integer = Math.Floor(amount)
+		Dim fractionalPart As Integer = Math.Round((amount - integerPart) * 100)
+
+		' Process integer part
+		result &amp;= ConvertAboveThousand(integerPart)
+
+		' Fractional part processing (for currency)
+		If fractionalPart &gt; 0 Then
+		If result &lt;&gt; "" Then result &amp;= " و "
+		result &amp;= ConvertBelowThousand(fractionalPart) &amp; " قرشاً"
+		End If
+
+		Return result.Trim()
+		End Function
+
+		Function ConvertAboveThousand(value As Integer) As String
+
+		Dim result As String = ""
+
+		Dim millions As Integer = value \ 1000000
+		Dim thousands As Integer = (value Mod 1000000) \ 1000
+		Dim remainder As Integer = value Mod 1000
+
+		If millions &gt; 0 Then
+		result &amp;= ConvertBelowThousand(millions) &amp; " مليون"
+
+		If thousands &gt; 0 Or remainder &gt; 0 Then
+		result &amp;= " و "
+		End If
+		End If
+
+		If thousands &gt; 0 Then
+		result &amp;= ConvertBelowThousand(thousands) &amp; " ألف"
+
+		If remainder &gt; 0 Then
+		result &amp;= " و "
+		End If
+		End If
+
+		If remainder &gt; 0 Then
+		result &amp;= ConvertBelowThousand(remainder)
+		End If
+
+		Return result.Trim()
+
+		End Function
+
+		Function ConvertBelowThousand(value As Integer) As String
+		Dim ones() As String = {"", "واحد", "اثنان", "ثلاثة", "أربعة", "خمسة", "ستة", "سبعة", "ثمانية", "تسعة"}
+		Dim tens() As String = {"", "عشرة", "عشرون", "ثلاثون", "أربعون", "خمسون", "ستون", "سبعون", "ثمانون", "تسعون"}
+		Dim teens() As String = {"عشرة", "أحد عشر", "اثنا عشر", "ثلاثة عشر", "أربعة عشر", "خمسة عشر", "ستة عشر", "سبعة عشر", "ثمانية عشر", "تسعة عشر"}
+		Dim hundreds() As String = {"", "مائة", "مائتان", "ثلاثمائة", "أربعمائة", "خمسمائة", "ستمائة", "سبعمائة", "ثمانمائة", "تسعمائة"}
+		Dim result As String = ""
+
+		Dim hundredPart As Integer = value \ 100
+		Dim tenPart As Integer = (value Mod 100) \ 10
+		Dim onePart As Integer = value Mod 10
+
+		' Handle hundreds
+		If hundredPart &gt; 0 Then
+		result &amp;= hundreds(hundredPart)
+		If tenPart &gt; 0 Or onePart &gt; 0 Then result &amp;= " و "
+		End If
+
+		' Handle tens and ones
+		If tenPart = 1 Then
+		result &amp;= teens(onePart) ' Teens include both tens and ones
+		Else
+		' Handle ones first
+		If onePart &gt; 0 Then
+		result &amp;= ones(onePart)
+		If tenPart &gt; 0 Then result &amp;= " و " ' Add "و" between ones and tens
+		End If
+		' Handle tens
+		If tenPart &gt; 0 Then result &amp;= tens(tenPart)
+		End If
+
+		Return result.Trim()
+		End Function
+	</Code>
+
+
+
+
+---------------------------------------------------------------------
+
+<< Ahmed Mohamed Samir Line Spaces >>
+
+-- the vertical space between two normal lines is 1 point
+-- the indent from right 2 presses on arrow left 
+-- space between text section is on arrow down
+-- headers of each section is one arrow down
+
+
+-- =Code.ToArabicDays(Format(First(Fields!Date.Value, "ContractOnlinePay_V"),"dddd"))  -- انه في يوم
+-- =Code.ToArabicNumber(Format(First(Fields!Date.Value,"ContractOnlinePay_V"),"dd"))
+
+
+=Code.ToArabicDays(Format(First(Today()),"dddd"))
+
+
+-----------------
