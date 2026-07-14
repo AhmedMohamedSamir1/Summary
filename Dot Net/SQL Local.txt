@@ -1,0 +1,7 @@
+-- try this commands
+	- sqllocaldb info
+	- sqllocaldb info MSSQLLocalDB
+		- if  -> State:              Stopped
+
+	sqllocaldb start MSSQLLocalDB
+		- LocalDB instance "MSSQLLocalDB" started.

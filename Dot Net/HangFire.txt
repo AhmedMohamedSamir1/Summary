@@ -1,9 +1,9 @@
 
 --- installation
 	install-package Hangfire.AspNetCore -Version 1.8.23
-	    install-package Newtonsoft.Json 13.0.3 // to get rid of the warning you are getting after installing the above
-	install-package Hangfire.SqlServer
-	Install-Package Hangfire.Dashboard.BasicAuthorization
+	    install-package Newtonsoft.Json -Version 13.0.3 // to get rid of the warning you are getting after installing the above
+	install-package Hangfire.SqlServer -Version 1.8.23
+	Install-Package Hangfire.Dashboard.BasicAuthorization -Version 1.0.2
 
 --- Registeration
 	
@@ -83,6 +83,12 @@
 
 
 -----------------
+
+
+<< Cron Signature >>
+
+
+- Cron.MinuteInterval(2)
 
 
 ┌──────── minute (0 - 59)
