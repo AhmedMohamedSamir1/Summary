@@ -1,9 +1,115 @@
 npm install tom-select
 
-"node_modules/tom-select/dist/css/tom-select.css"
+
+-- Import the CSS at angular.json
+	"node_modules/tom-select/dist/css/tom-select.css"
+
+-- add tom-select.bootstrap5.css at css folder and import it at angular.json
+	"src/css/tom-select.bootstrap5.css"
 
 
----------------------------------------------------------------------
+-- YOU could download tom-select.bootstrap5.css file from here
+	https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.bootstrap5.css
+
+------------------------------------------------------------------------------------------------
+
+<<  to be able to control the style of tom select >>
+
+@Component({
+  encapsulation: ViewEncapsulation.None,
+})
+
+
+-- to fix the padding
+  div#tomselect-1-ts-control.ts-control{
+     padding: .375rem .75rem !important;
+  }
+
+
+------------------------------------------------------------------------------------------------
+
+<< Example 1>>
+
+@ViewChild('CategorySelect') CategorySelect!: ElementRef;
+CategoryTomSelect: TomSelect|undefined;
+
+
+ngOnInit() {
+    
+    this.translateService.onLangChange.subscribe(() => {
+      this.CurrentLang = this.languageService.getCurrentLanguage();
+      this.updateCategoryDropdownOptions();
+    });
+
+    this.LoadRequiredData(); 
+  }
+
+
+  LoadRequiredData() {
+	this.LoadCategoryAndPagedVariant();
+  }
+
+  
+
+  LoadCategoryAndPagedVariant(){
+    forkJoin({
+      categoriesForDropdown: this.categoryService.GetAllForDropdown(),
+      pagedList: this.variantService.GetPagedList(this.PageParam),
+    }).subscribe({
+      next:({categoriesForDropdown, pagedList})=>{
+        if(categoriesForDropdown.success && pagedList.success){
+          this.CategoriesForDropdown = categoriesForDropdown.data || []
+          this.PaginationResult = pagedList.data;
+          this.InitializeDropdowns();
+          this.HidePageLoading();
+
+        }else{
+          if(!categoriesForDropdown.success)
+            this.AlertService.ShowSweetAlert('error','Error',categoriesForDropdown.message!)
+          else if(!pagedList.success)
+            this.AlertService.ShowSweetAlert('error','Error',pagedList.message!)
+
+        }
+      },
+    });
+  }
+
+
+
+  InitializeDropdowns() {
+    this.InitializeCategoryDropdown();
+  }
+
+  InitializeCategoryDropdown() {
+    this.CategoryTomSelect = new TomSelect(this.CategorySelect.nativeElement, {
+      plugins: ['dropdown_input'],
+      
+      onChange: (value: string|null)=>{
+        this.form.controls.categoryId.setValue(value ? Number(value) : null);  // we cast to number cause the form control defind DT is number | null	
+      }
+
+    });
+    this.updateCategoryDropdownOptions();
+  }
+
+  updateCategoryDropdownOptions(): void {
+    if (!this.CategoryTomSelect)
+      return;
+
+    this.CategoryTomSelect.clearOptions();
+
+    this.CategoriesForDropdown.forEach(c => {
+      this.CategoryTomSelect?.addOption({ value: `${c.id}`, text: this.CurrentLang === 'en' ? `${c.name}` : `${c.nameAr}` });
+    });
+
+    const selectedCategoryId = this.form.controls.categoryId.value;
+    if (selectedCategoryId !== null && selectedCategoryId !== undefined) {
+      this.CategoryTomSelect.setValue(`${selectedCategoryId}`);
+    }
+  }
+--------------------------------------------------------------------------------------------------
+
+
 << members >>
 
 - createFilter: (optionTxt) => { }   // listen for each press to filter the new created option 

@@ -1,4 +1,4 @@
-
+	
 << framework & library ,  dependency >>
 
 - framework 
@@ -846,7 +846,7 @@ at html
 	example 1 : 
 		<div #myElement>Some content</div>
 		<button (click)="myElement.style.display = 'none'">Hide Element</button>
-		button (click)="Show(myElement)">Hide Element</button> // the div element will be passed
+		<button (click)="Show(myElement)">Hide Element</button> // the div element will be passed
 
 	example 2:
 		<input type="number" #inputCount>  // << template variable , reference >>

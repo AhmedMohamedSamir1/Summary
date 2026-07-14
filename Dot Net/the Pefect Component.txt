@@ -1,0 +1,352 @@
+export interface PaginationResult<T> {
+    items: T[]; 
+    currentPage: number; 
+    totalPages: number; 
+    pageSize: number; 
+    totalCount: number; 
+    hasNext: boolean,
+    hasPrevious: boolean,
+}
+
+export interface IPageParameters {
+
+    SearchText: string | null;
+    PageNumber:number | null ;
+    PageSize: number | null;
+}
+
+export interface IVariantPageParameters extends IPageParameters{
+    VariantSearchType: VariantSearchType | null;
+}
+
+
+
+export class BaseLogic{
+
+    IsPageLoading!: boolean;
+    IsSubmittingDataLoading! : boolean;
+}
+
+
+export class VariantComponent extends BaseLogic implements OnInit{ 
+
+	PaginationResult: PaginationResult<IVariantGetDTO> |null = null
+	PageParam: IVariantPageParameters;
+
+
+	IsEditMode = false; 		// if true->  show the buttons edit and cancel
+	EnableFormEditing = false;	// if true -> show the button that save the edit changes
+	SelectedVariant: IVariantGetDTO | null = null;
+
+	CategoriesForDropdown: ICategoryDropdownDTO[] = [];
+	
+	CurrentLang!: string;
+	private LastAppliedSearchText: string | null = null;  // to apply search if SearchText is different from it
+
+	
+	SearchTypes: IEnum[] = []; // if you have dropdown next to search input
+
+
+        form = new FormGroup({
+    	    name: new FormControl('', { validators: [Validators.required, CustomValidator.EnglishNumbersSpacesOnly()], asyncValidators: [this.IsNameUniqueValidator()], updateOn: 'blur'}),
+    	    nameAr: new FormControl('', { validators: [Validators.required, CustomValidator.ArabicSpaceAndNumbersOnly()], asyncValidators: [this.IsNameArUniqueValidator()], updateOn: 'blur'}),
+    	    categoryId: new FormControl<number|null>(null, { validators: [Validators.required], asyncValidators: [], updateOn: 'blur'}),
+  	});
+
+		
+
+	
+  constructor(){
+
+    super();
+    this.PageParam= {
+      PageSize:4,
+      PageNumber:1,
+      SearchText:null,
+      VariantSearchType:VariantSearchType.name
+    };
+  }
+
+
+
+  ngOnInit() {
+    this.IsPageLoading = true;
+    this.AlertService.ShowSpinner();
+    
+    this.translateService.onLangChange.subscribe(() => {
+      this.CurrentLang = this.languageService.getCurrentLanguage();
+    });
+
+    this.SearchTypes = Helper.FromEnumToArrOfObject(VariantSearchType);
+    this.LoadRequiredData(); 
+  }
+
+
+
+ LoadRequiredData() {
+    this.LoadCategoryAndPagedVariant();
+  }
+
+
+ LoadCategoryAndPagedVariant(){
+    forkJoin({
+      categoriesForDropdown: this.categoryService.GetAllForDropdown(),
+      pagedList: this.variantService.GetPagedList(this.PageParam),
+    })
+    .subscribe({
+      next:({categoriesForDropdown, pagedList})=>{
+        
+        if(categoriesForDropdown.success && pagedList.success){
+          this.CategoriesForDropdown = categoriesForDropdown.data || []
+          this.PaginationResult = pagedList.data;
+
+        }else{
+
+          if(!categoriesForDropdown.success)
+            this.AlertService.ShowSweetAlert('error','Error',categoriesForDropdown.message!)
+          else if(!pagedList.success)
+            this.AlertService.ShowSweetAlert('error','Error',pagedList.message!)
+        }
+	this.HidePageLoading();
+      },
+    });
+  }
+
+
+  HidePageLoading(){
+    this.IsPageLoading = false;
+    this.AlertService.HideSpinner();
+  }
+
+
+  onPageChange(pageEvent: PageEvent) {
+    this.PageParam.PageNumber = pageEvent.pageIndex + 1;
+    this.PageParam.PageSize = pageEvent.pageSize;
+    this.GetPagedList();
+  }
+
+
+
+  GetPagedList(){
+    if(this.IsEditMode==false && this.IsSubmittingDataLoading==false)
+      this.AlertService.ShowSpinner();
+    this.variantService.GetPagedList(this.PageParam).subscribe({
+      next: (result)=>{
+        if(result.success==true){
+          this.PaginationResult = result.data;
+        }
+        else
+          this.AlertService.ShowSweetAlert('error','Error',result.message!)
+        this.HidePageLoading();
+      },
+    })
+  }
+
+  Submit(){
+    if(this.form.status==="VALID"){
+
+      this.IsSubmittingDataLoading = true;
+      this.AlertService.ShowLoadingOfSweatAlert();
+
+      let DTO: IVariantDTO = {
+        Name : this.form.controls.name?.value!,
+        NameAr: this.form.controls.nameAr?.value!,
+        CategoryId: this.form.controls.categoryId?.value!
+      }
+      
+      
+      this.variantService.Add(DTO).pipe(
+        finalize(()=>{
+            this.IsSubmittingDataLoading = false;          
+        })
+        ).subscribe({
+          next:(result)=>{
+            if(result.success){
+              this.PageParam.PageNumber = 1;
+              this.GetPagedList();
+              this.form.reset();
+              this.AlertService.ShowSweetAlert('info','success', 'added successfully')
+            }else{
+              this.AlertService.ShowSweetAlert('error', 'adding variant','Execution Failed');
+            }
+          },
+       })
+    }else{
+      this.form.markAllAsTouched();
+
+    }
+  }
+
+
+  // --- Edit part
+
+  View(item: IVariantGetDTO) {
+    
+    if(item.id == this.SelectedVariant?.id)
+      return;
+  
+    this.IsEditMode = true;
+    this.EnableFormEditing = false;
+    this.SelectedVariant = item;
+  
+    this.form.disable();
+    this.form.patchValue({
+      name: item.name,
+      nameAr: item.nameAr,
+      categoryId: item.categoryId,
+    });
+  } 
+
+ EnableEditing() {
+    this.EnableFormEditing = true; // appear the button that save the edit changes
+    this.form.enable();
+  }
+ 
+ CancelEdit() {
+    this.SelectedVariant= null;
+    this.IsEditMode = false;
+    this.EnableFormEditing = false;
+    this.form.reset();
+    this.form.enable();
+  }
+
+ Edit() {
+    if(this.form.status==="VALID"){
+      this.IsSubmittingDataLoading = true;
+      this.AlertService.ShowLoadingOfSweatAlert();
+
+      let DTO: IVariantDTO = {
+      
+        Name : this.form.controls.name?.value!,
+        NameAr: this.form.controls.nameAr?.value!,
+        CategoryId: this.form.controls.categoryId?.value!
+      }
+
+      this.variantService.Edit(this.SelectedVariant?.id!, DTO).pipe(
+
+      finalize(()=>{
+          this.IsSubmittingDataLoading = false;
+        })
+      ).subscribe({
+        next: (result)=>{
+          if(result.success){
+            this.PageParam.PageNumber = 1;
+            this.GetPagedList();
+            this.AlertService.ShowSweetAlert('info','success', this.translateService.instant("sucessOperation"))
+            this.CancelEdit();
+
+          }else{
+            this.AlertService.ShowSweetAlert('error', 'editing category','Execution Failed');
+            return;
+          }
+        },
+      })
+      
+    }else{
+      this.form.markAllAsTouched();
+    }
+  }
+
+
+/// search part
+
+
+ private PerformSearch() {
+    const currentSearchText = this.PageParam.SearchText?.trim() || null;
+
+    if (currentSearchText === this.LastAppliedSearchText)
+      return;
+
+    this.LastAppliedSearchText = currentSearchText;
+    this.PageParam.PageNumber = 1;
+    this.GetPagedList();
+  }
+
+  SearchIconClick() {
+    this.PerformSearch()
+  }
+
+  ApplySearch(event: KeyboardEvent){
+    if(event.key=== "Enter"){
+      this.PerformSearch();
+    }
+  }
+
+ 
+SearchTypeChanged(){
+    this.LastAppliedSearchText="~|"; // just anything 
+}
+
+
+ 
+  
+
+
+
+
+  // the validation part
+  IsNameUniqueValidator(): AsyncValidatorFn {
+
+    return (control: AbstractControl): Observable<ValidationErrors | null> => {
+
+      if (!control.value) 
+        return of(null);
+
+      if ( this.IsEditMode && this.SelectedVariant && control.value === this.SelectedVariant.name) {
+        return of(null);
+      }
+
+      return this.variantService.IsNameUnique(control.value, this.SelectedVariant?.id)
+        .pipe(
+          map(result => (result.data ? null : { nameIsNotUnique: true })),
+          catchError(() => of(null))
+        );
+    };
+  }
+
+  IsNameArUniqueValidator(): AsyncValidatorFn {
+
+    return (control: AbstractControl): Observable<ValidationErrors | null> => {
+
+      if (!control.value) 
+        return of(null);
+
+      if ( this.IsEditMode && this.SelectedVariant && control.value === this.SelectedVariant.nameAr) {
+        return of(null);
+      }
+
+      return this.variantService.IsNameArUnique(control.value, this.SelectedVariant?.id)
+        .pipe(
+          map(result => (result.data ? null : { nameArIsNotUnique: true })),
+          catchError(() => of(null))
+        );
+    };
+  }
+	
+}
+
+
+----------------------------------------
+
+
+<< HTML code >>
+
+
+<div class="d-flex justify-content-center gap-2 mt-4">
+
+  @if(!IsEditMode){
+    <button type="submit" class="btn submit-btn px-5 py-2 fw-bold" [disabled]="IsSubmittingDataLoading">
+          {{"submit" | translate}}
+    </button>
+  }
+  @if(IsEditMode){
+	@if (EnableFormEditing==false) {
+	   <button type="button" class="btn btn-success px-5 py-2" (click)="EnableEditing()">{{"edit" | translate}}</button>
+        }
+	@else{
+	    <button type="button" class="btn btn-success px-5 py-2" (click)="Edit()">{{"save" | translate}}</button>
+        }
+	<button type="button" class="btn btn-danger px-5 py-2" (click)="CancelEdit()">{{"cancel" | translate}}</button>
+  }
+
+</div>

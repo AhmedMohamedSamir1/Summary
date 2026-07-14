@@ -16,3 +16,25 @@
 -- side bar
 	- width: from 240px to 280px
 	- 	
+
+
+------------------------------------------------------------------
+
+
+<< Expansion Panel >>
+
+
+import [ MatExpansionModule, ɵInternalFormsSharedModule ]
+
+
+
+--------------------------------
+
+<< Auto complete >>
+
+
+import {MatAutocompleteModule} from '@angular/material/autocomplete';
+
+import [ MatAutocompleteModule ]
+
+
