@@ -1,0 +1,8 @@
+CONFLICT (modify/delete): Dot Net/NEW.pptx deleted in HEAD and modified in b66d5609b19a8b50d36b8ebad51d3ff8533a1fa9.
+Version b66d5609b19a8b50d36b8ebad51d3ff8533a1fa9 of Dot Net/NEW.pptx left in tree.
+
+
+
+--- the solution 
+	- git checkout --theirs "Dot Net/NEW.pptx"
+	- git add "Dot Net/NEW.pptx"
