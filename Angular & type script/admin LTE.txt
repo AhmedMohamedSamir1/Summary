@@ -8,4 +8,32 @@ npm install admin-lte@4.0.0
 	npm install overlayscrollbars
 
 
--- 
+-----------------------------------------------------------------
+
+<< collapsable cards >>
+
+
+<div class="card card-outline card-primary">
+    <div class="card-header">
+        <h3 class="card-title">Product Colors</h3>
+
+        <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-bs-toggle="collapse"
+                    data-bs-target="#productColorsCard">
+                <i class="bi bi-layout-text-window"></i>
+            </button>
+        </div>
+    </div>
+
+    <div id="productColorsCard" class="collapse show">
+        <div class="card-body">
+            <p>Your content goes here.</p>
+        </div>
+    </div>
+
+    <div class="card-footer">
+        Footer (optional)
+    </div>
+</div>
+
+
