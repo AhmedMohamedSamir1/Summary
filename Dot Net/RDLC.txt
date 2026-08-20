@@ -150,7 +150,7 @@ public HttpResponseMessage ReportAction()
 -- if you update the stored proc you need to the table adapter you added at dataset
 	- right click and configure 	
 --------------------------------------------------------------------------------------
-<< RDLC >>
+<< RDLC Expression >>
 
 
 =Lookup(1, Fields!GuarantorRow.Value, Fields!GuarantorName.Value, "GetRequestGuarantors")
@@ -169,7 +169,17 @@ public HttpResponseMessage ReportAction()
 
 =Code.ToArabicNumber( First(Fields!NumOfMonths.Value, "DataSet1") )
 
-( قروض متوسطة وطويلة الأمد+ CPLTD سحب على المكشوف +الجزء المستحق من القروض طويلة الأجل)
+=IIF(
+    Not IsNothing(Lookup(2, Fields!GuarRow.Value, Fields!GuarName.Value, "GetRequestGuarantors")),
+    First(Fields!NatureEnterprise.Value, "DataSet1"),
+    Nothing
+)
+-- at dataset GetRequestGuarantors where GuarRow.Value==2 get GuarName
+-- if GuarName has a value (not nothing) get NatureEnterprise from DataSet1
+-- else nothing
+ فى حالة الرفض من aml تكون المرحلة فى جدول  Vendors_Rejections_main مراجعة الائتمان مش aml
+
+
 ----------------------------------------------------------------------
 
 
@@ -401,3 +411,9 @@ Public Function ToArabicNumber(input As String) As String
 
 
 -----------------
+
+
+
+
+وحيث إن الطرف الثاني قد تقدم إلى الطرف الأول بطلب للحصول على تمويل بصيغة الوكالة بالاستثمار لاستثمار مبلغ محدد فى نشاطه           الذي يمارسه، وبشرط أن يكون النشاط مباحا ومتوافقا مع أحكام الشريعة الإسلامية، وقد تقدم الطرف الثاني بياناته ومستنداته وأقر بمزاولته للنشاط فعليا وبشكل مشروع، ويقر الطرف الثاني بأن كافة البيانات والمعلومات والمستندات التي قدمها صحيحة ومنسوبة إليه، وأنه يتحمل المسؤولية القانونية والجنائية عن أي بيانات غير صحيحة أو إخفاء واقعة جوهرية، ويعد الطلب المقدم
+.منه، وكافة الملاحق، جزءا لا يتجزأ من هذه الاتفاقية
