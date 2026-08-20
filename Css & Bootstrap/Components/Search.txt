@@ -31,3 +31,112 @@
 </div>
 
 -----------------------------------------------------------------------------------
+
+
+
+
+<!-- Search Bar Container -->
+
+<div class="search-container">
+  
+  <!-- 1. Search Type Dropdown (Optional) -->
+  <select class="search-select" aria-label="Search Category">
+    <option value="all">All</option>
+    <option value="name">Name</option>
+    <option value="code">Code</option>
+  </select>
+
+  <!-- 2. Search Text Input -->
+  <input type="text" class="search-input"  placeholder="Search..." aria-label="Search" />
+
+  <!-- 3. Search Action Button -->
+  <button type="button" class="search-btn" aria-label="Submit Search">
+    
+    <i class="bi bi-search"></i>
+  </button>
+  
+</div>
+
+
+/* ============================================================
+   Universal Reusable Search Bar (Supports LTR & RTL)
+   ============================================================ */
+
+.search-container {
+  display: flex;
+  align-items: stretch;
+  border: 1px solid #ced4da;
+  border-radius: 0.375rem; /* 6px */
+  overflow: hidden;
+  background-color: #ffffff;
+  height: 40px; /* Fixed height for clean alignment */
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+/* Outer Border & Glow on Focus */
+.search-container:focus-within {
+  border-color: #86b7fe;
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+/* 1. Search Dropdown */
+.search-select {
+  width: 130px;
+  border: none;
+  /* Automatically places border on the Right (LTR) or Left (RTL) */
+  border-inline-end: 1px solid #ced4da;
+  padding: 0 0.75rem;
+  background-color: #f8f9fa;
+  color: #495057;
+  font-size: 0.9rem;
+  outline: none;
+  cursor: pointer;
+}
+
+/* 2. Search Input */
+.search-input {
+  flex: 1;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  padding: 0 0.85rem;
+  font-size: 0.95rem;
+  color: #212529;
+  background: transparent;
+}
+
+.search-input::placeholder {
+  color: #6c757d;
+}
+
+/* 3. Search Button */
+.search-btn {
+  width: 46px;
+  border: none;
+  /* Automatically places border on the Left (LTR) or Right (RTL) */
+  border-inline-start: 1px solid #ced4da;
+  background-color: #f8f9fa;
+  color: #6c757d;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.search-btn:hover {
+  background-color: #e9ecef;
+  color: #0d6efd;
+}
+
+/* Reset standard select & input outline on focus inside container */
+.search-select:focus,
+.search-input:focus,
+.search-btn:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+
+
+
