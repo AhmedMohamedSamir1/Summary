@@ -16,31 +16,72 @@
 DataSouce contain datasets
 
 --------------------------------------
+
+
+
+<< Controller>>
+
+
+using System.Web.Http;		    // for ApiController
 using Microsoft.Reporting.WebForms; // note this using for report viewer
-
-private readonly ReportViewer reportViewer;
-
- public SanctionAMLController()
- {
-	reportViewer = new ReportViewer();
- }
+using System.Net.Http;
 
 
-[HttpPost]
-public HttpResponseMessage ReportAction([FromBody] SanctionAMLParam sanctionAMLParam){
 
-	string printType = "EXCEL";
-	reportViewer.ProcessingMode = ProcessingMode.Local;
-	string reportPath = HttpContext.Current.Server.MapPath("~/Reports/Reports2/ReportSanctionAML.rdlc");
-	
-	var data = this._service.GetSanctionResults(sanctionAMLParam); // the result
-	
-	    reportViewer.LocalReport.ReportPath = reportPath;
-            var rds = new ReportDataSource("SanctionResults", data); // SanctionResults is the dataset name in RDLC
-            reportViewer.LocalReport.DataSources.Clear();
-            reportViewer.LocalReport.DataSources.Add(rds);
-            reportViewer.LocalReport.Refresh();
+public class RenewalCustomerFieldInquiryController : ApiController
+{
+	private readonly ReportViewer reportViewer;
+	private readonly ICommonService _commonService;
+
+	public ResponsiblePricingDisclosureFormController(ICommonService commonService)
+	{
+            this._commonService = commonService;
+            reportViewer = new ReportViewer();
+	}
+
+	[HttpPost]
+	public HttpResponseMessage ReportAction([FromBody] Request_VM param)
+	{
+
+  	  try
+  	  {
+		string printType = "PDF";
+		reportViewer.ProcessingMode = ProcessingMode.Local;
+		string reportPath = HttpContext.Current.Server.MapPath("~/Reports/Islamic/RenewalCustomerFieldInquiry.rdlc");
+
+		 if (!System.IO.File.Exists(reportPath))
+                 {
+                    throw new Exception($"Report not found: {reportPath}");
+                 }
+		 // FixRdlc(reportPath);
+		reportViewer.LocalReport.ReportPath = reportPath;
+		reportViewer.LocalReport.DataSources.Clear();
+
+		var reportData = this._service.GetReportData(param.RequestId); // the result
+		var reportDataSet = new ReportDataSource("RenewalCustomerFieldInquiry_DS", reportData);
+		reportViewer.LocalReport.DataSources.Add(reportDataSet);
+
+		var OwnerData = this._service.GetOwners(param.RequestId); // the result
+		var OwnerDataSet = new ReportDataSource("RenewalCustomerFieldInquiryOwners_DS", OwnerData);
+		reportViewer.LocalReport.DataSources.Add(OwnerDataSet);
+
+
+		var PrevCurrGuarsData = this._service.GetPrevCurrGuars(param.RequestId); // the result
+		var PrevCurrGuarsDataSet = new ReportDataSource("PrevCurrGuars_DS", PrevCurrGuarsData);
+		reportViewer.LocalReport.DataSources.Add(PrevCurrGuarsDataSet);
+
+		reportViewer.LocalReport.Refresh();
+		return _commonService.PrintReportFileToClientSide(reportViewer, "RenewalCustomerFieldInquiry", printType);
+
+  	  }
+  	  catch (Exception ex)
+  	  {
+    	    var error = ex.ToString();
+    	    throw;
+  	  }
+	}
 }
+
 
 --------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -98,28 +139,30 @@ public class CommonService : ICommonService
 
  
 
---------------------------
+------------------------------------------------------------
+
+
 << Test report design>>
 
+        [HttpPost]
+        public HttpResponseMessage ReportAction()
+        {
+            try
+            {
+                string printType = "PDF";
+                reportViewer.ProcessingMode = ProcessingMode.Local;
+                string reportPath = System.Web.HttpContext.Current.Server.MapPath("~/Reports/Reports2/IndividualFinanceFormMSMEDA.rdlc"); // the report path
+                if (!System.IO.File.Exists(reportPath))
+                {
+                    throw new Exception($"Report not found: {reportPath}");
+                }
 
-
-[HttpGet]
-public HttpResponseMessage ReportAction()
-{
-  try
-  {        
-     string printType = "PDF";
-     reportViewer.ProcessingMode = ProcessingMode.Local;
-     string reportPath = HttpContext.Current.Server.MapPath("~/Reports/Islamic/CreditStudyForRenewalCustomers.rdlc"); // the report path
-
-                // var data = /*this._service.GetSanctionResults(sanctionAMLParam);*/ // the result
                 reportViewer.LocalReport.ReportPath = reportPath;
-                var rds = new ReportDataSource("SanctionResults"); // SanctionResults is the dataset name
+                var rds = new ReportDataSource("SanctionResults");
                 reportViewer.LocalReport.DataSources.Clear();
-                //reportViewer.LocalReport.DataSources.Add(rds);
                 reportViewer.LocalReport.Refresh();
 
-                return _commonService.PrintReportFileToClientSide(reportViewer, "ContractOnlineWekala", printType);
+                return _commonService.PrintReportFileToClientSide(reportViewer, "ResponsiblePricingDisclosure", printType);
             }
             catch (Exception ex)
             {
@@ -129,10 +172,45 @@ public HttpResponseMessage ReportAction()
         }
 
 
+note: endure that RDLC has no Dataset
+
+
+------------------------------------------------------------------
+
+<< Report Service >>
+
+
+using Tamweely.Infrastruture.Data;
+using System.Data.SqlClient;
+
+
+public List<IndividualFinanceFormMSMEDA_VM> GetReportData(decimal RequestId)
+{
+	try
+	{
+	   Context context = new Context();
+           context.Database.CommandTimeout = 900;
+
+           var list = context.Database.SqlQuery<IndividualFinanceFormMSMEDA_VM>(
+                    "EXEC [Report].IndividualFinanceFormMSMEDA_Proc  @RequestId",
+                    new SqlParameter("@RequestId", RequestId)
+           ).ToList();
+
+           return list;
+        }
+        catch (Exception ex)
+        {
+          throw new Exception("error while executing stored proc: " + ex.Message);
+        }
+}
 
 
 
- ---------------------------------------------------------------
+
+------------------------------------------------------------------
+
+
+
 
 << Add SP to  DataSet >>
 
@@ -150,6 +228,7 @@ public HttpResponseMessage ReportAction()
 -- if you update the stored proc you need to the table adapter you added at dataset
 	- right click and configure 	
 --------------------------------------------------------------------------------------
+
 << RDLC Expression >>
 
 
@@ -165,6 +244,7 @@ public HttpResponseMessage ReportAction()
 =Code.ToArabicDays(Format(First(Fields!Date.Value),"dddd")) -- إنه في يوم
 
 =Code.ToArabicNumber(Format(First(Fields!Date.Value),"yyyy/MM/dd")) -- الموافق
+=Code.ToArabicNumber(Format(First(Fields!CustomerBirthDate.Value, "Main_DS"),"yyyy/MM/dd"))
 
 
 =Code.ToArabicNumber( First(Fields!NumOfMonths.Value, "DataSet1") )
@@ -174,12 +254,22 @@ public HttpResponseMessage ReportAction()
     First(Fields!NatureEnterprise.Value, "DataSet1"),
     Nothing
 )
+
 -- at dataset GetRequestGuarantors where GuarRow.Value==2 get GuarName
 -- if GuarName has a value (not nothing) get NatureEnterprise from DataSet1
 -- else nothing
  فى حالة الرفض من aml تكون المرحلة فى جدول  Vendors_Rejections_main مراجعة الائتمان مش aml
 
 
+
+-- =Code.ToArabicDays(Format(First(Fields!Date.Value, "ContractOnlinePay_V"),"dddd"))  -- انه في يوم
+-- =Code.ToArabicNumber(Format(First(Fields!Date.Value,"ContractOnlinePay_V"),"dd"))
+
+
+=Code.ToArabicDays(Format(First(Today()),"dddd"))
+
+-- fix() // removes the decimal part of a number without rounding, ex: Fix(123.99) → 123
+-- N2   // Format the number with 2 decimal places and thousands separators EX: Format(1234, "N2") returns 1,234.00
 ----------------------------------------------------------------------
 
 
@@ -217,9 +307,6 @@ Function ConvertAboveThousand(value As Integer) As String
 
 End Function
 
-
-
-عدد القوائم المالية, عدد الضامنين, استيفاء كشف حساب بنكي, معدل عبىء الدين
 
 -----------------------------------------------------------------------
 
@@ -403,17 +490,36 @@ Public Function ToArabicNumber(input As String) As String
 -- headers of each section is one arrow down
 
 
--- =Code.ToArabicDays(Format(First(Fields!Date.Value, "ContractOnlinePay_V"),"dddd"))  -- انه في يوم
--- =Code.ToArabicNumber(Format(First(Fields!Date.Value,"ContractOnlinePay_V"),"dd"))
-
-
-=Code.ToArabicDays(Format(First(Today()),"dddd"))
-
-
------------------
 
 
 
+----------------------
 
-وحيث إن الطرف الثاني قد تقدم إلى الطرف الأول بطلب للحصول على تمويل بصيغة الوكالة بالاستثمار لاستثمار مبلغ محدد فى نشاطه           الذي يمارسه، وبشرط أن يكون النشاط مباحا ومتوافقا مع أحكام الشريعة الإسلامية، وقد تقدم الطرف الثاني بياناته ومستنداته وأقر بمزاولته للنشاط فعليا وبشكل مشروع، ويقر الطرف الثاني بأن كافة البيانات والمعلومات والمستندات التي قدمها صحيحة ومنسوبة إليه، وأنه يتحمل المسؤولية القانونية والجنائية عن أي بيانات غير صحيحة أو إخفاء واقعة جوهرية، ويعد الطلب المقدم
-.منه، وكافة الملاحق، جزءا لا يتجزأ من هذه الاتفاقية
+-- Row Group	
+	=Int((Fields!DocNo.Value - 1) / 3)
+
+-- Column Group
+	=(Fields!DocNo.Value - 1) Mod 3
+
+-- report properties
+	Width:  from 23: 27
+	Height: from 29: 32
+
+-- the rectangle that represents the page
+	width 24.92532cm
+	height: 26cm 
+
+
+-- report properties
+	-- Width: 23cm
+	-- left margin: 2cm
+	-- right margin: 2cm
+
+-- Body properties
+	--  Width:18.8 // must be <= (report.width - report.LeftMargin - report.RightMargin)
+
+--- the rectangle that represent your page
+	-- width: 18.6cm 
+	-- you need at least 0.460cm as free to avoid breaking down page into two pages
+
+--- the rectangle 

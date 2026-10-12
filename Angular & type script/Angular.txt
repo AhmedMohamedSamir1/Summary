@@ -1333,8 +1333,29 @@ new Types
 
 
 
---------------------------------------------------------------
+------------------------------------------------------------------------------
 
+-- pass data with navigate
+   this.router.navigate(
+      ['/Vendors/VendorData', vendorId],
+      {
+        state: {IsComingFromSearch: true}
+      }
+    );
+
+at VendorData
+	const navigationExtras = {
+        	state: { IsComingFromSearch: true }
+      	};
+
+    this.router.navigate(
+	['/Vendors/VendorData', vendorId],
+        navigationExtras
+    );
+
+-- but it has limitation if use refresh it gone
+
+-----------------------------------------------------------------------------
 
 -- Pages:  components which could be accessed via route
 	- Product

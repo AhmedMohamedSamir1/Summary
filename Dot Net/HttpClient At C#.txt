@@ -1,0 +1,66 @@
+at DI
+
+services.AddHttpClient("Creatio", client =>
+{
+    client.BaseAddress = new Uri(configure["Creatio:BaseUrl"]!); // configure is IConfigure
+});
+
+public class TestService
+{
+
+   private readonly string LoginUrl = "ServiceModel/AuthService.svc/Login";
+   private readonly HttpClient _client;
+
+   public TestService(IHttpClientFactory httpClientFactory){
+	
+	_client = httpClientFactory.CreateClient("Creatio");
+
+   }
+
+ }
+
+
+   var request = new HttpRequestMessage(HttpMethod.Post, this.LoginUrl);
+   var json = JsonSerializer.Serialize(loginDTO);
+   request.Headers.Add("ForceUseSession", "true");
+   request.Content = new StringContent(json, Encoding.UTF8, "application/json");
+   HttpResponseMessage? response = await _client.SendAsync(request);
+   if(response==null)
+	return OperationResult<CreatioLoginResultDTO>.Fail("Request without response", HttpStatusCode.BadGateway);
+
+    response.EnsureSuccessStatusCode(); // trow exception if HttpResponseMessage.IsSuccessStatusCode = false
+    
+    if (!response.IsSuccessStatusCode)
+    {
+    	return OperationResult<CreatioLoginResultDTO>.Fail("Failed Request", HttpStatusCode.BadRequest); // 400
+    }
+    
+   ResponseDTO resDTO = await response.Content.ReadFromJsonAsync<ResponseDTO>(); 
+   
+   // check if you get what do expect
+   if(resDTO.xx || resDTO.yy  ... ){
+	return failed operation or what do you want    
+   }
+
+   // to get BPMCSRF token from cookies
+   if (response.Headers.TryGetValues("Set-Cookie", out var cookies))
+   {
+    	var cookieList = cookies.Select(c => c.Split(';')[0]).ToList();
+    	var csrfCookie = cookieList.FirstOrDefault(c => c.StartsWith("BPMCSRF"));
+    	if (csrfCookie != null)
+        	creatioLoginResultDTO.BPMCSRF = csrfCookie?.Split('=')[1];
+   } 
+  
+
+
+
+
+-------------------------------------------------
+
+code to help
+
+string? ResponseBodyAsString = response.Content.ReadAsStringAsync(); // response type is HttpResponseMessage --> HttpResponseMessage response = await _client.SendAsync(request);
+
+
+
+
