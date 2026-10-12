@@ -52,6 +52,9 @@
 - QR Coder Package
 	- Install-Package QRCoder
 
+-- Image
+	- Install-Package SixLabors.ImageSharp
+
 - phone number
 	- Install-Package libphonenumber-csharp
 - Swagger
