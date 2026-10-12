@@ -118,12 +118,31 @@
 
 ---------------------------------------------------------------------------
 
-
 << code >>
 
+--- HTML
+	<div class="canvas-holder mx-auto bg-danger w-100 mw-100">
+		<canvas #canvasElement></canvas>
+	</div>
 
-@ViewChild('canvasElement') canvasRef!: ElementRef<HTMLCanvasElement>;
-private canvas!: fabric.Canvas;
+--- Generated HTML
+	<div class="canvas-holder mx-auto bg-danger w-100 mw-100">
+	   <div class="canvas-container">
+		<canvas class="lower-canvas"></canvas>
+   		<canvas class="upper-canvas"></canvas>
+	   </div>
+	</div>
+
+--- TS
+
+  @ViewChild('canvasElement') canvasRef!: ElementRef<HTMLCanvasElement>;
+  private canvas!: fabric.Canvas;
+
+ 
+---
+  const parent = this.Canvas.getElement().parentElement!; // <div class="canvas-container">
+
+
 
 
 
