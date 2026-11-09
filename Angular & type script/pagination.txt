@@ -230,6 +230,71 @@
 </nav>
 
 
+----------------------------------------------------------------------------------------------------
+
+<< Pagination of angular material >>
+
+interface PageParameters {
+  PageNumber: number | null;
+  PageSize: number | null;
+  SearchText: string | null;
+}
+
+interface PaginationResult<T> {
+  items: T[];
+  currentPage: number;
+  totalPages: number;
+  pageSize: number;
+  totalCount: number;
+  hasNext: boolean;
+  hasPrevious: boolean;
+}
+
+paginationResult: PaginationResult<Category> | null = null;
+
+onPageChange(event: PageEvent): void {
+  this.pageParameters.PageNumber = event.pageIndex + 1;
+  this.pageParameters.PageSize = event.pageSize;
+  this.loadPage();
+}
+
+loadPage(): void {
+  this.categoryService.getPagedList(this.pageParameters).subscribe(result => {
+    if (result.success) {
+      this.paginationResult = result.data;
+    }
+  });
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
