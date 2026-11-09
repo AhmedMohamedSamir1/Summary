@@ -265,3 +265,9 @@ F:/professional web developement/101_summary/.git/
 
 =AND($A1<>"",ISERROR(FIND(",,",$A1)),ISNUMBER(SUMPRODUCT(LEN(SUBSTITUTE($A1,",","")))))
 
+
+
+
+
+
+
