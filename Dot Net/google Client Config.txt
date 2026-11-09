@@ -1,0 +1,6 @@
+
+
+-- Authorized JavaScript Origins
+	- which site is allowed to use Google login
+	- for example of you have an angular site that works on http://localhost:4200
+	- http://localhost:5555/

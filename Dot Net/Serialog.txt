@@ -1,0 +1,516 @@
+# Serilog Error Logging to SQL Server — Reusable Setup Guide
+
+A complete, copy-paste-ready setup for logging unhandled exceptions into a SQL Server `ErrorLogs` table using Serilog + a global exception-handling middleware.
+
+---
+
+## 1. NuGet Packages
+
+Install these in your **Web API project** (`.csproj`):
+
+```xml
+<PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />
+<PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
+<PackageReference Include="Serilog.Sinks.MSSqlServer" Version="10.0.0" />
+```
+
+```powershell
+dotnet add package Serilog.AspNetCore --version 10.0.0
+dotnet add package Serilog.Sinks.Console --version 6.1.1
+dotnet add package Serilog.Sinks.MSSqlServer --version 10.0.0
+```
+
+--------------------------------------------------------------------------
+
+## 2. SQL Server Migration / Table
+
+Create the `ErrorLogs` table (via EF Core migration or raw SQL):
+
+```sql
+CREATE TABLE [dbo].[ErrorLogs] (
+    [Id]                INT             IDENTITY(1,1) NOT NULL PRIMARY KEY,
+    [ErrorMessage]      NVARCHAR(MAX)   NOT NULL,       -- Serilog's "Message"
+    [StackTrace]        NVARCHAR(MAX)   NULL,           -- Serilog's "Exception"
+    [CreatedAt]         DATETIME2       NOT NULL DEFAULT GETDATE(),  -- Serilog's "TimeStamp"
+    [Level]             NVARCHAR(128)   NULL,           -- Serilog standard column
+    [Controller]        NVARCHAR(150)   NULL,
+    [Action]            NVARCHAR(150)   NULL,
+    [Method]            NVARCHAR(20)    NULL,
+    [InnerErrorMessage] NVARCHAR(MAX)   NULL,
+    [ExceptionType]     NVARCHAR(250)   NULL,
+    [RequestPath]       NVARCHAR(500)   NULL,
+    [QueryString]       NVARCHAR(1000)  NULL,
+    [RequestBody]       NVARCHAR(MAX)   NULL,
+    [UserId]            NVARCHAR(100)   NULL,
+    [StatusCode]        INT             NULL,
+    [UpdatedAt]         DATETIME2       NULL
+);
+```
+
+> [!NOTE]
+> If you use EF Core, create an `ErrorLog` entity + migration instead (see Section 5 below).
+
+---
+
+## 3. SerilogConfiguration.cs
+
+Create a `Logging/` folder in your Web project and add this file:
+
+```csharp
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Serilog;
+using Serilog.Core;
+using Serilog.Events;
+using Serilog.Sinks.MSSqlServer;
+using System;
+using System.Collections.ObjectModel;
+using System.Data;
+using System.Security.Claims;
+
+namespace YourAppNamespace.Logging
+{
+    public static class SerilogConfiguration
+    {
+        /// <summary>
+        /// Call this in Program.cs:  builder.ConfigureSerilog();
+        /// </summary>
+        public static WebApplicationBuilder ConfigureSerilog(this WebApplicationBuilder builder)
+        {
+            builder.Host.ConfigureSerilog();
+            return builder;
+        }
+
+        public static IHostBuilder ConfigureSerilog(this IHostBuilder host)
+        {
+            return host.UseSerilog((hostContext, services, loggerConfiguration) =>
+            {
+                // ⚠️ Change "cs" to your connection string name in appsettings.json
+                var connectionString = hostContext.Configuration.GetConnectionString("cs");
+                var httpContextAccessor = services.GetRequiredService<IHttpContextAccessor>();
+
+                loggerConfiguration
+                    .MinimumLevel.Information()
+                    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+                    .Enrich.FromLogContext()
+                    .Enrich.With(new HttpContextErrorLogEnricher(httpContextAccessor))
+                    .WriteTo.Console();
+
+                if (!string.IsNullOrEmpty(connectionString))
+                {
+                    loggerConfiguration.WriteTo.MSSqlServer(
+                        connectionString: connectionString,
+                        sinkOptions: GetSinkOptions(),
+                        columnOptions: GetColumnOptions(),
+                        restrictedToMinimumLevel: LogEventLevel.Error);
+                }
+            });
+        }
+
+        public static ColumnOptions GetColumnOptions()
+        {
+            var columnOptions = new ColumnOptions();
+
+            // Remove columns we don't need
+            columnOptions.Store.Remove(StandardColumn.MessageTemplate);
+            columnOptions.Store.Remove(StandardColumn.Properties);
+
+            // Rename standard columns to match our table
+            columnOptions.Id.ColumnName = "Id";
+            columnOptions.Message.ColumnName = "ErrorMessage";
+            columnOptions.Exception.ColumnName = "StackTrace";
+            columnOptions.TimeStamp.ColumnName = "CreatedAt";
+
+            // Additional custom columns (enriched by HttpContextErrorLogEnricher)
+            columnOptions.AdditionalColumns = new Collection<SqlColumn>
+            {
+                new SqlColumn { ColumnName = "Controller",        DataType = SqlDbType.NVarChar, DataLength = 150,  AllowNull = true },
+                new SqlColumn { ColumnName = "Action",            DataType = SqlDbType.NVarChar, DataLength = 150,  AllowNull = true },
+                new SqlColumn { ColumnName = "Method",            DataType = SqlDbType.NVarChar, DataLength = 20,   AllowNull = true },
+                new SqlColumn { ColumnName = "InnerErrorMessage", DataType = SqlDbType.NVarChar, DataLength = -1,   AllowNull = true },
+                new SqlColumn { ColumnName = "ExceptionType",     DataType = SqlDbType.NVarChar, DataLength = 250,  AllowNull = true },
+                new SqlColumn { ColumnName = "RequestPath",       DataType = SqlDbType.NVarChar, DataLength = 500,  AllowNull = true },
+                new SqlColumn { ColumnName = "QueryString",       DataType = SqlDbType.NVarChar, DataLength = 1000, AllowNull = true },
+                new SqlColumn { ColumnName = "RequestBody",       DataType = SqlDbType.NVarChar, DataLength = -1,   AllowNull = true },
+                new SqlColumn { ColumnName = "UserId",            DataType = SqlDbType.NVarChar, DataLength = 100,  AllowNull = true },
+                new SqlColumn { ColumnName = "StatusCode",        DataType = SqlDbType.Int,                         AllowNull = true },
+                new SqlColumn { ColumnName = "UpdatedAt",         DataType = SqlDbType.DateTime2,                   AllowNull = true }
+            };
+
+            return columnOptions;
+        }
+
+        public static MSSqlServerSinkOptions GetSinkOptions()
+        {
+            return new MSSqlServerSinkOptions
+            {
+                TableName = "ErrorLogs",
+                AutoCreateSqlTable = false   // Set to true if you want Serilog to create the table
+            };
+        }
+    }
+
+    /// <summary>
+    /// Enriches Serilog log events with HTTP context data (controller, action, user, IP, etc.)
+    /// Runs only for Error-level and above.
+    /// </summary>
+    public class HttpContextErrorLogEnricher : ILogEventEnricher
+    {
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
+        public HttpContextErrorLogEnricher(IHttpContextAccessor httpContextAccessor)
+        {
+            _httpContextAccessor = httpContextAccessor;
+        }
+
+        public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
+        {
+            if (logEvent.Level < LogEventLevel.Error)
+                return;
+
+            // Timestamp in your preferred timezone
+            DateTime now;
+            try
+            {
+                // ⚠️ Change timezone ID to your region
+                var timeZone = TimeZoneInfo.FindSystemTimeZoneById("Africa/Cairo");
+                now = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, timeZone);
+            }
+            catch
+            {
+                now = DateTime.UtcNow;
+            }
+
+            logEvent.AddPropertyIfAbsent(propertyFactory.CreateProperty("UpdatedAt", now));
+
+            // Exception details
+            if (logEvent.Exception != null)
+            {
+                logEvent.AddPropertyIfAbsent(propertyFactory.CreateProperty(
+                    "ExceptionType", logEvent.Exception.GetType().FullName));
+
+                if (logEvent.Exception.InnerException != null)
+                {
+                    logEvent.AddPropertyIfAbsent(propertyFactory.CreateProperty(
+                        "InnerErrorMessage", logEvent.Exception.InnerException.Message));
+                }
+            }
+
+            // HTTP context details
+            var context = _httpContextAccessor.HttpContext;
+            if (context == null)
+                return;
+
+            var endpoint = context.GetEndpoint();
+            var actionDescriptor = endpoint?.Metadata.GetMetadata<ControllerActionDescriptor>();
+
+            var controller  = actionDescriptor?.ControllerName ?? context.Request.RouteValues["controller"]?.ToString();
+            var action      = actionDescriptor?.ActionName ?? context.Request.RouteValues["action"]?.ToString();
+            var method      = context.Request.Method;
+            var requestPath = context.Request.Path.Value;
+            var queryString = context.Request.QueryString.HasValue ? context.Request.QueryString.Value : null;
+
+            var userId = context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                         ?? context.User?.FindFirst("id")?.Value;
+
+            if (!string.IsNullOrEmpty(controller))
+                logEvent.AddPropertyIfAbsent(propertyFactory.CreateProperty("Controller", controller));
+
+            if (!string.IsNullOrEmpty(action))
+                logEvent.AddPropertyIfAbsent(propertyFactory.CreateProperty("Action", action));
+
+            if (!string.IsNullOrEmpty(method))
+                logEvent.AddPropertyIfAbsent(propertyFactory.CreateProperty("Method", method));
+
+            if (!string.IsNullOrEmpty(requestPath))
+                logEvent.AddPropertyIfAbsent(propertyFactory.CreateProperty("RequestPath", requestPath));
+
+            if (!string.IsNullOrEmpty(queryString))
+                logEvent.AddPropertyIfAbsent(propertyFactory.CreateProperty("QueryString", queryString));
+
+            if (!string.IsNullOrEmpty(userId))
+                logEvent.AddPropertyIfAbsent(propertyFactory.CreateProperty("UserId", userId));
+
+            if (context.Response.StatusCode > 0)
+                logEvent.AddPropertyIfAbsent(propertyFactory.CreateProperty("StatusCode", context.Response.StatusCode));
+        }
+    }
+}
+```
+
+---
+
+## 4. ExceptionHandlingMiddleware.cs
+
+Create a `Middlewares/` folder and add this file:
+
+```csharp
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.Extensions.Hosting;
+using Serilog;
+using System;
+using System.IO;
+using System.Net;
+using System.Text;
+using System.Text.Json;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+
+namespace YourAppNamespace.Middlewares
+{
+    public class ExceptionHandlingMiddleware
+    {
+        private readonly RequestDelegate _next;
+        private readonly IWebHostEnvironment _env;
+
+        public ExceptionHandlingMiddleware(RequestDelegate next, IWebHostEnvironment env)
+        {
+            _next = next;
+            _env = env;
+        }
+
+        public async Task InvokeAsync(HttpContext context)
+        {
+            context.Request.EnableBuffering();
+
+            try
+            {
+                await _next(context);
+            }
+            catch (Exception ex)
+            {
+                await HandleExceptionAsync(context, ex);
+            }
+        }
+
+        private async Task HandleExceptionAsync(HttpContext context, Exception ex)
+        {
+            var requestBody = await ReadRequestBodySafelyAsync(context);
+
+            // Serilog writes to ErrorLogs table (enriched by HttpContextErrorLogEnricher)
+            Log.ForContext("RequestBody", requestBody)
+               .ForContext("StatusCode", (int)HttpStatusCode.InternalServerError)
+               .Error(ex, "{ErrorMessage}", ex.Message);
+
+            if (!context.Response.HasStarted)
+            {
+                context.Response.ContentType = "application/json";
+                context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+
+                object response;
+
+                if (_env.IsDevelopment())
+                {
+                    var endpoint = context.GetEndpoint();
+                    var actionDescriptor = endpoint?.Metadata.GetMetadata<ControllerActionDescriptor>();
+                    var controller = actionDescriptor?.ControllerName
+                                     ?? context.Request.RouteValues["controller"]?.ToString();
+                    var action = actionDescriptor?.ActionName
+                                 ?? context.Request.RouteValues["action"]?.ToString();
+
+                    response = new
+                    {
+                        success = false,
+                        statusCode = context.Response.StatusCode,
+                        message = ex.Message,
+                        exceptionType = ex.GetType().FullName,
+                        innerMessage = ex.InnerException?.Message,
+                        controller,
+                        action,
+                        method = context.Request.Method,
+                        path = context.Request.Path.Value,
+                        queryString = context.Request.QueryString.HasValue
+                                      ? context.Request.QueryString.Value : null,
+                        stackTrace = ex.StackTrace?.Split(
+                            new[] { "\r\n", "\r", "\n" },
+                            StringSplitOptions.RemoveEmptyEntries)
+                    };
+                }
+                else
+                {
+                    response = new
+                    {
+                        success = false,
+                        statusCode = context.Response.StatusCode,
+                        message = "An unexpected error occurred"
+                    };
+                }
+
+                var json = JsonSerializer.Serialize(response, new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    WriteIndented = true
+                });
+
+                await context.Response.WriteAsync(json);
+            }
+        }
+
+        /// <summary>
+        /// Reads the request body, masks sensitive fields, and truncates if too long.
+        /// </summary>
+        private static async Task<string?> ReadRequestBodySafelyAsync(HttpContext context)
+        {
+            try
+            {
+                var request = context.Request;
+                if (!request.Body.CanSeek) return null;
+
+                if (request.ContentType != null &&
+                    request.ContentType.StartsWith("multipart/form-data", StringComparison.OrdinalIgnoreCase))
+                    return "[Multipart/form-data omitted]";
+
+                request.Body.Position = 0;
+                using var reader = new StreamReader(
+                    request.Body, Encoding.UTF8,
+                    detectEncodingFromByteOrderMarks: false,
+                    bufferSize: 1024, leaveOpen: true);
+                var content = await reader.ReadToEndAsync();
+                request.Body.Position = 0;
+
+                if (string.IsNullOrWhiteSpace(content)) return null;
+
+                // Mask passwords, tokens, secrets
+                content = Regex.Replace(
+                    content,
+                    @"(""(?:password|confirmPassword|token|refreshToken|secret)""\s*:\s*"")[^""]*("")",
+                    "$1***$2",
+                    RegexOptions.IgnoreCase);
+
+                if (content.Length > 4000)
+                    content = content.Substring(0, 4000) + "... [truncated]";
+
+                return content;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+    }
+}
+```
+
+---
+
+## 5. ErrorLog Entity (if using EF Core)
+
+```csharp
+public class ErrorLog
+{
+    public int Id { get; set; }
+    public string? Controller { get; set; }
+    public string? Action { get; set; }
+    public string? Method { get; set; }
+    public string ErrorMessage { get; set; } = string.Empty;
+    public string? InnerErrorMessage { get; set; }
+    public string? StackTrace { get; set; }
+    public string? ExceptionType { get; set; }
+    public string? RequestPath { get; set; }
+    public string? QueryString { get; set; }
+    public string? RequestBody { get; set; }
+    public string? UserId { get; set; }
+    public int? StatusCode { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; }
+}
+```
+
+**EF Core Fluent Configuration:**
+
+```csharp
+public class ErrorLogMap : IEntityTypeConfiguration<ErrorLog>
+{
+    public void Configure(EntityTypeBuilder<ErrorLog> builder)
+    {
+        builder.ToTable("ErrorLogs");
+
+        builder.Property(e => e.Controller).HasMaxLength(150);
+        builder.Property(e => e.Action).HasMaxLength(150);
+        builder.Property(e => e.Method).HasMaxLength(20);
+        builder.Property(e => e.ErrorMessage).IsRequired();
+        builder.Property(e => e.ExceptionType).HasMaxLength(250);
+        builder.Property(e => e.RequestPath).HasMaxLength(500);
+        builder.Property(e => e.QueryString).HasMaxLength(1000);
+        builder.Property(e => e.UserId).HasMaxLength(100);
+
+        builder.Property(e => e.CreatedAt).HasDefaultValueSql("GETDATE()");
+        builder.Property(e => e.UpdatedAt).HasDefaultValueSql("GETDATE()");
+    }
+}
+```
+
+Then add to your `DbContext`:
+```csharp
+public DbSet<ErrorLog> ErrorLogs { get; set; }
+```
+
+Run:
+```powershell
+Add-Migration AddErrorLogsTable
+Update-Database
+```
+
+---
+
+## 6. Program.cs — Wiring It All Up
+
+```csharp
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddControllers();
+
+// ✅ Required: register IHttpContextAccessor BEFORE ConfigureSerilog
+builder.Services.AddHttpContextAccessor();
+
+// ✅ One-liner to set up all Serilog configuration
+builder.ConfigureSerilog();
+
+var app = builder.Build();
+
+// ✅ Register the global exception handler (should be early in the pipeline)
+app.UseMiddleware<ExceptionHandlingMiddleware>();
+
+app.UseHttpsRedirection();
+app.UseAuthentication();
+app.UseAuthorization();
+app.MapControllers();
+app.Run();
+```
+
+---
+
+## 7. How It Works — Flow Diagram
+
+```mermaid
+flowchart TD
+    A["HTTP Request"] --> B["ExceptionHandlingMiddleware"]
+    B --> C{"Exception thrown?"}
+    C -->|No| D["Normal Response"]
+    C -->|Yes| E["Read & mask request body"]
+    E --> F["Log.Error with Serilog"]
+    F --> G["HttpContextErrorLogEnricher enriches log event"]
+    G --> H["Serilog.Sinks.MSSqlServer writes to ErrorLogs table"]
+    F --> I{"IsDevelopment?"}
+    I -->|Yes| J["Return detailed JSON:\nmessage, stackTrace, controller,\naction, innerMessage, etc."]
+    I -->|No| K["Return generic JSON:\n'An unexpected error occurred'"]
+```
+
+---
+
+## 8. Quick Checklist for New Projects
+
+- [ ] Install the 3 NuGet packages
+- [ ] Add `appsettings.json` connection string named `"cs"` (or change the key)
+- [ ] Copy `Logging/SerilogConfiguration.cs` — change namespace & timezone
+- [ ] Copy `Middlewares/ExceptionHandlingMiddleware.cs` — change namespace
+- [ ] Create `ErrorLogs` table (SQL script or EF Core migration)
+- [ ] Wire up in `Program.cs`: `AddHttpContextAccessor()` → `ConfigureSerilog()` → `UseMiddleware<ExceptionHandlingMiddleware>()`
+
+> [!TIP]
+> Set `AutoCreateSqlTable = true` in `GetSinkOptions()` if you want Serilog to auto-create the table on first run (useful for quick prototyping, but EF Core migrations give you more control).
